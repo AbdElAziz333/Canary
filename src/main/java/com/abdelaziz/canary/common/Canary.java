@@ -1,4 +1,4 @@
-package com.abdelaziz.canary;
+package com.abdelaziz.canary.common;
 
 import com.abdelaziz.canary.common.config.CanaryConfig;
 import com.mojang.logging.LogUtils;

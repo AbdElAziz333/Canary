@@ -23,7 +23,7 @@ import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
  * stack list also changes. For example, an inventory which only accepts an item if it already contains an item of the
  * same type would work fine (changing the acceptance condition only happens when changing the inventory contents here).
  * However, an inventory which accepts an item only if a certain block is near its position will need to signal this
- * change to hoppers by calling {@link LithiumDefaultedList#changedInteractionConditions()}.
+ * change to hoppers by calling {@link CanaryDefaultedList#changedInteractionConditions()}.
  *
  * @author 2No2Name
  */

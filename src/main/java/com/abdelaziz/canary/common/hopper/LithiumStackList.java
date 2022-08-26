@@ -1,6 +1,6 @@
 package com.abdelaziz.canary.common.hopper;
 
-import com.abdelaziz.canary.api.inventory.LithiumDefaultedList;
+import com.abdelaziz.canary.api.inventory.CanaryDefaultedList;
 import com.abdelaziz.canary.common.block.entity.inventory_change_tracking.InventoryChangeTracker;
 import com.abdelaziz.canary.mixin.block.hopper.DefaultedListAccessor;
 import net.minecraft.core.NonNullList;
@@ -10,7 +10,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
-public class LithiumStackList extends NonNullList<ItemStack> implements LithiumDefaultedList {
+public class LithiumStackList extends NonNullList<ItemStack> implements CanaryDefaultedList {
     final int maxCountPerStack;
 
     protected int cachedSignalStrength;

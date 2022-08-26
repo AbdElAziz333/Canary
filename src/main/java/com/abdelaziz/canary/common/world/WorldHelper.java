@@ -4,7 +4,6 @@ import com.abdelaziz.canary.client.world.ClientWorldAccessor;
 import com.abdelaziz.canary.common.entity.pushable.EntityPushablePredicate;
 import com.abdelaziz.canary.common.world.chunk.ClassGroupFilterableList;
 import com.abdelaziz.canary.common.entity.EntityClassGroup;
-import com.abdelaziz.canary.common.ClimbingMobCachingSection;
 import com.abdelaziz.canary.mixin.chunk.entity_class_groups.TransientEntitySectionManagerAccessor;
 import com.abdelaziz.canary.mixin.chunk.entity_class_groups.EntitySectionAccessor;
 import com.abdelaziz.canary.mixin.chunk.entity_class_groups.PersistentEntitySectionManagerAccessor;

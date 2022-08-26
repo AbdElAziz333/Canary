@@ -3,7 +3,7 @@ package com.abdelaziz.canary.api.inventory;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 
-public interface LithiumDefaultedList {
+public interface CanaryDefaultedList {
     /**
      * Call this method when the behavior of
      * {@link net.minecraft.world.Container#canPlaceItem(int, ItemStack)}

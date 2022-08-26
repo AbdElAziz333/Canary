@@ -1,6 +1,6 @@
 package com.abdelaziz.canary.mixin.entity.collisions.unpushable_cramming;
 
-import com.abdelaziz.canary.common.ClimbingMobCachingSection;
+import com.abdelaziz.canary.common.world.ClimbingMobCachingSection;
 import com.abdelaziz.canary.common.entity.pushable.BlockCachingEntity;
 import com.abdelaziz.canary.common.entity.pushable.EntityPushablePredicate;
 import com.abdelaziz.canary.common.entity.pushable.PushableEntityClassGroup;

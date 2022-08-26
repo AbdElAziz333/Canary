@@ -1,6 +1,6 @@
 package com.abdelaziz.canary.mixin;
 
-import com.abdelaziz.canary.Canary;
+import com.abdelaziz.canary.common.Canary;
 import com.abdelaziz.canary.common.config.CanaryConfig;
 import com.abdelaziz.canary.common.config.Option;
 import org.apache.logging.log4j.LogManager;
