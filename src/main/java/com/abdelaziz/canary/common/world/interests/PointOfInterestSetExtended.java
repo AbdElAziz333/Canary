@@ -9,6 +9,6 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public interface PointOfInterestSetExtended {
-    void collectMatchingPoints(Predicate<Holder<PoiType>> type, PoiManager.Occupancy status,
+    void collectMatchingPoints(Predicate<PoiType> type, PoiManager.Occupancy status,
                                Consumer<PoiRecord> consumer);
 }

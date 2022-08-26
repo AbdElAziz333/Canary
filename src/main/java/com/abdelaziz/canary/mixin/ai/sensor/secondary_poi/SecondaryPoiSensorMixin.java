@@ -18,7 +18,7 @@ public class SecondaryPoiSensorMixin {
             cancellable = true
     )
     private void skipUselessSense(ServerLevel serverWorld, Villager villagerEntity, CallbackInfo ci) {
-        if (villagerEntity.getVillagerData().getProfession().secondaryPoi().isEmpty()) {
+        if (villagerEntity.getVillagerData().getProfession().getSecondaryPoi().isEmpty()) {
             villagerEntity.getBrain().eraseMemory(MemoryModuleType.SECONDARY_JOB_SITE);
             ci.cancel();
         }

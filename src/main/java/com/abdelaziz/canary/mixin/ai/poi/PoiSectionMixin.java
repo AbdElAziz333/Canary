@@ -32,7 +32,7 @@ public class PoiSectionMixin implements PointOfInterestSetExtended {
     @Mutable
     @Shadow
     @Final
-    private Map<Holder<PoiType>, Set<PoiRecord>> pointsOfInterestByType;
+    private Map<PoiType, Set<PoiRecord>> pointsOfInterestByType;
 
     private static <K, V> Iterable<? extends Map.Entry<K, V>> getPointsByTypeIterator(Map<K, V> map) {
         if (map instanceof Reference2ReferenceMap) {
@@ -48,7 +48,7 @@ public class PoiSectionMixin implements PointOfInterestSetExtended {
     }
 
     @Override
-    public void collectMatchingPoints(Predicate<Holder<PoiType>> type, PoiManager.Occupancy status, Consumer<PoiRecord> consumer) {
+    public void collectMatchingPoints(Predicate<PoiType> type, PoiManager.Occupancy status, Consumer<PoiRecord> consumer) {
         if (type instanceof SinglePointOfInterestTypeFilter) {
             this.getWithSingleTypeFilter(((SinglePointOfInterestTypeFilter) type).getType(), status, consumer);
         } else {
@@ -56,8 +56,8 @@ public class PoiSectionMixin implements PointOfInterestSetExtended {
         }
     }
 
-    private void getWithDynamicTypeFilter(Predicate<Holder<PoiType>> type, PoiManager.Occupancy status, Consumer<PoiRecord> consumer) {
-        for (Map.Entry<Holder<PoiType>, Set<PoiRecord>> entry : getPointsByTypeIterator(this.pointsOfInterestByType)) {
+    private void getWithDynamicTypeFilter(Predicate<PoiType> type, PoiManager.Occupancy status, Consumer<PoiRecord> consumer) {
+        for (Map.Entry<PoiType, Set<PoiRecord>> entry : getPointsByTypeIterator(this.pointsOfInterestByType)) {
             if (!type.test(entry.getKey())) {
                 continue;
             }
@@ -72,7 +72,7 @@ public class PoiSectionMixin implements PointOfInterestSetExtended {
         }
     }
 
-    private void getWithSingleTypeFilter(Holder<PoiType> type, PoiManager.Occupancy status, Consumer<PoiRecord> consumer) {
+    private void getWithSingleTypeFilter(PoiType type, PoiManager.Occupancy status, Consumer<PoiRecord> consumer) {
         Set<PoiRecord> entries = this.pointsOfInterestByType.get(type);
 
         if (entries == null || entries.isEmpty()) {

@@ -17,6 +17,6 @@ public class LevelMixin {
         if (pos == null) {
             return false;
         }
-        return instance.shouldTickBlocksAt(pos);
+        return instance.shouldTickBlocksAt(pos.asLong());
     }
 }

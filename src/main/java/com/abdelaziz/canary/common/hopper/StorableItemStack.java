@@ -1,11 +1,11 @@
 package com.abdelaziz.canary.common.hopper;
 
-import com.abdelaziz.canary.common.hopper.LithiumStackList;
+import com.abdelaziz.canary.common.hopper.CanaryStackList;
 
 public interface StorableItemStack {
-    void registerToInventory(LithiumStackList itemStacks, int slot);
+    void registerToInventory(CanaryStackList itemStacks, int slot);
 
-    void unregisterFromInventory(LithiumStackList myInventoryList);
+    void unregisterFromInventory(CanaryStackList myInventoryList);
 
-    void unregisterFromInventory(LithiumStackList stackList, int index);
+    void unregisterFromInventory(CanaryStackList stackList, int index);
 }

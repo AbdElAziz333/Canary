@@ -10,7 +10,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
-public class LithiumStackList extends NonNullList<ItemStack> implements CanaryDefaultedList {
+public class CanaryStackList extends NonNullList<ItemStack> implements CanaryDefaultedList {
     final int maxCountPerStack;
 
     protected int cachedSignalStrength;
@@ -26,7 +26,7 @@ public class LithiumStackList extends NonNullList<ItemStack> implements CanaryDe
 
     InventoryChangeTracker inventoryModificationCallback;
 
-    public LithiumStackList(NonNullList<ItemStack> original, int maxCountPerStack) {
+    public CanaryStackList(NonNullList<ItemStack> original, int maxCountPerStack) {
         //noinspection unchecked
         super(((DefaultedListAccessor<ItemStack>) original).getDelegate(), ItemStack.EMPTY);
         this.maxCountPerStack = maxCountPerStack;
@@ -54,12 +54,13 @@ public class LithiumStackList extends NonNullList<ItemStack> implements CanaryDe
         this.inventoryModificationCallback = null;
     }
 
-    public LithiumStackList(int maxCountPerStack) {
+    public CanaryStackList(int maxCountPerStack) {
         super(null, ItemStack.EMPTY);
         this.maxCountPerStack = maxCountPerStack;
         this.cachedSignalStrength = -1;
         this.inventoryModificationCallback = null;
     }
+
     public long getModCount() {
         return this.modCount;
     }
@@ -226,7 +227,7 @@ public class LithiumStackList extends NonNullList<ItemStack> implements CanaryDe
      * @param masterStackList the stacklist of the inventory that comparators read from (double inventory for double chests)
      * @param inventory       the blockentity / inventory that this stacklist is inside
      */
-    public void runComparatorUpdatePatternOnFailedExtract(LithiumStackList masterStackList, Container inventory) {
+    public void runComparatorUpdatePatternOnFailedExtract(CanaryStackList masterStackList, Container inventory) {
         if (inventory instanceof BlockEntity) {
             if (this.cachedComparatorUpdatePattern == null) {
                 this.cachedComparatorUpdatePattern = HopperHelper.determineComparatorUpdatePattern(inventory, masterStackList);

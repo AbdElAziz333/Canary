@@ -1,6 +1,6 @@
-modLoader="javafml"
-loaderVersion="[42,)"
-license="LGPL-3.0-only"
+modLoader = "javafml"
+loaderVersion = "[40,)"
+license = "LGPL-3.0-only"
 #issueTrackerURL="https://change.me.to.your.issue.tracker.example.invalid/"
 [[mods]]
 modId="canary"
@@ -8,25 +8,25 @@ version="${file.jarVersion}"
 displayName="Canary"
 #updateJSONURL="https://change.me.example.invalid/updates.json"
 #displayURL="https://change.me.to.your.mods.homepage.example.invalid/"
-logoFile="logo.png"
-credits="AbdElAziz" #JellySquid, 2No2Name
-authors="AbdElAziz"
+logoFile = "logo.png"
+credits = "AbdElAziz, JellySquid, 2No2Name"
+authors = "AbdElAziz"
 displayTest="MATCH_VERSION"
 
-description='''
-A performance optimization mod for Minecraft.
+description= '''
+Canary is a free and open-source optimization mod for Minecraft which makes a wide range of performance improvements to the game.
 '''
-#Lithium is a free and open-source optimization mod for Minecraft which makes a wide range of performance improvements to the game.
+
 [[dependencies.canary]]
     modId="forge"
-    mandatory=true
-    versionRange="[42,)"
-    ordering="NONE"
+mandatory = true
+versionRange = "[40,)"
+ordering = "NONE"
     side="BOTH"
 
 [[dependencies.canary]]
     modId="minecraft"
-    mandatory=true
-    versionRange="[1.19.1,1.20)"
-    ordering="NONE"
+mandatory = true
+versionRange = "[1.18.2,1.19)"
+ordering = "NONE"
     side="BOTH"

@@ -1,7 +1,7 @@
 package com.abdelaziz.canary.mixin.block.hopper;
 
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import com.abdelaziz.canary.common.hopper.LithiumStackList;
+import com.abdelaziz.canary.common.hopper.CanaryStackList;
 import com.abdelaziz.canary.common.hopper.StorableItemStack;
 import com.abdelaziz.canary.common.util.tuples.RefIntPair;
 import net.minecraft.world.item.ItemStack;
@@ -25,9 +25,9 @@ public abstract class ItemStackMixin implements StorableItemStack {
     private Object myLocation;
 
     @Override
-    public void registerToInventory(LithiumStackList itemStacks, int mySlot) {
+    public void registerToInventory(CanaryStackList itemStacks, int mySlot) {
         if (this.myLocation != null) {
-            this.lithiumRegisterMultipleInventories(itemStacks, mySlot);
+            this.canaryRegisterMultipleInventories(itemStacks, mySlot);
         } else {
             this.myLocation = itemStacks;
             this.mySlot = mySlot;
@@ -35,17 +35,17 @@ public abstract class ItemStackMixin implements StorableItemStack {
     }
 
     @Override
-    public void unregisterFromInventory(LithiumStackList stackList) {
+    public void unregisterFromInventory(CanaryStackList stackList) {
         this.unregisterFromInventory(stackList, -1);
     }
 
     @Override
-    public void unregisterFromInventory(LithiumStackList myInventoryList, int index) {
+    public void unregisterFromInventory(CanaryStackList myInventoryList, int index) {
         if (this.myLocation == myInventoryList) {
             this.myLocation = null;
             this.mySlot = -1;
         } else if (this.myLocation instanceof Set<?>) {
-            this.lithiumUnregisterMultipleInventories(myInventoryList, index);
+            this.canaryUnregisterMultipleInventories(myInventoryList, index);
         } else {
             //Todo does this even happen? This seems to be unexpected behavior
             this.myLocation = null;
@@ -55,38 +55,38 @@ public abstract class ItemStackMixin implements StorableItemStack {
     @ModifyVariable(method = "setCount(I)V", at = @At("HEAD"))
     public int updateInventory(int count) {
         if (this.myLocation != null && this.count != count) {
-            if (this.myLocation instanceof LithiumStackList stackList) {
+            if (this.myLocation instanceof CanaryStackList stackList) {
                 stackList.beforeSlotCountChange(this.mySlot, count);
             } else {
-                this.lithiumUpdateMultipleInventories();
+                this.canaryUpdateMultipleInventories();
             }
         }
         return count;
     }
 
-    private void lithiumRegisterMultipleInventories(LithiumStackList itemStacks, int mySlot) {
-        Set<RefIntPair<LithiumStackList>> stackLists;
+    private void canaryRegisterMultipleInventories(CanaryStackList itemStacks, int mySlot) {
+        Set<RefIntPair<CanaryStackList>> stackLists;
         if (this.myLocation instanceof Set<?>) {
             //noinspection unchecked
-            stackLists = (Set<RefIntPair<LithiumStackList>>) this.myLocation;
+            stackLists = (Set<RefIntPair<CanaryStackList>>) this.myLocation;
         } else {
             stackLists = new ObjectOpenHashSet<>();
             if (this.myLocation != null) {
-                RefIntPair<LithiumStackList> pair = new RefIntPair<>((LithiumStackList) this.myLocation, this.mySlot);
+                RefIntPair<CanaryStackList> pair = new RefIntPair<>((CanaryStackList) this.myLocation, this.mySlot);
                 stackLists.add(pair);
                 this.myLocation = stackLists;
                 this.mySlot = -1;
             }
         }
-        RefIntPair<LithiumStackList> pair = new RefIntPair<>(itemStacks, mySlot);
+        RefIntPair<CanaryStackList> pair = new RefIntPair<>(itemStacks, mySlot);
         stackLists.add(pair);
     }
 
-    private void lithiumUnregisterMultipleInventories(LithiumStackList itemStacks, int mySlot) {
+    private void canaryUnregisterMultipleInventories(CanaryStackList itemStacks, int mySlot) {
         //Handle shadow item technology correctly (Item in multiple inventories at once!)
         if (this.myLocation instanceof Set<?> set) {
             //noinspection unchecked
-            Set<RefIntPair<LithiumStackList>> stackLists = (Set<RefIntPair<LithiumStackList>>) set;
+            Set<RefIntPair<CanaryStackList>> stackLists = (Set<RefIntPair<CanaryStackList>>) set;
             if (mySlot >= 0) {
                 stackLists.remove(new RefIntPair<>(itemStacks, mySlot));
             } else {
@@ -96,12 +96,12 @@ public abstract class ItemStackMixin implements StorableItemStack {
         }
     }
 
-    private void lithiumUpdateMultipleInventories() {
+    private void canaryUpdateMultipleInventories() {
         //Handle shadow item technology correctly (Item in multiple inventories at once!)
         if (this.myLocation instanceof Set<?> set) {
             //noinspection unchecked
-            Set<RefIntPair<LithiumStackList>> stackLists = (Set<RefIntPair<LithiumStackList>>) set;
-            for (RefIntPair<LithiumStackList> stackListLocationPair : stackLists) {
+            Set<RefIntPair<CanaryStackList>> stackLists = (Set<RefIntPair<CanaryStackList>>) set;
+            for (RefIntPair<CanaryStackList> stackListLocationPair : stackLists) {
                 stackListLocationPair.left().beforeSlotCountChange(stackListLocationPair.right(), count);
             }
 

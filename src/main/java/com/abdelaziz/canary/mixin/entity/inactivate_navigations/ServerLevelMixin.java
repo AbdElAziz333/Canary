@@ -61,8 +61,8 @@ public abstract class ServerLevelMixin extends Level implements ServerWorldExten
 
     private ReferenceOpenHashSet<PathNavigation> activeNavigations;
 
-    protected ServerLevelMixin(WritableLevelData properties, ResourceKey<Level> registryRef, Holder<DimensionType> dimension, Supplier<ProfilerFiller> supplier, boolean isClient, boolean debugWorld, long seed, int maxChainedNeighborUpdates) {
-        super(properties, registryRef, dimension, supplier, isClient, debugWorld, seed, maxChainedNeighborUpdates);
+    protected ServerLevelMixin(WritableLevelData properties, ResourceKey<Level> registryRef, Holder<DimensionType> dimension, Supplier<ProfilerFiller> supplier, boolean isClient, boolean debugWorld, long seed) {
+        super(properties, registryRef, dimension, supplier, isClient, debugWorld, seed);
     }
 
 

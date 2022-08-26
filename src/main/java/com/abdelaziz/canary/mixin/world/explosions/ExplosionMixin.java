@@ -6,7 +6,6 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import com.abdelaziz.canary.common.util.Pos;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Explosion;
@@ -16,7 +15,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunkSection;
-import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
+import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.levelgen.RandomSource;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import org.spongepowered.asm.mixin.Final;
@@ -93,7 +93,7 @@ public abstract class ExplosionMixin {
         this.maxY = this.level.getMaxBuildHeight();
 
         boolean explodeAir = this.fire; // air blocks are only relevant for the explosion when fire should be created inside them
-        if (!explodeAir && this.level.dimension() == Level.END && this.level.dimensionTypeRegistration().is(BuiltinDimensionTypes.END)) {
+        if (!explodeAir && this.level.dimension() == Level.END && this.level.dimensionTypeRegistration().is(DimensionType.END_LOCATION)) {
             float overestimatedExplosionRange = (8 + (int) (6f * this.radius));
             int endPortalX = 0;
             int endPortalZ = 0;
@@ -133,7 +133,7 @@ public abstract class ExplosionMixin {
         // compared to a memory allocation and associated overhead of hashing real objects in a set.
         final LongOpenHashSet touched = new LongOpenHashSet(0);
 
-        final RandomSource random = this.level.random;
+        final Random random = this.level.random;
 
         // Explosions work by casting many rays through the level from the origin of the explosion
         for (int rayX = 0; rayX < 16; ++rayX) {
@@ -169,7 +169,7 @@ public abstract class ExplosionMixin {
         return added;
     }
 
-    private void performRayCast(RandomSource random, double vecX, double vecY, double vecZ, LongOpenHashSet touched) {
+    private void performRayCast(Random random, double vecX, double vecY, double vecZ, LongOpenHashSet touched) {
         double dist = Math.sqrt((vecX * vecX) + (vecY * vecY) + (vecZ * vecZ));
 
         double normX = (vecX / dist) * 0.3D;

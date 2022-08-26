@@ -3,7 +3,6 @@ package com.abdelaziz.canary.mixin.ai.poi;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 import com.abdelaziz.canary.common.world.interests.types.PointOfInterestTypeHelper;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
-import net.minecraft.world.entity.ai.village.poi.PoiTypes;
 import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -15,8 +14,8 @@ import java.util.Map;
 /**
  * Replaces the backing map type with a faster collection type which uses reference equality.
  */
-@Mixin(PoiTypes.class)
-public class PoiTypesMixin {
+@Mixin(PoiType.class)
+public class PoiTypeMixin {
     @Mutable
     @Shadow
     @Final

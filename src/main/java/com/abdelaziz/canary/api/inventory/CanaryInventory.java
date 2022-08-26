@@ -27,22 +27,22 @@ import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
  *
  * @author 2No2Name
  */
-public interface LithiumInventory extends Container {
+public interface CanaryInventory extends Container {
 
     /**
      * Getter for the inventory stack list of this inventory.
      *
      * @return inventory stack list
      */
-    NonNullList<ItemStack> getInventoryLithium();
+    NonNullList<ItemStack> getInventoryCanary();
 
     /**
      * Setter for the inventory stack list of this inventory.
-     * Used to replace the stack list with Lithium's custom stack list.
+     * Used to replace the stack list with Canary's custom stack list.
      *
      * @param inventory inventory stack list
      */
-    void setInventoryLithium(NonNullList<ItemStack> inventory);
+    void setInventoryCanary(NonNullList<ItemStack> inventory);
 
     /**
      * Generates the loot like a hopper access would do in vanilla.
@@ -50,12 +50,12 @@ public interface LithiumInventory extends Container {
      * If a modded inventory has custom loot generation code, it will be required to override this
      * loot generation method. Otherwise its loot may be generated too late.
      */
-    default void generateLootLithium() {
+    default void generateLootCanary() {
         if (this instanceof RandomizableContainerBlockEntity) {
             ((RandomizableContainerBlockEntity) this).unpackLootTable(null);
         }
         if (this instanceof AbstractMinecartContainer) {
-            ((AbstractMinecartContainer) this).unpackChestVehicleLootTable(null);
+            ((AbstractMinecartContainer) this).unpackLootTable(null);
         }
     }
 }

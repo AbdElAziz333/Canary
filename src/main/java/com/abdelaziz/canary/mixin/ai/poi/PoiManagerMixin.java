@@ -11,7 +11,6 @@ import com.abdelaziz.canary.common.world.interests.iterator.SinglePointOfInteres
 import com.abdelaziz.canary.common.world.interests.iterator.SphereChunkOrderedPoiSetSpliterator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.SectionPos;
 import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.entity.ai.village.poi.PoiManager;
@@ -44,8 +43,8 @@ import java.util.stream.StreamSupport;
 public abstract class PoiManagerMixin extends SectionStorage<PoiSection>
         implements PointOfInterestStorageExtended {
 
-    public PoiManagerMixin(Path path, Function<Runnable, Codec<PoiSection>> codecFactory, Function<Runnable, PoiSection> factory, DataFixer dataFixer, DataFixTypes dataFixTypes, boolean dsync, RegistryAccess dynamicRegistryManager, LevelHeightAccessor world) {
-        super(path, codecFactory, factory, dataFixer, dataFixTypes, dsync, dynamicRegistryManager, world);
+    public PoiManagerMixin(Path path, Function<Runnable, Codec<PoiSection>> codecFactory, Function<Runnable, PoiSection> factory, DataFixer dataFixer, DataFixTypes dataFixTypes, boolean dsync, LevelHeightAccessor world) {
+        super(path, codecFactory, factory, dataFixer, dataFixTypes, dsync, world);
     }
 
     /**
@@ -55,7 +54,7 @@ public abstract class PoiManagerMixin extends SectionStorage<PoiSection>
     @Debug
     @SuppressWarnings("unchecked")
     @Overwrite
-    public Stream<PoiRecord> getInChunk(Predicate<Holder<PoiType>> predicate, ChunkPos pos,
+    public Stream<PoiRecord> getInChunk(Predicate<PoiType> predicate, ChunkPos pos,
                                         PoiManager.Occupancy status) {
         return ((RegionBasedStorageSectionExtended<PoiSection>) this)
                 .getWithinChunkColumn(pos.x, pos.z)
@@ -69,9 +68,9 @@ public abstract class PoiManagerMixin extends SectionStorage<PoiSection>
      * @author JellySquid
      */
     @Overwrite
-    public Optional<BlockPos> getRandom(Predicate<Holder<PoiType>> typePredicate, Predicate<BlockPos> posPredicate,
-                                          PoiManager.Occupancy status, BlockPos pos, int radius,
-                                          Random rand) {
+    public Optional<BlockPos> getRandom(Predicate<PoiType> typePredicate, Predicate<BlockPos> posPredicate,
+                                        PoiManager.Occupancy status, BlockPos pos, int radius,
+                                        Random rand) {
         ArrayList<PoiRecord> list = this.withinSphereChunkSectionSorted(typePredicate, pos, radius, status);
 
         for (int i = list.size() - 1; i >= 0; i--) {
@@ -95,8 +94,8 @@ public abstract class PoiManagerMixin extends SectionStorage<PoiSection>
      * @author 2No2Name
      */
     @Overwrite
-    public Optional<BlockPos> findClosest(Predicate<Holder<PoiType>> predicate, BlockPos pos, int radius,
-                                                 PoiManager.Occupancy status) {
+    public Optional<BlockPos> findClosest(Predicate<PoiType> predicate, BlockPos pos, int radius,
+                                          PoiManager.Occupancy status) {
         return this.getNearestPosition(predicate, null, pos, radius, status);
     }
 
@@ -108,7 +107,7 @@ public abstract class PoiManagerMixin extends SectionStorage<PoiSection>
      * @author JellySquid, 2No2Name
      */
     @Overwrite
-    public Optional<BlockPos> getNearestPosition(Predicate<Holder<PoiType>> predicate,
+    public Optional<BlockPos> getNearestPosition(Predicate<PoiType> predicate,
                                                  Predicate<BlockPos> posPredicate, BlockPos pos, int radius,
                                                  PoiManager.Occupancy status) {
         Stream<PoiRecord> pointOfInterestStream = this.streamOutwards(pos, radius, status, true, false, predicate, posPredicate == null ? null : poi -> posPredicate.test(poi.getPos()));
@@ -122,7 +121,7 @@ public abstract class PoiManagerMixin extends SectionStorage<PoiSection>
      * @author JellySquid
      */
     @Overwrite
-    public long count(Predicate<Holder<PoiType>> predicate, BlockPos pos, int radius,
+    public long count(Predicate<PoiType> predicate, BlockPos pos, int radius,
                       PoiManager.Occupancy status) {
         return this.withinSphereChunkSectionSorted(predicate, pos, radius, status).size();
     }
@@ -137,15 +136,15 @@ public abstract class PoiManagerMixin extends SectionStorage<PoiSection>
      * @reason Avoid stream-heavy code, use faster filtering and fetches
      */
     @Overwrite
-    public Stream<PoiRecord> getInCircle(Predicate<Holder<PoiType>> predicate, BlockPos sphereOrigin, int radius,
-                                               PoiManager.Occupancy status) {
+    public Stream<PoiRecord> getInCircle(Predicate<PoiType> predicate, BlockPos sphereOrigin, int radius,
+                                         PoiManager.Occupancy status) {
         return this.withinSphereChunkSectionSortedStream(predicate, sphereOrigin, radius, status);
     }
 
     @Override
-    public Optional<PoiRecord> findNearestForPortalLogic(BlockPos origin, int radius, Holder<PoiType> type,
-                                                               PoiManager.Occupancy status,
-                                                               Predicate<PoiRecord> afterSortPredicate, WorldBorder worldBorder) {
+    public Optional<PoiRecord> findNearestForPortalLogic(BlockPos origin, int radius, PoiType type,
+                                                         PoiManager.Occupancy status,
+                                                         Predicate<PoiRecord> afterSortPredicate, WorldBorder worldBorder) {
         // Order of the POI:
         // return closest accepted POI (L2 distance). If several exist:
         // return the one with most negative Y. If several exist:
@@ -162,8 +161,8 @@ public abstract class PoiManagerMixin extends SectionStorage<PoiSection>
         return this.streamOutwards(origin, radius, status, true, true, new SinglePointOfInterestTypeFilter(type), poiPredicateAfterSorting).findFirst();
     }
 
-    private Stream<PoiRecord> withinSphereChunkSectionSortedStream(Predicate<Holder<PoiType>> predicate, BlockPos origin,
-                                                                         int radius, PoiManager.Occupancy status) {
+    private Stream<PoiRecord> withinSphereChunkSectionSortedStream(Predicate<PoiType> predicate, BlockPos origin,
+                                                                   int radius, PoiManager.Occupancy status) {
         double radiusSq = radius * radius;
 
 
@@ -179,8 +178,8 @@ public abstract class PoiManagerMixin extends SectionStorage<PoiSection>
         ));
     }
 
-    private ArrayList<PoiRecord> withinSphereChunkSectionSorted(Predicate<Holder<PoiType>> predicate, BlockPos origin,
-                                                                      int radius, PoiManager.Occupancy status) {
+    private ArrayList<PoiRecord> withinSphereChunkSectionSorted(Predicate<PoiType> predicate, BlockPos origin,
+                                                                int radius, PoiManager.Occupancy status) {
         double radiusSq = radius * radius;
 
         int minChunkX = origin.getX() - radius - 1 >> 4;
@@ -211,11 +210,11 @@ public abstract class PoiManagerMixin extends SectionStorage<PoiSection>
     }
 
     private Stream<PoiRecord> streamOutwards(BlockPos origin, int radius,
-                                                   PoiManager.Occupancy status,
-                                                   @SuppressWarnings("SameParameterValue") boolean useSquareDistanceLimit,
-                                                   boolean preferNegativeY,
-                                                   Predicate<Holder<PoiType>> typePredicate,
-                                                   @Nullable Predicate<PoiRecord> afterSortingPredicate) {
+                                             PoiManager.Occupancy status,
+                                             @SuppressWarnings("SameParameterValue") boolean useSquareDistanceLimit,
+                                             boolean preferNegativeY,
+                                             Predicate<PoiType> typePredicate,
+                                             @Nullable Predicate<PoiRecord> afterSortingPredicate) {
         // noinspection unchecked
         RegionBasedStorageSectionExtended<PoiSection> storage = (RegionBasedStorageSectionExtended<PoiSection>) this;
 
