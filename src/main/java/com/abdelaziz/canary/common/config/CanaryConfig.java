@@ -372,7 +372,7 @@ public class CanaryConfig {
         }
 
         try (Writer writer = new FileWriter(file)) {
-            writer.write("# This is the configuration file for Lithium.\n");
+            writer.write("# This is the configuration file for Canary.\n");
             writer.write("# This file exists for debugging purposes and should not be configured otherwise.\n");
             writer.write("#\n");
             writer.write("# You can find information on editing this file and all the available options here:\n");
