@@ -19,7 +19,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-import static com.abdelaziz.canary.common.entity.LithiumEntityCollisions.EPSILON;
+import static com.abdelaziz.canary.common.entity.CanaryEntityCollisions.EPSILON;
 
 /**
  * ChunkAwareBlockCollisionSweeper iterates over blocks in one chunk section at a time. Together with the chunk

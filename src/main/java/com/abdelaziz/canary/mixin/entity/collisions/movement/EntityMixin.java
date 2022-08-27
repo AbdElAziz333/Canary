@@ -1,6 +1,6 @@
 package com.abdelaziz.canary.mixin.entity.collisions.movement;
 
-import com.abdelaziz.canary.common.entity.LithiumEntityCollisions;
+import com.abdelaziz.canary.common.entity.CanaryEntityCollisions;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
@@ -59,14 +59,14 @@ public class EntityMixin {
             movementSpace = entityBoundingBox.expandTowards(movement);
         }
 
-        List<VoxelShape> blockCollisions = LithiumEntityCollisions.getBlockCollisions(world, entity, movementSpace);
+        List<VoxelShape> blockCollisions = CanaryEntityCollisions.getBlockCollisions(world, entity, movementSpace);
         List<VoxelShape> entityWorldBorderCollisions = null;
 
         if (velY != 0.0) {
             velY = Shapes.collide(Direction.Axis.Y, entityBoundingBox, blockCollisions, velY);
             if (velY != 0.0) {
                 if (getEntityCollisions) {
-                    entityWorldBorderCollisions = LithiumEntityCollisions.getEntityWorldBorderCollisions(world, entity, movementSpace, entity != null);
+                    entityWorldBorderCollisions = CanaryEntityCollisions.getEntityWorldBorderCollisions(world, entity, movementSpace, entity != null);
                     velY = Shapes.collide(Direction.Axis.Y, entityBoundingBox, entityWorldBorderCollisions, velY);
                 }
                 if (velY != 0.0) {
@@ -79,7 +79,7 @@ public class EntityMixin {
             velZ = Shapes.collide(Direction.Axis.Z, entityBoundingBox, blockCollisions, velZ);
             if (velZ != 0.0) {
                 if (entityWorldBorderCollisions == null && getEntityCollisions) {
-                    entityWorldBorderCollisions = LithiumEntityCollisions.getEntityWorldBorderCollisions(world, entity, movementSpace, entity != null);
+                    entityWorldBorderCollisions = CanaryEntityCollisions.getEntityWorldBorderCollisions(world, entity, movementSpace, entity != null);
                 }
                 if (getEntityCollisions) {
                     velZ = Shapes.collide(Direction.Axis.Z, entityBoundingBox, entityWorldBorderCollisions, velZ);
@@ -93,7 +93,7 @@ public class EntityMixin {
             velX = Shapes.collide(Direction.Axis.X, entityBoundingBox, blockCollisions, velX);
             if (velX != 0.0) {
                 if (entityWorldBorderCollisions == null && getEntityCollisions) {
-                    entityWorldBorderCollisions = LithiumEntityCollisions.getEntityWorldBorderCollisions(world, entity, movementSpace, entity != null);
+                    entityWorldBorderCollisions = CanaryEntityCollisions.getEntityWorldBorderCollisions(world, entity, movementSpace, entity != null);
                 }
                 if (getEntityCollisions) {
                     velX = Shapes.collide(Direction.Axis.X, entityBoundingBox, entityWorldBorderCollisions, velX);
@@ -107,7 +107,7 @@ public class EntityMixin {
             velZ = Shapes.collide(Direction.Axis.Z, entityBoundingBox, blockCollisions, velZ);
             if (velZ != 0.0 && getEntityCollisions) {
                 if (entityWorldBorderCollisions == null) {
-                    entityWorldBorderCollisions = LithiumEntityCollisions.getEntityWorldBorderCollisions(world, entity, movementSpace, entity != null);
+                    entityWorldBorderCollisions = CanaryEntityCollisions.getEntityWorldBorderCollisions(world, entity, movementSpace, entity != null);
                 }
 
                 velZ = Shapes.collide(Direction.Axis.Z, entityBoundingBox, entityWorldBorderCollisions, velZ);

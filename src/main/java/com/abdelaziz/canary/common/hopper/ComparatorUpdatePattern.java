@@ -10,11 +10,11 @@ import net.minecraft.world.level.block.entity.BlockEntity;
  * put it back right after. Some types of inventories will send comparator updates
  * every time a hopper does that. Multiple consecutive comparator updates
  * are not distinguishable from a single one and can therefore be omitted.
- *
+ * <p>
  * A hopper failing to take items can be predicted by testing whether the inventory
- * modification counter {@link LithiumStackList} of the hopper or the inventory above
+ * modification counter {@link CanaryStackList} of the hopper or the inventory above
  * have changed since just before the previous attempt to take items.
- *
+ * <p>
  * Decrementing and immediately incrementing the signal strength of an inventory
  * cannot be distinguished from setting the signal strength to 0 temporarily.
  *
@@ -37,7 +37,7 @@ public enum ComparatorUpdatePattern {
     UPDATE {
         //example: inventory with items, but removing any single item does not change the signal strength
         @Override
-        public void apply(BlockEntity blockEntity, LithiumStackList stackList) {
+        public void apply(BlockEntity blockEntity, CanaryStackList stackList) {
             blockEntity.setChanged();
         }
 
@@ -49,7 +49,7 @@ public enum ComparatorUpdatePattern {
     DECREMENT_UPDATE_INCREMENT_UPDATE {
         //example: inventory with items, but removing the first item reduces the signal strength
         @Override
-        public void apply(BlockEntity blockEntity, LithiumStackList stackList) {
+        public void apply(BlockEntity blockEntity, CanaryStackList stackList) {
             stackList.setReducedSignalStrengthOverride();
             blockEntity.setChanged();
             stackList.clearSignalStrengthOverride();
@@ -65,7 +65,7 @@ public enum ComparatorUpdatePattern {
         //example: inventory with items, removing the first item does not reduce the signal strength,
         // but there is another item that will reduce the signal strength when removed
         @Override
-        public void apply(BlockEntity blockEntity, LithiumStackList stackList) {
+        public void apply(BlockEntity blockEntity, CanaryStackList stackList) {
             blockEntity.setChanged();
             stackList.setReducedSignalStrengthOverride();
             blockEntity.setChanged();
@@ -79,7 +79,7 @@ public enum ComparatorUpdatePattern {
         }
     };
 
-    public void apply(BlockEntity blockEntity, LithiumStackList stackList) {
+    public void apply(BlockEntity blockEntity, CanaryStackList stackList) {
 
     }
 

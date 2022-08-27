@@ -8,26 +8,26 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Class to allow DoubleInventory to have LithiumStackList optimizations.
+ * Class to allow DoubleInventory to have CanaryStackList optimizations.
  * The objects should be immutable and their state should be limited to the first and second inventory.
  * Other state must be managed carefully, as at any time objects of this class may be replaced with new instances.
  */
-public class LithiumDoubleStackList extends LithiumStackList {
-    private final LithiumStackList first;
-    private final LithiumStackList second;
+public class CanaryDoubleStackList extends CanaryStackList {
+    private final CanaryStackList first;
+    private final CanaryStackList second;
 
     private long signalStrengthChangeCount;
 
-    public LithiumDoubleStackList(LithiumStackList first, LithiumStackList second, int maxCountPerStack) {
+    public CanaryDoubleStackList(CanaryStackList first, CanaryStackList second, int maxCountPerStack) {
         super(maxCountPerStack);
         this.first = first;
         this.second = second;
     }
 
-    public static LithiumStackList getOrCreate(LithiumStackList first, LithiumStackList second, int maxCountPerStack) {
-        LithiumDoubleStackList parentStackList = first.parent;
+    public static CanaryStackList getOrCreate(CanaryStackList first, CanaryStackList second, int maxCountPerStack) {
+        CanaryDoubleStackList parentStackList = first.parent;
         if (parentStackList == null || parentStackList != second.parent) {
-            parentStackList = new LithiumDoubleStackList(first, second, maxCountPerStack);
+            parentStackList = new CanaryDoubleStackList(first, second, maxCountPerStack);
             first.parent = parentStackList;
             second.parent = parentStackList;
         }
@@ -105,15 +105,15 @@ public class LithiumDoubleStackList extends LithiumStackList {
 
     /**
      * @param masterStackList the stacklist of the inventory that comparators read from (double inventory for double chests)
-     * @param inventory the blockentity / inventory that this stacklist is inside
+     * @param inventory       the blockentity / inventory that this stacklist is inside
      */
-    public void runComparatorUpdatePatternOnFailedExtract(LithiumStackList masterStackList, Container inventory) {
+    public void runComparatorUpdatePatternOnFailedExtract(CanaryStackList masterStackList, Container inventory) {
         if (inventory instanceof CompoundContainer) {
             this.first.runComparatorUpdatePatternOnFailedExtract(
-                    this, ((DoubleInventoryAccessor)inventory).getFirst()
+                    this, ((DoubleInventoryAccessor) inventory).getFirst()
             );
             this.second.runComparatorUpdatePatternOnFailedExtract(
-                    this, ((DoubleInventoryAccessor)inventory).getSecond()
+                    this, ((DoubleInventoryAccessor) inventory).getSecond()
             );
         }
     }

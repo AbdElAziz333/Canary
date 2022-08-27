@@ -1,6 +1,6 @@
 package com.abdelaziz.canary.mixin.entity.collisions.intersection;
 
-import com.abdelaziz.canary.common.entity.LithiumEntityCollisions;
+import com.abdelaziz.canary.common.entity.CanaryEntityCollisions;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.CollisionGetter;
 import net.minecraft.world.level.EntityGetter;
@@ -23,16 +23,16 @@ public interface CollisionGetterMixin {
      */
     @Overwrite
     default boolean isSpaceEmpty(@Nullable Entity entity, AABB box) {
-        boolean ret = !LithiumEntityCollisions.doesBoxCollideWithBlocks((CollisionGetter) this, entity, box);
+        boolean ret = !CanaryEntityCollisions.doesBoxCollideWithBlocks((CollisionGetter) this, entity, box);
 
         // If no blocks were collided with, try to check for entity collisions if we can read entities
         if (ret && this instanceof EntityGetter) {
             //needs to include world border collision
-            ret = !LithiumEntityCollisions.doesBoxCollideWithHardEntities((EntityGetter) this, entity, box);
+            ret = !CanaryEntityCollisions.doesBoxCollideWithHardEntities((EntityGetter) this, entity, box);
         }
 
         if (ret && entity != null) {
-            ret = !LithiumEntityCollisions.doesEntityCollideWithWorldBorder((CollisionGetter) this, entity);
+            ret = !CanaryEntityCollisions.doesEntityCollideWithWorldBorder((CollisionGetter) this, entity);
         }
 
         return ret;

@@ -19,7 +19,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-public class LithiumEntityCollisions {
+public class CanaryEntityCollisions {
     public static final double EPSILON = 1.0E-7D;
 
     /**

@@ -1,4 +1,4 @@
-package com.abdelaziz.canary.common;
+package com.abdelaziz.canary.common.world;
 
 import com.abdelaziz.canary.common.entity.pushable.BlockCachingEntity;
 import com.abdelaziz.canary.common.entity.pushable.EntityPushablePredicate;

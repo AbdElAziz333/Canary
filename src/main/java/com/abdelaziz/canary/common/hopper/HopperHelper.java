@@ -106,7 +106,7 @@ public class HopperHelper {
         return Mth.floor(newContentWeight * 14.0F) + (newNumOccupiedSlots > 0 ? 1 : 0);
     }
 
-    public static ComparatorUpdatePattern determineComparatorUpdatePattern(Container from, LithiumStackList fromStackList) {
+    public static ComparatorUpdatePattern determineComparatorUpdatePattern(Container from, CanaryStackList fromStackList) {
         if ((from instanceof HopperBlockEntity) || !(from instanceof RandomizableContainerBlockEntity)) {
             return ComparatorUpdatePattern.NO_UPDATE;
         }

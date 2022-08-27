@@ -15,19 +15,19 @@ public class ReflectionUtil {
             } catch (NoSuchMethodException e) {
                 clazz = clazz.getSuperclass();
             } catch (NoClassDefFoundError error) {
-                Logger logger = LogManager.getLogger("Lithium Class Analysis");
-                logger.warn("Lithium Class Analysis Error: Class " + clazz.getName() + " cannot be analysed, because" +
+                Logger logger = LogManager.getLogger("Canary Class Analysis");
+                logger.warn("Canary Class Analysis Error: Class " + clazz.getName() + " cannot be analysed, because" +
                         " getting declared methods crashes with NoClassDefFoundError: " + error.getMessage() +
                         ". This is usually caused by modded" +
                         " entities declaring methods that have a return type or parameter type that is annotated" +
                         " with @Environment(value=EnvType.CLIENT). Loading the type is not possible, because" +
                         " it only exists in the CLIENT environment. The recommended fix is to annotate the method with" +
                         " this argument or return type with the same annotation." +
-                        " Lithium handles this error by assuming the class cannot be included in some optimizations.");
+                        " Canary handles this error by assuming the class cannot be included in some optimizations.");
                 return fallbackResult;
             } catch (Throwable e) {
                 final String crashedClass = clazz.getName();
-                CrashReport crashReport = CrashReport.forThrowable(e, "Lithium Class Analysis");
+                CrashReport crashReport = CrashReport.forThrowable(e, "Canary Class Analysis");
                 CrashReportCategory crashReportSection = crashReport.addCategory(e.getClass().toString() + " when getting declared methods.");
                 crashReportSection.setDetail("Analyzed class", crashedClass);
                 crashReportSection.setDetail("Analyzed method name", methodName);
