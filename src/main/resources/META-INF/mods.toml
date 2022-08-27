@@ -1,7 +1,7 @@
 modLoader = "javafml"
 loaderVersion = "[40,)"
 license = "LGPL-3.0-only"
-issueTrackerURL = "https://change.me.to.your.issue.tracker.example.invalid/"
+issueTrackerURL = "https://github.com/AbdElAziz333/Canary/issues"
 [[mods]]
 modId="canary"
 version="${file.jarVersion}"
