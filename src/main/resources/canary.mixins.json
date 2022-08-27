@@ -150,7 +150,6 @@
     "util.inventory_comparator_tracking.BlockEntityMixin",
     "util.inventory_comparator_tracking.ComparatorBlockMixin",
     "util.world_border_listener.WorldBorderMixin",
-    "world.biome_manager.BiomeManagerMixin",
     "world.block_entity_retrieval.LevelMixin",
     "world.block_entity_ticking.sleeping.brewing_stand.BrewingStandBlockEntityMixin",
     "world.block_entity_ticking.campfire.CampfireBlockEntityMixin",
