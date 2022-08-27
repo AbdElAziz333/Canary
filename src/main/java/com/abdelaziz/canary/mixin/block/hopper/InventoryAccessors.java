@@ -21,12 +21,12 @@ public class InventoryAccessors {
         protected abstract void setInvStackList(NonNullList<ItemStack> list);
 
         @Override
-        public NonNullList<ItemStack> getInventoryLithium() {
+        public NonNullList<ItemStack> getInventoryCanary() {
             return this.getInvStackList();
         }
 
         @Override
-        public void setInventoryLithium(NonNullList<ItemStack> inventory) {
+        public void setInventoryCanary(NonNullList<ItemStack> inventory) {
             this.setInvStackList(inventory);
         }
     }
@@ -34,32 +34,32 @@ public class InventoryAccessors {
     @Mixin(AbstractFurnaceBlockEntity.class)
     public abstract static class InventoryAccessorAbstractFurnaceBlockEntity implements CanaryInventory {
         @Accessor("inventory")
-        public abstract NonNullList<ItemStack> getInventoryLithium();
+        public abstract NonNullList<ItemStack> getInventoryCanary();
 
         @Accessor("inventory")
-        public abstract void setInventoryLithium(NonNullList<ItemStack> inventory);
+        public abstract void setInventoryCanary(NonNullList<ItemStack> inventory);
     }
 
     @Mixin(BrewingStandBlockEntity.class)
     public abstract static class InventoryAccessorBrewingStandBlockEntity implements CanaryInventory {
         @Override
         @Accessor("inventory")
-        public abstract NonNullList<ItemStack> getInventoryLithium();
+        public abstract NonNullList<ItemStack> getInventoryCanary();
 
         @Override
         @Accessor("inventory")
-        public abstract void setInventoryLithium(NonNullList<ItemStack> inventory);
+        public abstract void setInventoryCanary(NonNullList<ItemStack> inventory);
     }
 
     @Mixin(AbstractMinecartContainer.class)
     public abstract static class InventoryAccessorStorageMinecartEntity implements CanaryInventory {
         @Override
         @Accessor("inventory")
-        public abstract NonNullList<ItemStack> getInventoryLithium();
+        public abstract NonNullList<ItemStack> getInventoryCanary();
 
         @Override
         @Accessor("inventory")
-        public abstract void setInventoryLithium(NonNullList<ItemStack> inventory);
+        public abstract void setInventoryCanary(NonNullList<ItemStack> inventory);
     }
 
 }

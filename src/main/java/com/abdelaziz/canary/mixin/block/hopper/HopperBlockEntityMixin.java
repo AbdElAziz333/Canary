@@ -81,7 +81,7 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
     @Nullable
     private CanaryInventory insertInventory, extractInventory;
     @Nullable //Null iff corresp. CanaryInventory field is null
-    private LithiumStackList insertStackList, extractStackList;
+    private CanaryStackList insertStackList, extractStackList;
     //Mod count used to avoid transfer attempts that are known to fail (no change since last attempt)
     private long insertStackListModCount, extractStackListModCount;
 
@@ -131,7 +131,7 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
         }
         Container inventory = inventoryEntities.get(world.random.nextInt(inventoryEntities.size()));
         if (inventory instanceof CanaryInventory optimizedInventory) {
-            LithiumStackList extractInventoryStackList = InventoryHelper.getLithiumStackList(optimizedInventory);
+            CanaryStackList extractInventoryStackList = InventoryHelper.getCanaryStackList(optimizedInventory);
             if (inventory != hopperBlockEntity.extractInventory || hopperBlockEntity.extractStackList != extractInventoryStackList) {
                 //not caching the inventory (NO_BLOCK_INVENTORY prevents it)
                 //make change counting on the entity inventory possible, without caching it as block inventory
@@ -160,7 +160,7 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
             return insert(world, pos, hopperState, hopper);
         }
 
-        LithiumStackList hopperStackList = InventoryHelper.getLithiumStackList(hopperBlockEntity);
+        CanaryStackList hopperStackList = InventoryHelper.getCanaryStackList(hopperBlockEntity);
         if (hopperBlockEntity.insertInventory == insertInventory && hopperStackList.getModCount() == hopperBlockEntity.myModCountAtLastInsert) {
             if (hopperBlockEntity.insertStackList != null && hopperBlockEntity.insertStackList.getModCount() == hopperBlockEntity.insertStackListModCount) {
 //                ComparatorUpdatePattern.NO_UPDATE.apply(hopperBlockEntity, hopperStackList); //commented because it's a noop, Hoppers do not send useless comparator updates
@@ -216,8 +216,8 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
             return; //from inventory is not an optimized inventory, vanilla fallback
         }
 
-        LithiumStackList hopperStackList = InventoryHelper.getLithiumStackList(hopperBlockEntity);
-        LithiumStackList fromStackList = hopperBlockEntity.extractStackList;
+        CanaryStackList hopperStackList = InventoryHelper.getCanaryStackList(hopperBlockEntity);
+        CanaryStackList fromStackList = hopperBlockEntity.extractStackList;
 
         if (hopperStackList.getModCount() == hopperBlockEntity.myModCountAtLastExtract) {
             if (fromStackList.getModCount() == hopperBlockEntity.extractStackListModCount) {
@@ -273,7 +273,7 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
     )
     private static boolean lithiumHopperIsFull(HopperBlockEntity hopperBlockEntity) {
         //noinspection ConstantConditions
-        LithiumStackList lithiumStackList = InventoryHelper.getLithiumStackList((HopperBlockEntityMixin) (Object) hopperBlockEntity);
+        CanaryStackList lithiumStackList = InventoryHelper.getCanaryStackList((HopperBlockEntityMixin) (Object) hopperBlockEntity);
         return lithiumStackList.getFullSlots() == lithiumStackList.size();
     }
 
@@ -286,7 +286,7 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
     )
     private static boolean lithiumHopperIsEmpty(HopperBlockEntity hopperBlockEntity) {
         //noinspection ConstantConditions
-        LithiumStackList lithiumStackList = InventoryHelper.getLithiumStackList((HopperBlockEntityMixin) (Object) hopperBlockEntity);
+        CanaryStackList lithiumStackList = InventoryHelper.getCanaryStackList((HopperBlockEntityMixin) (Object) hopperBlockEntity);
         return lithiumStackList.getOccupiedSlots() == 0;
     }
 
@@ -328,7 +328,7 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
         if (hopperBlockEntity.collectItemEntityTracker == null) {
             hopperBlockEntity.initCollectItemEntityTracker();
         }
-        long modCount = InventoryHelper.getLithiumStackList(hopperBlockEntity).getModCount();
+        long modCount = InventoryHelper.getCanaryStackList(hopperBlockEntity).getModCount();
         if ((hopperBlockEntity.collectItemEntityTrackerWasEmpty || hopperBlockEntity.myModCountAtLastItemCollect == modCount) &&
                 hopperBlockEntity.collectItemEntityTracker.isUnchangedSince(hopperBlockEntity.collectItemEntityAttemptTime)) {
             hopperBlockEntity.collectItemEntityAttemptTime = hopperBlockEntity.lastTickTime;
@@ -381,7 +381,7 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
 
     private void cacheInsertCanaryInventory(CanaryInventory optimizedInventory) {
         this.insertInventory = optimizedInventory;
-        LithiumStackList insertInventoryStackList = InventoryHelper.getLithiumStackList(optimizedInventory);
+        CanaryStackList insertInventoryStackList = InventoryHelper.getCanaryStackList(optimizedInventory);
         this.insertStackList = insertInventoryStackList;
         this.insertStackListModCount = insertInventoryStackList.getModCount() - 1;
     }
@@ -430,7 +430,7 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
 
         if (extractInventory instanceof CanaryInventory optimizedInventory) {
             this.extractInventory = optimizedInventory;
-            LithiumStackList extractInventoryStackList = InventoryHelper.getLithiumStackList(optimizedInventory);
+            CanaryStackList extractInventoryStackList = InventoryHelper.getCanaryStackList(optimizedInventory);
             this.extractStackList = extractInventoryStackList;
             this.extractStackListModCount = extractInventoryStackList.getModCount() - 1;
         } else {
@@ -459,7 +459,7 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
                     pos.getZ() == thisPos.getZ()) {
                 CanaryInventory optimizedInventory;
                 if ((optimizedInventory = this.extractInventory) != null) {
-                    LithiumStackList insertInventoryStackList = InventoryHelper.getLithiumStackList(optimizedInventory);
+                    CanaryStackList insertInventoryStackList = InventoryHelper.getCanaryStackList(optimizedInventory);
                     //This check is necessary as sometimes the stacklist is silently replaced (e.g. command making furnace read inventory from nbt)
                     if (insertInventoryStackList == this.extractStackList) {
                         return optimizedInventory;
@@ -496,7 +496,7 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
                     pos.equals(transferPos)) {
                 CanaryInventory optimizedInventory;
                 if ((optimizedInventory = this.insertInventory) != null) {
-                    LithiumStackList insertInventoryStackList = InventoryHelper.getLithiumStackList(optimizedInventory);
+                    CanaryStackList insertInventoryStackList = InventoryHelper.getCanaryStackList(optimizedInventory);
                     //This check is necessary as sometimes the stacklist is silently replaced (e.g. command making furnace read inventory from nbt)
                     if (insertInventoryStackList == this.insertStackList) {
                         return optimizedInventory;
@@ -541,7 +541,7 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
         }
         Container inventory = inventoryEntities.get(world.random.nextInt(inventoryEntities.size()));
         if (inventory instanceof CanaryInventory optimizedInventory) {
-            LithiumStackList insertInventoryStackList = InventoryHelper.getLithiumStackList(optimizedInventory);
+            CanaryStackList insertInventoryStackList = InventoryHelper.getCanaryStackList(optimizedInventory);
             if (inventory != this.insertInventory || this.insertStackList != insertInventoryStackList) {
                 this.cacheInsertCanaryInventory(optimizedInventory);
             }
@@ -711,7 +711,7 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
                 boolean listenToExtractEntities = false;
                 boolean listenToInsertEntities = false;
 
-                LithiumStackList thisStackList = InventoryHelper.getLithiumStackList(this);
+                CanaryStackList thisStackList = InventoryHelper.getCanaryStackList(this);
 
                 if (this.extractionMode != HopperCachingState.BlockInventory.BLOCK_STATE && !this.isFull()) {
                     if (this.extractionMode == HopperCachingState.BlockInventory.REMOVAL_TRACKING_BLOCK_ENTITY) {
