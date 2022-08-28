@@ -55,7 +55,7 @@ public interface CanaryInventory extends Container {
             ((RandomizableContainerBlockEntity) this).unpackLootTable(null);
         }
         if (this instanceof AbstractMinecartContainer) {
-            ((AbstractMinecartContainer) this).unpackLootTable(null);
+            ((AbstractMinecartContainer) this).unpackChestVehicleLootTable(null);
         }
     }
 }

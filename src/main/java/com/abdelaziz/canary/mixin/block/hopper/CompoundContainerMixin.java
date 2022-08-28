@@ -1,13 +1,13 @@
 package com.abdelaziz.canary.mixin.block.hopper;
 
-import com.abdelaziz.canary.api.inventory.LithiumInventory;
+import com.abdelaziz.canary.api.inventory.CanaryInventory;
 import com.abdelaziz.canary.common.block.entity.inventory_change_tracking.InventoryChangeEmitter;
 import com.abdelaziz.canary.common.block.entity.inventory_change_tracking.InventoryChangeListener;
 import com.abdelaziz.canary.common.block.entity.inventory_change_tracking.InventoryChangeTracker;
 import com.abdelaziz.canary.common.block.entity.inventory_comparator_tracking.ComparatorTracker;
 import com.abdelaziz.canary.common.hopper.InventoryHelper;
-import com.abdelaziz.canary.common.hopper.LithiumDoubleStackList;
-import com.abdelaziz.canary.common.hopper.LithiumStackList;
+import com.abdelaziz.canary.common.hopper.CanaryDoubleStackList;
+import com.abdelaziz.canary.common.hopper.CanaryStackList;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
@@ -21,7 +21,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import java.util.ArrayList;
 
 @Mixin(CompoundContainer.class)
-public abstract class CompoundContainerMixin implements LithiumInventory, InventoryChangeTracker, InventoryChangeEmitter, InventoryChangeListener, ComparatorTracker {
+public abstract class CompoundContainerMixin implements CanaryInventory, InventoryChangeTracker, InventoryChangeEmitter, InventoryChangeListener, ComparatorTracker {
     @Shadow
     @Final
     private Container container1;
@@ -33,7 +33,7 @@ public abstract class CompoundContainerMixin implements LithiumInventory, Invent
     @Shadow
     public abstract int getMaxCountPerStack();
 
-    private LithiumStackList cachedList;
+    private CanaryStackList cachedList;
 
     ArrayList<InventoryChangeListener> inventoryChangeListeners = null;
     ReferenceOpenHashSet<InventoryChangeListener> inventoryHandlingTypeListeners = null;
@@ -77,7 +77,7 @@ public abstract class CompoundContainerMixin implements LithiumInventory, Invent
     }
 
     @Override
-    public void forwardContentChangeOnce(InventoryChangeListener inventoryChangeListener, LithiumStackList stackList, InventoryChangeTracker thisTracker) {
+    public void forwardContentChangeOnce(InventoryChangeListener inventoryChangeListener, CanaryStackList stackList, InventoryChangeTracker thisTracker) {
         if (this.inventoryChangeListeners == null) {
             this.inventoryChangeListeners = new ArrayList<>(1);
         }
@@ -109,19 +109,19 @@ public abstract class CompoundContainerMixin implements LithiumInventory, Invent
     }
 
     @Override
-    public NonNullList<ItemStack> getInventoryLithium() {
+    public NonNullList<ItemStack> getInventoryCanary() {
         if (this.cachedList != null) {
             return this.cachedList;
         }
-        return this.cachedList = LithiumDoubleStackList.getOrCreate(
-                InventoryHelper.getLithiumStackList((LithiumInventory) this.container1),
-                InventoryHelper.getLithiumStackList((LithiumInventory) this.container2),
+        return this.cachedList = CanaryDoubleStackList.getOrCreate(
+                InventoryHelper.getCanaryStackList((CanaryInventory) this.container1),
+                InventoryHelper.getCanaryStackList((CanaryInventory) this.container2),
                 this.getMaxCountPerStack()
         );
     }
 
     @Override
-    public void setInventoryLithium(NonNullList<ItemStack> inventory) {
+    public void setInventoryCanary(NonNullList<ItemStack> inventory) {
         throw new UnsupportedOperationException();
     }
 

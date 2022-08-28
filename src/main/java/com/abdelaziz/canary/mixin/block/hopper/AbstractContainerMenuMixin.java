@@ -1,6 +1,6 @@
 package com.abdelaziz.canary.mixin.block.hopper;
 
-import com.abdelaziz.canary.api.inventory.LithiumInventory;
+import com.abdelaziz.canary.api.inventory.CanaryInventory;
 import com.abdelaziz.canary.common.hopper.InventoryHelper;
 import net.minecraft.world.Container;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -14,8 +14,8 @@ public abstract class AbstractContainerMenuMixin {
     @Inject(method = "checkContainerSize(Lnet/minecraft/world/Container;)I",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/Container;size()I", shift = At.Shift.BEFORE, ordinal = 0), cancellable = true)
     private static void getFastOutputStrength(Container inventory, CallbackInfoReturnable<Integer> cir) {
-        if (inventory instanceof LithiumInventory optimizedInventory) {
-            cir.setReturnValue(InventoryHelper.getLithiumStackList(optimizedInventory).getSignalStrength(inventory));
+        if (inventory instanceof CanaryInventory optimizedInventory) {
+            cir.setReturnValue(InventoryHelper.getCanaryStackList(optimizedInventory).getSignalStrength(inventory));
         }
     }
 }

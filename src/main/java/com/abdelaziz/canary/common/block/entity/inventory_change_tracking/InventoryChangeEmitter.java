@@ -1,6 +1,6 @@
 package com.abdelaziz.canary.common.block.entity.inventory_change_tracking;
 
-import com.abdelaziz.canary.common.hopper.LithiumStackList;
+import com.abdelaziz.canary.common.hopper.CanaryStackList;
 
 /**
  * Interface for Objects that can emit various inventory change events. This does not mean that the inventory
@@ -18,7 +18,7 @@ public interface InventoryChangeEmitter {
 
     void emitFirstComparatorAdded();
 
-    void forwardContentChangeOnce(InventoryChangeListener inventoryChangeListener, LithiumStackList stackList, InventoryChangeTracker thisTracker);
+    void forwardContentChangeOnce(InventoryChangeListener inventoryChangeListener, CanaryStackList stackList, InventoryChangeTracker thisTracker);
 
     void forwardMajorInventoryChanges(InventoryChangeListener inventoryChangeListener);
 

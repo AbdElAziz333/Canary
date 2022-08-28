@@ -4,7 +4,7 @@ import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import com.abdelaziz.canary.common.block.entity.inventory_change_tracking.InventoryChangeEmitter;
 import com.abdelaziz.canary.common.block.entity.inventory_change_tracking.InventoryChangeListener;
 import com.abdelaziz.canary.common.block.entity.inventory_change_tracking.InventoryChangeTracker;
-import com.abdelaziz.canary.common.hopper.LithiumStackList;
+import com.abdelaziz.canary.common.hopper.CanaryStackList;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.vehicle.ContainerEntity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -63,7 +63,7 @@ public abstract class ContainerEntityMixin implements InventoryChangeEmitter, Co
     }
 
     @Override
-    public void forwardContentChangeOnce(InventoryChangeListener inventoryChangeListener, LithiumStackList stackList, InventoryChangeTracker thisTracker) {
+    public void forwardContentChangeOnce(InventoryChangeListener inventoryChangeListener, CanaryStackList stackList, InventoryChangeTracker thisTracker) {
         if (this.inventoryChangeListeners == null) {
             this.inventoryChangeListeners = new ArrayList<>(1);
         }

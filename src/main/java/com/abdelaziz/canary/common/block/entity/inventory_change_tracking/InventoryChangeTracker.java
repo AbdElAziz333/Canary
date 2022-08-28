@@ -1,9 +1,9 @@
 package com.abdelaziz.canary.common.block.entity.inventory_change_tracking;
 
-import com.abdelaziz.canary.common.hopper.LithiumStackList;
+import com.abdelaziz.canary.common.hopper.CanaryStackList;
 
 public interface InventoryChangeTracker extends InventoryChangeEmitter {
-    default void listenForContentChangesOnce(LithiumStackList stackList, InventoryChangeListener inventoryChangeListener) {
+    default void listenForContentChangesOnce(CanaryStackList stackList, InventoryChangeListener inventoryChangeListener) {
         this.forwardContentChangeOnce(inventoryChangeListener, stackList, this);
     }
 
