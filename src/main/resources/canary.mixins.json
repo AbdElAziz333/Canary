@@ -72,11 +72,9 @@
     "chunk.block_counting.BlockStateBaseMixin",
     "chunk.block_counting.LevelChunkSectionMixin",
     "chunk.entity_class_groups.ClassInstanceMultiMapMixin",
-    "chunk.entity_class_groups.ClientLevelMixin",
     "chunk.entity_class_groups.EntitySectionAccessor",
     "chunk.entity_class_groups.PersistentEntitySectionManagerAccessor",
     "chunk.entity_class_groups.ServerLevelAccessor",
-    "chunk.entity_class_groups.TransientEntitySectionManagerAccessor",
     "chunk.no_locking.PalettedContainerMixin",
     "chunk.no_validation.SimpleBitStorage",
     "chunk.no_validation.ZeroBitStorage",
@@ -173,5 +171,9 @@
     "world.inline_height.LevelMixin",
     "world.player_chunk_tick.ChunkMapMixin",
     "world.tick_scheduler.LevelChunkTicksMixin"
+  ],
+  "client": [
+    "chunk.entity_class_groups.ClientLevelMixin",
+    "chunk.entity_class_groups.TransientEntitySectionManagerAccessor"
   ]
 }
