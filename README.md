@@ -3,6 +3,7 @@
 # Canary for Minecraft Forge
 ![Github License](https://img.shields.io/github/license/AbdElAziz333/Canary)
 ![Github Issues](https://img.shields.io/github/issues/AbdElAziz333/Canary)
+![Curseforge Downloads](https://cf.way2muchnoise.eu/665658.svg)
 
 Canary is a general-purpose optimization mod and unofficial fork of the Fabric mod [Lithium](https://github.com/CaffeineMC/lithium-fabric) for Minecraft, this mod aims to optimize many areas of the game in order to provide better overall performance. It works on both the **client and server**, and **doesn't require the mod to be installed on both sides**.
 
