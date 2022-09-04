@@ -1,30 +1,30 @@
 package com.abdelaziz.canary.common.util.math;
 
-import net.minecraft.util.Mth;
+import net.minecraft.util.math.MathHelper;
 
 /**
- * A replacement for the sine angle lookup table used in {@link Mth}, both reducing the size of LUT and improving
+ * A replacement for the sine angle lookup table used in {@link MathHelper}, both reducing the size of LUT and improving
  * the access patterns for common paired sin/cos operations.
- *
- *  sin(-x) = -sin(x)
- *    ... to eliminate negative angles from the LUT.
- *
- *  sin(x) = sin(pi/2 - x)
- *    ... to eliminate supplementary angles from the LUT.
- *
+ * <p>
+ * sin(-x) = -sin(x)
+ * ... to eliminate negative angles from the LUT.
+ * <p>
+ * sin(x) = sin(pi/2 - x)
+ * ... to eliminate supplementary angles from the LUT.
+ * <p>
  * Using these identities allows us to reduce the LUT from 64K entries (256 KB) to just 16K entries (64 KB), enabling
  * it to better fit into the CPU's caches at the expense of some cycles on the fast path. The implementation has been
  * tightly optimized to avoid branching where possible and to use very quick integer operations.
- *
+ * <p>
  * Generally speaking, reducing the size of a lookup table is always a good optimization, but since we need to spend
  * extra CPU cycles trying to maintain parity with vanilla, there is the potential risk that this implementation ends
  * up being slower than vanilla when the lookup table is able to be kept in cache memory.
- *
+ * <p>
  * Unlike other "fast math" implementations, the values returned by this class are *bit-for-bit identical* with those
- * from {@link Mth}. Validation is performed during runtime to ensure that the table is correct.
+ * from {@link MathHelper}. Validation is performed during runtime to ensure that the table is correct.
  *
  * @author coderbot16   Author of the original (and very clever) implementation in Rust:
- *  https://gitlab.com/coderbot16/i73/-/tree/master/i73-trig/src
+ * https://gitlab.com/coderbot16/i73/-/tree/master/i73-trig/src
  * @author jellysquid3  Additional optimizations, port to Java
  */
 public class CompactSineLUT {
@@ -34,14 +34,14 @@ public class CompactSineLUT {
     static {
         // Copy the sine table, covering to raw int bits
         for (int i = 0; i < SINE_TABLE_INT.length; i++) {
-            SINE_TABLE_INT[i] = Float.floatToRawIntBits(Mth.SIN[i]);
+            SINE_TABLE_INT[i] = Float.floatToRawIntBits(MathHelper.SINE_TABLE[i]);
         }
 
-        SINE_TABLE_MIDPOINT = Mth.SIN[Mth.SIN.length / 2];
+        SINE_TABLE_MIDPOINT = MathHelper.SINE_TABLE[MathHelper.SINE_TABLE.length / 2];
 
         // Test that the lookup table is correct during runtime
-        for (int i = 0; i < Mth.SIN.length; i++) {
-            float expected = Mth.SIN[i];
+        for (int i = 0; i < MathHelper.SINE_TABLE.length; i++) {
+            float expected = MathHelper.SINE_TABLE[i];
             float value = lookup(i);
 
             if (expected != value) {
@@ -50,12 +50,12 @@ public class CompactSineLUT {
         }
     }
 
-    // [VanillaCopy] Mth#sin(float)
+    // [VanillaCopy] MathHelper#sin(float)
     public static float sin(float f) {
         return lookup((int) (f * 10430.38) & 0xFFFF);
     }
 
-    // [VanillaCopy] Mth#cos(float)
+    // [VanillaCopy] MathHelper#cos(float)
     public static float cos(float f) {
         return lookup((int) (f * 10430.38 + 16384.0) & 0xFFFF);
     }

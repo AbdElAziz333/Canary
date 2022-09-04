@@ -1,7 +1,7 @@
 package com.abdelaziz.canary.common.shapes;
 
-import net.minecraft.core.Direction;
-import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.shape.VoxelShape;
 
 public interface OffsetVoxelShapeCache {
     VoxelShape getOffsetSimplifiedShape(float offset, Direction direction);

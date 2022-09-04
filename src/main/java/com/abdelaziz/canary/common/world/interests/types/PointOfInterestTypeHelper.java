@@ -1,7 +1,7 @@
 package com.abdelaziz.canary.common.world.interests.types;
 
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.chunk.LevelChunkSection;
+import net.minecraft.block.BlockState;
+import net.minecraft.world.chunk.ChunkSection;
 
 import java.util.Set;
 import java.util.function.Predicate;
@@ -18,7 +18,7 @@ public class PointOfInterestTypeHelper {
         POI_BLOCKSTATE_PREDICATE = types::contains;
     }
 
-    public static boolean shouldScan(LevelChunkSection section) {
-        return section.maybeHas(POI_BLOCKSTATE_PREDICATE);
+    public static boolean shouldScan(ChunkSection section) {
+        return section.hasAny(POI_BLOCKSTATE_PREDICATE);
     }
 }

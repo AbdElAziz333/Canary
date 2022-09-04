@@ -1,8 +1,8 @@
 package com.abdelaziz.canary.common.reflection;
 
-import net.minecraft.CrashReport;
-import net.minecraft.CrashReportCategory;
-import net.minecraft.ReportedException;
+import net.minecraft.util.crash.CrashException;
+import net.minecraft.util.crash.CrashReport;
+import net.minecraft.util.crash.CrashReportSection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -27,13 +27,13 @@ public class ReflectionUtil {
                 return fallbackResult;
             } catch (Throwable e) {
                 final String crashedClass = clazz.getName();
-                CrashReport crashReport = CrashReport.forThrowable(e, "Lithium Class Analysis");
-                CrashReportCategory crashReportSection = crashReport.addCategory(e.getClass().toString() + " when getting declared methods.");
-                crashReportSection.setDetail("Analyzed class", crashedClass);
-                crashReportSection.setDetail("Analyzed method name", methodName);
-                crashReportSection.setDetail("Analyzed method args", methodArgs);
+                CrashReport crashReport = CrashReport.create(e, "Lithium Class Analysis");
+                CrashReportSection crashReportSection = crashReport.addElement(e.getClass().toString() + " when getting declared methods.");
+                crashReportSection.add("Analyzed class", crashedClass);
+                crashReportSection.add("Analyzed method name", methodName);
+                crashReportSection.add("Analyzed method args", methodArgs);
 
-                throw new ReportedException(crashReport);
+                throw new CrashException(crashReport);
             }
         }
         return false;

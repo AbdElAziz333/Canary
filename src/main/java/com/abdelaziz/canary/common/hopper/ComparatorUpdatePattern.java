@@ -1,6 +1,6 @@
 package com.abdelaziz.canary.common.hopper;
 
-import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntity;
 
 /**
  * Pattern of comparator updates that the given inventory is sending when a hopper
@@ -10,11 +10,11 @@ import net.minecraft.world.level.block.entity.BlockEntity;
  * put it back right after. Some types of inventories will send comparator updates
  * every time a hopper does that. Multiple consecutive comparator updates
  * are not distinguishable from a single one and can therefore be omitted.
- * <p>
+ *
  * A hopper failing to take items can be predicted by testing whether the inventory
  * modification counter {@link CanaryStackList} of the hopper or the inventory above
  * have changed since just before the previous attempt to take items.
- * <p>
+ *
  * Decrementing and immediately incrementing the signal strength of an inventory
  * cannot be distinguished from setting the signal strength to 0 temporarily.
  *
@@ -38,7 +38,7 @@ public enum ComparatorUpdatePattern {
         //example: inventory with items, but removing any single item does not change the signal strength
         @Override
         public void apply(BlockEntity blockEntity, CanaryStackList stackList) {
-            blockEntity.setChanged();
+            blockEntity.markDirty();
         }
 
         @Override
@@ -51,9 +51,9 @@ public enum ComparatorUpdatePattern {
         @Override
         public void apply(BlockEntity blockEntity, CanaryStackList stackList) {
             stackList.setReducedSignalStrengthOverride();
-            blockEntity.setChanged();
+            blockEntity.markDirty();
             stackList.clearSignalStrengthOverride();
-            blockEntity.setChanged();
+            blockEntity.markDirty();
         }
 
         @Override
@@ -66,11 +66,11 @@ public enum ComparatorUpdatePattern {
         // but there is another item that will reduce the signal strength when removed
         @Override
         public void apply(BlockEntity blockEntity, CanaryStackList stackList) {
-            blockEntity.setChanged();
+            blockEntity.markDirty();
             stackList.setReducedSignalStrengthOverride();
-            blockEntity.setChanged();
+            blockEntity.markDirty();
             stackList.clearSignalStrengthOverride();
-            blockEntity.setChanged();
+            blockEntity.markDirty();
         }
 
         @Override

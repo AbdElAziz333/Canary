@@ -1,17 +1,17 @@
 package com.abdelaziz.canary.common.world.interests.iterator;
 
-import net.minecraft.world.entity.ai.village.poi.PoiType;
+import net.minecraft.world.poi.PointOfInterestType;
 
 import java.util.function.Predicate;
 
-public record SinglePointOfInterestTypeFilter(PoiType type) implements Predicate<PoiType> {
+public record SinglePointOfInterestTypeFilter(PointOfInterestType type) implements Predicate<PointOfInterestType> {
 
     @Override
-    public boolean test(PoiType other) {
+    public boolean test(PointOfInterestType other) {
         return this.type == other;
     }
 
-    public PoiType getType() {
+    public PointOfInterestType getType() {
         return this.type;
     }
 }

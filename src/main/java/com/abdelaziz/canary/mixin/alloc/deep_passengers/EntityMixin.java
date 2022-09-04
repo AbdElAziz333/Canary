@@ -1,7 +1,8 @@
 package com.abdelaziz.canary.mixin.alloc.deep_passengers;
 
+
 import com.google.common.collect.ImmutableList;
-import net.minecraft.world.entity.Entity;
+import net.minecraft.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
@@ -14,15 +15,15 @@ import java.util.stream.Stream;
 public abstract class EntityMixin {
 
     @Shadow
-    private ImmutableList<Entity> passengers;
+    private ImmutableList<Entity> passengerList;
 
     /**
      * @author 2No2Name
      * @reason Avoid stream code
      */
     @Overwrite
-    public Iterable<Entity> getIndirectPassengers() {
-        if (this.passengers.isEmpty()) {
+    public Iterable<Entity> getPassengersDeep() {
+        if (this.passengerList.isEmpty()) {
             return Collections.emptyList();
         }
         ArrayList<Entity> passengers = new ArrayList<>();
@@ -36,8 +37,8 @@ public abstract class EntityMixin {
      * @reason Avoid stream allocations
      */
     @Overwrite
-    private Stream<Entity> getIndirectPassengersStream() {
-        if (this.passengers.isEmpty()) {
+    private Stream<Entity> streamIntoPassengers() {
+        if (this.passengerList.isEmpty()) {
             return Stream.empty();
         }
         ArrayList<Entity> passengers = new ArrayList<>();
@@ -51,8 +52,8 @@ public abstract class EntityMixin {
      * @reason Avoid stream allocations
      */
     @Overwrite
-    public Stream<Entity> getSelfAndPassengers() {
-        if (this.passengers.isEmpty()) {
+    public Stream<Entity> streamSelfAndPassengers() {
+        if (this.passengerList.isEmpty()) {
             return Stream.of((Entity) (Object) this);
         }
         ArrayList<Entity> passengers = new ArrayList<>();
@@ -67,8 +68,8 @@ public abstract class EntityMixin {
      * @reason Avoid stream allocations
      */
     @Overwrite
-    public Stream<Entity> getPassengersAndSelf() {
-        if (this.passengers.isEmpty()) {
+    public Stream<Entity> streamPassengersAndSelf() {
+        if (this.passengerList.isEmpty()) {
             return Stream.of((Entity) (Object) this);
         }
         ArrayList<Entity> passengers = new ArrayList<>();
@@ -78,7 +79,7 @@ public abstract class EntityMixin {
     }
 
     private void addPassengersDeep(ArrayList<Entity> passengers) {
-        ImmutableList<Entity> list = this.passengers;
+        ImmutableList<Entity> list = this.passengerList;
         for (int i = 0, listSize = list.size(); i < listSize; i++) {
             Entity passenger = list.get(i);
             passengers.add(passenger);
@@ -88,7 +89,7 @@ public abstract class EntityMixin {
     }
 
     private void addPassengersDeepFirst(ArrayList<Entity> passengers) {
-        ImmutableList<Entity> list = this.passengers;
+        ImmutableList<Entity> list = this.passengerList;
         for (int i = 0, listSize = list.size(); i < listSize; i++) {
             Entity passenger = list.get(i);
             //noinspection ConstantConditions

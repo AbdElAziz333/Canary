@@ -1,14 +1,14 @@
 package com.abdelaziz.canary.common.entity.tracker.nearby;
 
-import com.abdelaziz.canary.mixin.ai.nearby_entity_tracking.PersistentEntitySectionManagerAccessor;
-import com.abdelaziz.canary.mixin.ai.nearby_entity_tracking.ServerLevelAccessor;
 import com.abdelaziz.canary.common.util.collections.BucketedList;
 import com.abdelaziz.canary.common.util.tuples.WorldSectionBox;
-import com.abdelaziz.canary.mixin.block.hopper.EntitySectionAccessor;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.ClassInstanceMultiMap;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.phys.AABB;
+import com.abdelaziz.canary.mixin.ai.nearby_entity_tracking.ServerEntityManagerAccessor;
+import com.abdelaziz.canary.mixin.ai.nearby_entity_tracking.ServerWorldAccessor;
+import com.abdelaziz.canary.mixin.block.hopper.EntityTrackingSectionAccessor;
+import net.minecraft.entity.Entity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.collection.TypeFilterableList;
+import net.minecraft.util.math.Box;
 
 import java.util.List;
 
@@ -18,8 +18,8 @@ public class SectionedItemEntityMovementTracker<S extends Entity> extends Sectio
         super(worldSectionBox, clazz);
     }
 
-    public static <S extends Entity> SectionedItemEntityMovementTracker<S> registerAt(ServerLevel world, AABB encompassingBox, Class<S> clazz) {
-        MovementTrackerCache cache = (MovementTrackerCache) ((PersistentEntitySectionManagerAccessor<?>) ((ServerLevelAccessor) world).getEntityManager()).getCache();
+    public static <S extends Entity> SectionedItemEntityMovementTracker<S> registerAt(ServerWorld world, Box encompassingBox, Class<S> clazz) {
+        MovementTrackerCache cache = (MovementTrackerCache) ((ServerEntityManagerAccessor<?>) ((ServerWorldAccessor) world).getEntityManager()).getCache();
 
         WorldSectionBox worldSectionBox = WorldSectionBox.entityAccessBox(world, encompassingBox);
         SectionedItemEntityMovementTracker<S> tracker = new SectionedItemEntityMovementTracker<>(worldSectionBox, clazz);
@@ -29,18 +29,18 @@ public class SectionedItemEntityMovementTracker<S extends Entity> extends Sectio
         return tracker;
     }
 
-    public List<S> getEntities(AABB[] areas) {
+    public List<S> getEntities(Box[] areas) {
         int numBoxes = areas.length - 1;
         BucketedList<S> entities = new BucketedList<>(numBoxes);
-        AABB encompassingBox = areas[numBoxes];
+        Box encompassingBox = areas[numBoxes];
         for (int sectionIndex = 0; sectionIndex < this.sortedSections.size(); sectionIndex++) {
             if (this.sectionVisible[sectionIndex]) {
                 //noinspection unchecked
-                ClassInstanceMultiMap<S> collection = ((EntitySectionAccessor<S>) this.sortedSections.get(sectionIndex)).getCollection();
+                TypeFilterableList<S> collection = ((EntityTrackingSectionAccessor<S>) this.sortedSections.get(sectionIndex)).getCollection();
 
-                for (S entity : collection.find(this.clazz)) {
+                for (S entity : collection.getAllOfType(this.clazz)) {
                     if (entity.isAlive()) {
-                        AABB entityBoundingBox = entity.getBoundingBox();
+                        Box entityBoundingBox = entity.getBoundingBox();
                         //even though there are usually only two boxes to check, checking the encompassing box only will be faster in most cases
                         //In vanilla the number of boxes checked is always 2. Here it is 1 (miss) and 2-3 (hit)
                         if (entityBoundingBox.intersects(encompassingBox)) {

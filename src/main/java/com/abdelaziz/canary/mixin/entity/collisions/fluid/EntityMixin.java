@@ -1,18 +1,18 @@
 package com.abdelaziz.canary.mixin.entity.collisions.fluid;
 
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
-import com.abdelaziz.canary.common.block.BlockCountingSection;
-import com.abdelaziz.canary.common.block.BlockStateFlags;
-import com.abdelaziz.canary.common.block.TrackedBlockStatePredicate;
-import com.abdelaziz.canary.common.util.Pos;
-import net.minecraft.tags.FluidTags;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.chunk.LevelChunkSection;
-import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.phys.AABB;
+import me.jellysquid.mods.lithium.common.block.BlockCountingSection;
+import me.jellysquid.mods.lithium.common.block.BlockStateFlags;
+import me.jellysquid.mods.lithium.common.block.TrackedBlockStatePredicate;
+import me.jellysquid.mods.lithium.common.util.Pos;
+import net.minecraft.entity.Entity;
+import net.minecraft.fluid.Fluid;
+import net.minecraft.tag.FluidTags;
+import net.minecraft.tag.TagKey;
+import net.minecraft.util.math.Box;
+import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.ChunkSection;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -24,10 +24,10 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 public abstract class EntityMixin {
 
     @Shadow
-    public abstract AABB getBoundingBox();
+    public World world;
 
     @Shadow
-    public Level level;
+    public abstract Box getBoundingBox();
 
     @Shadow
     protected Object2DoubleMap<TagKey<Fluid>> fluidHeight;
@@ -42,7 +42,7 @@ public abstract class EntityMixin {
             cancellable = true,
             locals = LocalCapture.CAPTURE_FAILHARD
     )
-    public void tryShortcutFluidPushing(TagKey<Fluid> tag, double speed, CallbackInfoReturnable<Boolean> cir, AABB box, int x1, int x2, int y1, int y2, int z1, int z2, double zero) {
+    public void tryShortcutFluidPushing(TagKey<Fluid> tag, double speed, CallbackInfoReturnable<Boolean> cir, Box box, int x1, int x2, int y1, int y2, int z1, int z2, double zero) {
         TrackedBlockStatePredicate blockStateFlag;
         if (tag == FluidTags.WATER) {
             blockStateFlag = BlockStateFlags.WATER;
@@ -55,14 +55,14 @@ public abstract class EntityMixin {
         int chunkZ1 = z1 >> 4;
         int chunkX2 = ((x2 - 1) >> 4);
         int chunkZ2 = ((z2 - 1) >> 4);
-        int chunkYIndex1 = Math.max(Pos.SectionYIndex.fromBlockCoord(this.level, y1), Pos.SectionYIndex.getMinYSectionIndex(this.level));
-        int chunkYIndex2 = Math.min(Pos.SectionYIndex.fromBlockCoord(this.level, y2 - 1), Pos.SectionYIndex.getMaxYSectionIndexInclusive(this.level));
+        int chunkYIndex1 = Math.max(Pos.SectionYIndex.fromBlockCoord(this.world, y1), Pos.SectionYIndex.getMinYSectionIndex(this.world));
+        int chunkYIndex2 = Math.min(Pos.SectionYIndex.fromBlockCoord(this.world, y2 - 1), Pos.SectionYIndex.getMaxYSectionIndexInclusive(this.world));
         for (int chunkX = chunkX1; chunkX <= chunkX2; chunkX++) {
             for (int chunkZ = chunkZ1; chunkZ <= chunkZ2; chunkZ++) {
-                ChunkAccess chunk = this.level.getChunk(chunkX, chunkZ);
+                Chunk chunk = this.world.getChunk(chunkX, chunkZ);
                 for (int chunkYIndex = chunkYIndex1; chunkYIndex <= chunkYIndex2; chunkYIndex++) {
-                    LevelChunkSection section = chunk.getSections()[chunkYIndex];
-                    if (((BlockCountingSection) section).anyMatch(blockStateFlag, true)) {
+                    ChunkSection section = chunk.getSectionArray()[chunkYIndex];
+                    if (((BlockCountingSection) section).anyMatch(blockStateFlag)) {
                         //fluid found, cannot skip code
                         return;
                     }

@@ -1,27 +1,27 @@
 package com.abdelaziz.canary.common.world;
 
-import com.abdelaziz.canary.client.world.ClientWorldAccessor;
+import com.abdelaziz.canary.common.client.ClientWorldAccessor;
+import com.abdelaziz.canary.common.entity.EntityClassGroup;
 import com.abdelaziz.canary.common.entity.pushable.EntityPushablePredicate;
 import com.abdelaziz.canary.common.world.chunk.ClassGroupFilterableList;
-import com.abdelaziz.canary.common.entity.EntityClassGroup;
-import com.abdelaziz.canary.mixin.chunk.entity_class_groups.TransientEntitySectionManagerAccessor;
-import com.abdelaziz.canary.mixin.chunk.entity_class_groups.EntitySectionAccessor;
-import com.abdelaziz.canary.mixin.chunk.entity_class_groups.PersistentEntitySectionManagerAccessor;
-import com.abdelaziz.canary.mixin.chunk.entity_class_groups.ServerLevelAccessor;
-import net.minecraft.core.BlockPos;
-import net.minecraft.util.ClassInstanceMultiMap;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.EntityGetter;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.entity.EntitySectionStorage;
-import net.minecraft.world.phys.AABB;
+import com.abdelaziz.canary.mixin.chunk.entity_class_groups.ClientEntityManagerAccessor;
+import com.abdelaziz.canary.mixin.chunk.entity_class_groups.EntityTrackingSectionAccessor;
+import com.abdelaziz.canary.mixin.chunk.entity_class_groups.ServerEntityManagerAccessor;
+import com.abdelaziz.canary.mixin.chunk.entity_class_groups.ServerWorldAccessor;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.collection.TypeFilterableList;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.world.EntityView;
+import net.minecraft.world.World;
+import net.minecraft.world.entity.SectionedEntityCache;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 public class WorldHelper {
-    public static final boolean CUSTOM_TYPE_FILTERABLE_LIST_DISABLED = !ClassGroupFilterableList.class.isAssignableFrom(ClassInstanceMultiMap.class);
+    public static final boolean CUSTOM_TYPE_FILTERABLE_LIST_DISABLED = !ClassGroupFilterableList.class.isAssignableFrom(TypeFilterableList.class);
 
     /**
      * Partial [VanillaCopy]
@@ -36,35 +36,35 @@ public class WorldHelper {
      * @param collidingEntity the entity that is searching for the colliding entities
      * @return iterator of entities with collision boxes
      */
-    public static List<Entity> getEntitiesForCollision(EntityGetter entityView, AABB box, Entity collidingEntity) {
-        if (!CUSTOM_TYPE_FILTERABLE_LIST_DISABLED && entityView instanceof Level world && (collidingEntity == null || !EntityClassGroup.MINECART_BOAT_LIKE_COLLISION.contains(collidingEntity.getClass()))) {
-            EntitySectionStorage<Entity> cache = getEntityCacheOrNull(world);
+    public static List<Entity> getEntitiesForCollision(EntityView entityView, Box box, Entity collidingEntity) {
+        if (!CUSTOM_TYPE_FILTERABLE_LIST_DISABLED && entityView instanceof World world && (collidingEntity == null || !EntityClassGroup.MINECART_BOAT_LIKE_COLLISION.contains(collidingEntity.getClass()))) {
+            SectionedEntityCache<Entity> cache = getEntityCacheOrNull(world);
             if (cache != null) {
-                world.getProfiler().push("getEntities");
+                world.getProfiler().visit("getEntities");
                 return getEntitiesOfClassGroup(cache, collidingEntity, EntityClassGroup.NoDragonClassGroup.BOAT_SHULKER_LIKE_COLLISION, box);
             }
         }
         //use vanilla code in case the shortcut is not applicable
         // due to the reference entity implementing special collision or the mixin being disabled in the config
-        return entityView.getEntities(collidingEntity, box);
+        return entityView.getOtherEntities(collidingEntity, box);
     }
 
-    public static EntitySectionStorage<Entity> getEntityCacheOrNull(Level world) {
+    public static SectionedEntityCache<Entity> getEntityCacheOrNull(World world) {
         if (world instanceof ClientWorldAccessor) {
             //noinspection unchecked
-            return ((TransientEntitySectionManagerAccessor<Entity>) ((ClientWorldAccessor) world).getEntityManager()).getCache();
-        } else if (world instanceof ServerLevelAccessor) {
+            return ((ClientEntityManagerAccessor<Entity>) ((ClientWorldAccessor) world).getEntityManager()).getCache();
+        } else if (world instanceof ServerWorldAccessor) {
             //noinspection unchecked
-            return ((PersistentEntitySectionManagerAccessor<Entity>) ((ServerLevelAccessor) world).getEntityManager()).getCache();
+            return ((ServerEntityManagerAccessor<Entity>) ((ServerWorldAccessor) world).getEntityManager()).getCache();
         }
         return null;
     }
 
-    public static List<Entity> getEntitiesOfClassGroup(EntitySectionStorage<Entity> cache, Entity collidingEntity, EntityClassGroup.NoDragonClassGroup entityClassGroup, AABB box) {
+    public static List<Entity> getEntitiesOfClassGroup(SectionedEntityCache<Entity> cache, Entity collidingEntity, EntityClassGroup.NoDragonClassGroup entityClassGroup, Box box) {
         ArrayList<Entity> entities = new ArrayList<>();
-        cache.forEachAccessibleNonEmptySection(box, section -> {
+        cache.forEachInBox(box, section -> {
             //noinspection unchecked
-            ClassInstanceMultiMap<Entity> allEntities = ((EntitySectionAccessor<Entity>) section).getCollection();
+            TypeFilterableList<Entity> allEntities = ((EntityTrackingSectionAccessor<Entity>) section).getCollection();
             //noinspection unchecked
             Collection<Entity> entitiesOfType = ((ClassGroupFilterableList<Entity>) allEntities).getAllOfGroupType(entityClassGroup);
             if (!entitiesOfType.isEmpty()) {
@@ -79,9 +79,9 @@ public class WorldHelper {
         return entities;
     }
 
-    public static List<Entity> getPushableEntities(Level world, EntitySectionStorage<Entity> cache, Entity except, AABB box, EntityPushablePredicate<? super Entity> entityPushablePredicate) {
+    public static List<Entity> getPushableEntities(World world, SectionedEntityCache<Entity> cache, Entity except, Box box, EntityPushablePredicate<? super Entity> entityPushablePredicate) {
         ArrayList<Entity> entities = new ArrayList<>();
-        cache.forEachAccessibleNonEmptySection(box, section -> ((ClimbingMobCachingSection) section).collectPushableEntities(world, except, box, entityPushablePredicate, entities));
+        cache.forEachInBox(box, section -> ((ClimbingMobCachingSection) section).collectPushableEntities(world, except, box, entityPushablePredicate, entities));
         return entities;
     }
 

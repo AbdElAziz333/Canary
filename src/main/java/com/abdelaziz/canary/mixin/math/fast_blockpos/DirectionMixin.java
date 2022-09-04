@@ -1,7 +1,7 @@
 package com.abdelaziz.canary.mixin.math.fast_blockpos;
 
-import net.minecraft.core.Direction;
-import net.minecraft.core.Vec3i;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3i;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.injection.At;

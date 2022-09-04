@@ -1,12 +1,12 @@
 package com.abdelaziz.canary.common.util.tuples;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.ai.village.poi.PoiRecord;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.poi.PointOfInterest;
 
-public record SortedPointOfInterest(PoiRecord poi, double distanceSq) {
+public record SortedPointOfInterest(PointOfInterest poi, double distanceSq) {
 
-    public SortedPointOfInterest(PoiRecord poi, BlockPos origin) {
-        this(poi, poi.getPos().distSqr(origin));
+    public SortedPointOfInterest(PointOfInterest poi, BlockPos origin) {
+        this(poi, poi.getPos().getSquaredDistance(origin));
     }
 
     public BlockPos getPos() {

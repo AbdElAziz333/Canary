@@ -1,7 +1,7 @@
 package com.abdelaziz.canary.mixin.ai.task.memory_change_counting;
 
-import com.abdelaziz.canary.common.ai.MemoryModificationCounter;
-import net.minecraft.world.entity.ai.Brain;
+import me.jellysquid.mods.lithium.common.ai.MemoryModificationCounter;
+import net.minecraft.entity.ai.brain.Brain;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -17,7 +17,7 @@ public class BrainMixin implements MemoryModificationCounter {
     private long memoryModCount = 1;
 
     @Redirect(
-            method = "setMemory(Lnet/minecraft/world/entity/ai/memory/MemoryModuleType;Ljava/util/Optional;)V",
+            method = "setMemory(Lnet/minecraft/entity/ai/brain/MemoryModuleType;Ljava/util/Optional;)V",
             at = @At(
                     value = "INVOKE",
                     target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"
@@ -41,8 +41,8 @@ public class BrainMixin implements MemoryModificationCounter {
      * Fix mod count being reset when villager loses profession due to disappearing workstation.
      * Mod count being reset can lead to tasks not running even though they should be!
      */
-    @Inject( //copy
-            method = "setMemoryInternal()Lnet/minecraft/world/entity/ai/Brain;",
+    @Inject(
+            method = "copy()Lnet/minecraft/entity/ai/brain/Brain;",
             at = @At("RETURN")
     )
     private void copyModCount(CallbackInfoReturnable<Brain<?>> cir) {

@@ -6,8 +6,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(targets = "net.minecraft.world.level.block.ComposterBlock$InputContainer")
-public abstract class ComposterBlockComposterInventoryMixin { //ComposterInventory
+@Mixin(targets = "net.minecraft.block.ComposterBlock$ComposterInventory")
+public abstract class ComposterBlockComposterInventoryMixin {
     @Shadow
     private boolean dirty;
 
@@ -18,7 +18,7 @@ public abstract class ComposterBlockComposterInventoryMixin { //ComposterInvento
             method = "markDirty()V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/world/level/block/ComposterBlock$InputContainer;removeStack(I)Lnet/minecraft/world/item/ItemStack;"
+                    target = "Lnet/minecraft/block/ComposterBlock$ComposterInventory;removeStack(I)Lnet/minecraft/item/ItemStack;"
             )
     )
     private void resetDirty(CallbackInfo ci) {

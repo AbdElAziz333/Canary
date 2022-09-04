@@ -1,16 +1,16 @@
 package com.abdelaziz.canary.mixin.block.hopper;
 
-import net.minecraft.world.CompoundContainer;
-import net.minecraft.world.Container;
+import net.minecraft.inventory.DoubleInventory;
+import net.minecraft.inventory.Inventory;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(CompoundContainer.class)
+@Mixin(DoubleInventory.class)
 public interface DoubleInventoryAccessor {
 
     @Accessor("first")
-    Container getFirst();
+    Inventory getFirst();
 
     @Accessor("second")
-    Container getSecond();
+    Inventory getSecond();
 }

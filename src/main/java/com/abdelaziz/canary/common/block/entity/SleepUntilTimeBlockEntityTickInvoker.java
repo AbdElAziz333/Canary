@@ -1,17 +1,17 @@
 package com.abdelaziz.canary.common.block.entity;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.entity.TickingBlockEntity;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.chunk.BlockEntityTickInvoker;
 
 public record SleepUntilTimeBlockEntityTickInvoker(BlockEntity sleepingBlockEntity, long sleepUntilTickExclusive,
-                                                   TickingBlockEntity delegate) implements TickingBlockEntity {
+                                                   BlockEntityTickInvoker delegate) implements BlockEntityTickInvoker {
 
     @Override
     public void tick() {
         //noinspection ConstantConditions
-        long tickTime = this.sleepingBlockEntity.getLevel().getGameTime();
+        long tickTime = this.sleepingBlockEntity.getWorld().getTime();
         if (tickTime >= this.sleepUntilTickExclusive) {
             ((SleepingBlockEntity) this.sleepingBlockEntity).setTicker(this.delegate);
             this.delegate.tick();
@@ -25,12 +25,12 @@ public record SleepUntilTimeBlockEntityTickInvoker(BlockEntity sleepingBlockEnti
 
     @Override
     public BlockPos getPos() {
-        return this.sleepingBlockEntity.getBlockPos();
+        return this.sleepingBlockEntity.getPos();
     }
 
     @Override
-    public String getType() {
+    public String getName() {
         //noinspection ConstantConditions
-        return BlockEntityType.getKey(this.sleepingBlockEntity.getType()).toString();
+        return BlockEntityType.getId(this.sleepingBlockEntity.getType()).toString();
     }
 }

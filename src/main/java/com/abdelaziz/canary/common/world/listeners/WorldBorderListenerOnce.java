@@ -1,9 +1,9 @@
 package com.abdelaziz.canary.common.world.listeners;
 
-import net.minecraft.world.level.border.BorderChangeListener;
-import net.minecraft.world.level.border.WorldBorder;
+import net.minecraft.world.border.WorldBorder;
+import net.minecraft.world.border.WorldBorderListener;
 
-public interface WorldBorderListenerOnce extends BorderChangeListener {
+public interface WorldBorderListenerOnce extends WorldBorderListener {
 
     void onWorldBorderShapeChange(WorldBorder worldBorder);
 
@@ -12,37 +12,37 @@ public interface WorldBorderListenerOnce extends BorderChangeListener {
     }
 
     @Override
-    default void onBorderSizeSet(WorldBorder border, double size) {
+    default void onSizeChange(WorldBorder border, double size) {
         this.onWorldBorderShapeChange(border);
     }
 
     @Override
-    default void onBorderSizeLerping(WorldBorder border, double fromSize, double toSize, long time) {
+    default void onInterpolateSize(WorldBorder border, double fromSize, double toSize, long time) {
         this.onWorldBorderShapeChange(border);
     }
 
     @Override
-    default void onBorderCenterSet(WorldBorder border, double centerX, double centerZ) {
+    default void onCenterChanged(WorldBorder border, double centerX, double centerZ) {
         this.onWorldBorderShapeChange(border);
     }
 
     @Override
-    default void onBorderSetWarningTime(WorldBorder border, int warningTime) {
+    default void onWarningTimeChanged(WorldBorder border, int warningTime) {
 
     }
 
     @Override
-    default void onBorderSetWarningBlocks(WorldBorder border, int warningBlockDistance) {
+    default void onWarningBlocksChanged(WorldBorder border, int warningBlockDistance) {
 
     }
 
     @Override
-    default void onBorderSetDamagePerBlock(WorldBorder border, double damagePerBlock) {
+    default void onDamagePerBlockChanged(WorldBorder border, double damagePerBlock) {
 
     }
 
     @Override
-    default void onBorderSetDamageSafeZOne(WorldBorder border, double safeZoneRadius) {
+    default void onSafeZoneChanged(WorldBorder border, double safeZoneRadius) {
 
     }
 }

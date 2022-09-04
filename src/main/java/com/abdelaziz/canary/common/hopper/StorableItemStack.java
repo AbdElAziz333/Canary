@@ -1,7 +1,5 @@
 package com.abdelaziz.canary.common.hopper;
 
-import com.abdelaziz.canary.common.hopper.CanaryStackList;
-
 public interface StorableItemStack {
     void registerToInventory(CanaryStackList itemStacks, int slot);
 

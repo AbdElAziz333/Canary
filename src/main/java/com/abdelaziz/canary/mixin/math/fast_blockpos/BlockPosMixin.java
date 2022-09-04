@@ -1,8 +1,8 @@
 package com.abdelaziz.canary.mixin.math.fast_blockpos;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.Vec3i;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3i;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 
@@ -30,7 +30,7 @@ public abstract class BlockPosMixin extends Vec3i {
      */
     @Override
     @Overwrite
-    public BlockPos above() {
+    public BlockPos up() {
         return new BlockPos(this.getX(), this.getY() + 1, this.getZ());
     }
 
@@ -40,7 +40,7 @@ public abstract class BlockPosMixin extends Vec3i {
      */
     @Override
     @Overwrite
-    public BlockPos above(int distance) {
+    public BlockPos up(int distance) {
         return new BlockPos(this.getX(), this.getY() + distance, this.getZ());
     }
 
@@ -50,7 +50,7 @@ public abstract class BlockPosMixin extends Vec3i {
      */
     @Override
     @Overwrite
-    public BlockPos below() {
+    public BlockPos down() {
         return new BlockPos(this.getX(), this.getY() - 1, this.getZ());
     }
 
@@ -60,7 +60,7 @@ public abstract class BlockPosMixin extends Vec3i {
      */
     @Override
     @Overwrite
-    public BlockPos below(int distance) {
+    public BlockPos down(int distance) {
         return new BlockPos(this.getX(), this.getY() - distance, this.getZ());
     }
 

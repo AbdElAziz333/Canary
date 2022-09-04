@@ -1,8 +1,8 @@
 package com.abdelaziz.canary.mixin.entity.collisions.unpushable_cramming;
 
-import com.abdelaziz.canary.common.entity.pushable.BlockCachingEntity;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.block.state.BlockState;
+import me.jellysquid.mods.lithium.common.entity.pushable.BlockCachingEntity;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -19,8 +19,8 @@ public class EntityMixin implements BlockCachingEntity {
     @Inject(
             method = "setPos(DDD)V",
             at = @At(
-                    value = "INVOKE", //getSectionCoord - blockToSectionCoord - sectionToBlockCoord
-                    target = "Lnet/minecraft/core/SectionPos;blockToSectionCoord(I)I",
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/util/math/ChunkSectionPos;getSectionCoord(I)I",
                     ordinal = 0,
                     shift = At.Shift.BEFORE
             )
@@ -33,7 +33,7 @@ public class EntityMixin implements BlockCachingEntity {
             method = "baseTick()V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/world/entity/Entity;hasVehicle()Z",
+                    target = "Lnet/minecraft/entity/Entity;hasVehicle()Z",
                     ordinal = 0,
                     shift = At.Shift.BEFORE
             )
@@ -43,10 +43,10 @@ public class EntityMixin implements BlockCachingEntity {
     }
 
     @Inject(
-            method = "getBlockStateAtPos()Lnet/minecraft/world/level/block/state/BlockState;",
+            method = "getBlockStateAtPos()Lnet/minecraft/block/BlockState;",
             at = @At(
                     value = "INVOKE_ASSIGN",
-                    target = "Lnet/minecraft/world/level/Level;getBlockState(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;",
+                    target = "Lnet/minecraft/world/World;getBlockState(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/BlockState;",
                     shift = At.Shift.AFTER
             )
     )

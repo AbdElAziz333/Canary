@@ -2,16 +2,16 @@ package com.abdelaziz.canary.common.block;
 
 import com.abdelaziz.canary.common.ai.pathing.BlockStatePathingCache;
 import com.abdelaziz.canary.common.ai.pathing.PathNodeCache;
-import net.minecraft.tags.FluidTags;
-import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.chunk.LevelChunkSection;
-import net.minecraft.world.level.pathfinder.BlockPathTypes;
+import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.ai.pathing.PathNodeType;
+import net.minecraft.tag.FluidTags;
+import net.minecraft.world.chunk.ChunkSection;
 
 import java.util.ArrayList;
 
 public class BlockStateFlags {
-    public static final boolean ENABLED = BlockCountingSection.class.isAssignableFrom(LevelChunkSection.class);
+    public static final boolean ENABLED = BlockCountingSection.class.isAssignableFrom(ChunkSection.class);
     public static final int NUM_FLAGS;
 
     public static final TrackedBlockStatePredicate OVERSIZED_SHAPE;
@@ -27,7 +27,7 @@ public class BlockStateFlags {
         OVERSIZED_SHAPE = new TrackedBlockStatePredicate(allFlags.size()) {
             @Override
             public boolean test(BlockState operand) {
-                return operand.hasLargeCollisionShape();
+                return operand.exceedsCube();
             }
         };
         allFlags.add(OVERSIZED_SHAPE);
@@ -35,7 +35,7 @@ public class BlockStateFlags {
         WATER = new TrackedBlockStatePredicate(allFlags.size()) {
             @Override
             public boolean test(BlockState operand) {
-                return operand.getFluidState().getType().is(FluidTags.WATER);
+                return operand.getFluidState().getFluid().isIn(FluidTags.WATER);
             }
         };
         allFlags.add(WATER);
@@ -43,16 +43,16 @@ public class BlockStateFlags {
         LAVA = new TrackedBlockStatePredicate(allFlags.size()) {
             @Override
             public boolean test(BlockState operand) {
-                return operand.getFluidState().getType().is(FluidTags.LAVA);
+                return operand.getFluidState().getFluid().isIn(FluidTags.LAVA);
             }
         };
         allFlags.add(LAVA);
 
-        if (BlockStatePathingCache.class.isAssignableFrom(BlockBehaviour.BlockStateBase.class)) {
+        if (BlockStatePathingCache.class.isAssignableFrom(AbstractBlock.AbstractBlockState.class)) {
             PATH_NOT_OPEN = new TrackedBlockStatePredicate(allFlags.size()) {
                 @Override
                 public boolean test(BlockState operand) {
-                    return PathNodeCache.getNeighborPathNodeType(operand) != BlockPathTypes.OPEN;
+                    return PathNodeCache.getNeighborPathNodeType(operand) != PathNodeType.OPEN;
                 }
             };
             allFlags.add(PATH_NOT_OPEN);
