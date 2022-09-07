@@ -52,7 +52,7 @@ public class TestOptimizedVoxelShapeMatchesAnywhere {
         matchedAnywhere = 0;
         notMatchedAnywhere = 0;
         notRunModCode = 0;
-        Random random = Random.createLocal();
+        Random random = new Random();
         VoxelShapeVoxelShapePair pair = null;
 
         try {

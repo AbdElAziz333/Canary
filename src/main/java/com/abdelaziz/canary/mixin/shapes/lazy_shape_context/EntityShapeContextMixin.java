@@ -15,7 +15,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.function.Predicate;
@@ -57,6 +56,7 @@ public class EntityShapeContextMixin {
         return false;
     }
 
+    /*
     @Inject(
             method = "<init>(Lnet/minecraft/entity/Entity;)V",
             at = @At(
@@ -69,6 +69,7 @@ public class EntityShapeContextMixin {
         this.heldItem = null;
         this.walkOnFluidPredicate = null;
     }
+    */
 
     @Inject(
             method = "isHolding(Lnet/minecraft/item/Item;)Z",

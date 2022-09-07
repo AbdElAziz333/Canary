@@ -1,9 +1,9 @@
 package com.abdelaziz.canary.mixin.ai.nearby_entity_tracking;
 
-import me.jellysquid.mods.lithium.common.entity.tracker.EntityTrackerEngine;
-import me.jellysquid.mods.lithium.common.entity.tracker.EntityTrackerSection;
-import me.jellysquid.mods.lithium.common.entity.tracker.nearby.NearbyEntityListenerMulti;
-import me.jellysquid.mods.lithium.common.entity.tracker.nearby.NearbyEntityListenerProvider;
+import com.abdelaziz.canary.common.entity.tracker.EntityTrackerEngine;
+import com.abdelaziz.canary.common.entity.tracker.EntityTrackerSection;
+import com.abdelaziz.canary.common.entity.tracker.nearby.NearbyEntityListenerMulti;
+import com.abdelaziz.canary.common.entity.tracker.nearby.NearbyEntityListenerProvider;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.world.ServerEntityManager;
 import net.minecraft.util.math.BlockPos;
@@ -43,12 +43,13 @@ public class ServerEntityManagerListenerMixin<T extends EntityLike> {
         //Fix #284 Summoned inventory minecarts do not immediately notify hoppers of their presence when created using summon command
         this.notifyMovementListeners();
     }
-
+/*
     @ModifyVariable(method = "updateEntityPosition()V", at = @At("RETURN"))
     private long updateEntityTrackerEngine(long sectionPos) {
         this.notifyMovementListeners();
         return sectionPos;
     }
+    */
 
     @Inject(
             method = "updateEntityPosition()V",
