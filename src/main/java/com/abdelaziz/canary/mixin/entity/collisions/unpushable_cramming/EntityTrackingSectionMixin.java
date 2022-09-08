@@ -1,6 +1,8 @@
 package com.abdelaziz.canary.mixin.entity.collisions.unpushable_cramming;
 
+import com.abdelaziz.canary.common.entity.pushable.BlockCachingEntity;
 import com.abdelaziz.canary.common.entity.pushable.EntityPushablePredicate;
+import com.abdelaziz.canary.common.entity.pushable.PushableEntityClassGroup;
 import com.abdelaziz.canary.common.util.collections.MaskedList;
 import com.abdelaziz.canary.common.world.ClimbingMobCachingSection;
 import net.minecraft.block.BlockState;

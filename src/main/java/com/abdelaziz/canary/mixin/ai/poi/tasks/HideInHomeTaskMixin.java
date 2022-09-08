@@ -1,4 +1,4 @@
-package com.abdelaziz.canary.mixin.ai.poi.poi.tasks;
+package com.abdelaziz.canary.mixin.ai.poi.tasks;
 
 import com.abdelaziz.canary.common.util.POIRegistryEntries;
 import com.abdelaziz.canary.common.world.interests.iterator.SinglePointOfInterestTypeFilter;
