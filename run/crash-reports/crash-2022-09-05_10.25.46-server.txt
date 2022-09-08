@@ -1,0 +1,105 @@
+---- Minecraft Crash Report ----
+// Who set us up the TNT?
+
+Time: 9/5/22, 10:25 AM
+Description: Exception in server tick loop
+
+java.lang.ExceptionInInitializerError: null
+	at com.abdelaziz.canary.common.world.WorldHelper.getEntitiesForCollision(WorldHelper.java:40) ~[%2374!/:?] {re:mixin,re:classloading}
+	at com.abdelaziz.canary.common.entity.CanaryEntityCollisions$1$1.computeNext(CanaryEntityCollisions.java:103) ~[%2374!/:?] {re:classloading}
+	at com.abdelaziz.canary.common.entity.CanaryEntityCollisions$1$1.computeNext(CanaryEntityCollisions.java:91) ~[%2374!/:?] {re:classloading}
+	at com.google.common.collect.AbstractIterator.tryToComputeNext(AbstractIterator.java:146) ~[guava-31.0.1-jre.jar%2332!/:?] {re:mixin}
+	at com.google.common.collect.AbstractIterator.hasNext(AbstractIterator.java:141) ~[guava-31.0.1-jre.jar%2332!/:?] {re:mixin}
+	at com.abdelaziz.canary.common.entity.CanaryEntityCollisions.doesBoxCollideWithHardEntities(CanaryEntityCollisions.java:59) ~[%2374!/:?] {re:mixin,re:classloading}
+	at net.minecraft.world.CollisionView.isSpaceEmpty(CollisionView.java:531) ~[forge-1.18.2-40.1.73-minecraft-project-@-merged-named.jar%2369!/:?] {re:computing_frames,re:mixin,re:classloading,pl:mixin:APP:canary.mixins.json:entity.collisions.intersection.CollisionViewMixin,pl:mixin:A}
+	at net.minecraft.world.CollisionView.isSpaceEmpty(CollisionView.java:44) ~[forge-1.18.2-40.1.73-minecraft-project-@-merged-named.jar%2369!/:?] {re:computing_frames,re:mixin,re:classloading,pl:mixin:APP:canary.mixins.json:entity.collisions.intersection.CollisionViewMixin,pl:mixin:A}
+	at net.minecraft.server.network.ServerPlayerEntity.moveToSpawn(ServerPlayerEntity.java:267) ~[forge-1.18.2-40.1.73-minecraft-project-@-merged-named.jar%2369!/:?] {re:computing_frames,pl:accesstransformer:B,pl:unprotect:A,re:classloading,pl:accesstransformer:B,pl:unprotect:A,re:mixin,pl:accesstransformer:B,pl:unprotect:A}
+	at net.minecraft.server.network.ServerPlayerEntity.<init>(ServerPlayerEntity.java:238) ~[forge-1.18.2-40.1.73-minecraft-project-@-merged-named.jar%2369!/:?] {re:computing_frames,pl:accesstransformer:B,pl:unprotect:A,re:classloading,pl:accesstransformer:B,pl:unprotect:A,re:mixin,pl:accesstransformer:B,pl:unprotect:A}
+	at net.minecraft.server.PlayerManager.createPlayer(PlayerManager.java:399) ~[forge-1.18.2-40.1.73-minecraft-project-@-merged-named.jar%2369!/:?] {re:classloading,pl:unprotect:A}
+	at net.minecraft.server.network.ServerLoginNetworkHandler.acceptPlayer(ServerLoginNetworkHandler.java:120) ~[forge-1.18.2-40.1.73-minecraft-project-@-merged-named.jar%2369!/:?] {re:classloading,pl:accesstransformer:B,pl:unprotect:A}
+	at net.minecraft.server.network.ServerLoginNetworkHandler.tick(ServerLoginNetworkHandler.java:69) ~[forge-1.18.2-40.1.73-minecraft-project-@-merged-named.jar%2369!/:?] {re:classloading,pl:accesstransformer:B,pl:unprotect:A}
+	at net.minecraft.network.ClientConnection.tick(ClientConnection.java:241) ~[forge-1.18.2-40.1.73-minecraft-project-@-merged-named.jar%2369!/:?] {re:classloading,pl:unprotect:A}
+	at net.minecraft.server.ServerNetworkIo.tick(ServerNetworkIo.java:143) ~[forge-1.18.2-40.1.73-minecraft-project-@-merged-named.jar%2369!/:?] {re:classloading,pl:unprotect:A}
+	at net.minecraft.server.MinecraftServer.tickWorlds(MinecraftServer.java:916) ~[forge-1.18.2-40.1.73-minecraft-project-@-merged-named.jar%2369!/:?] {re:mixin,pl:accesstransformer:B,pl:unprotect:A,re:classloading,pl:accesstransformer:B,pl:unprotect:A}
+	at net.minecraft.server.MinecraftServer.tick(MinecraftServer.java:842) ~[forge-1.18.2-40.1.73-minecraft-project-@-merged-named.jar%2369!/:?] {re:mixin,pl:accesstransformer:B,pl:unprotect:A,re:classloading,pl:accesstransformer:B,pl:unprotect:A}
+	at net.minecraft.server.integrated.IntegratedServer.tick(IntegratedServer.java:84) ~[forge-1.18.2-40.1.73-minecraft-project-@-merged-named.jar%2369!/:?] {re:classloading,pl:unprotect:A,pl:runtimedistcleaner:A}
+	at net.minecraft.server.MinecraftServer.runServer(MinecraftServer.java:685) ~[forge-1.18.2-40.1.73-minecraft-project-@-merged-named.jar%2369!/:?] {re:mixin,pl:accesstransformer:B,pl:unprotect:A,re:classloading,pl:accesstransformer:B,pl:unprotect:A}
+	at net.minecraft.server.MinecraftServer.method_29739(MinecraftServer.java:261) ~[forge-1.18.2-40.1.73-minecraft-project-@-merged-named.jar%2369!/:?] {re:mixin,pl:accesstransformer:B,pl:unprotect:A,re:classloading,pl:accesstransformer:B,pl:unprotect:A}
+	at java.lang.Thread.run(Thread.java:833) [?:?] {re:mixin}
+Caused by: net.minecraftforge.fml.util.ObfuscationReflectionHelper$UnableToFindMethodException: java.lang.NoSuchMethodException: net.minecraft.entity.Entity.collidesWith()
+	at net.minecraftforge.fml.util.ObfuscationReflectionHelper.findMethod(ObfuscationReflectionHelper.java:151) ~[fmlcore-1.18.2-40.1.73.jar%2373!/:?] {}
+	at com.abdelaziz.canary.common.entity.EntityClassGroup.<clinit>(EntityClassGroup.java:29) ~[%2374!/:?] {re:mixin,re:classloading}
+	... 21 more
+Caused by: java.lang.NoSuchMethodException: net.minecraft.entity.Entity.collidesWith()
+	at java.lang.Class.getDeclaredMethod(Class.java:2675) ~[?:?] {re:computing_frames,re:mixin}
+	at net.minecraftforge.fml.util.ObfuscationReflectionHelper.findMethod(ObfuscationReflectionHelper.java:145) ~[fmlcore-1.18.2-40.1.73.jar%2373!/:?] {}
+	at com.abdelaziz.canary.common.entity.EntityClassGroup.<clinit>(EntityClassGroup.java:29) ~[%2374!/:?] {re:mixin,re:classloading}
+	... 21 more
+
+
+A detailed walkthrough of the error, its code path and all known details is as follows:
+---------------------------------------------------------------------------------------
+
+-- System Details --
+Details:
+	Minecraft Version: 1.18.2
+	Minecraft Version ID: 1.18.2
+	Operating System: Windows 10 (amd64) version 10.0
+	Java Version: 17.0.3, Oracle Corporation
+	Java VM Version: Java HotSpot(TM) 64-Bit Server VM (mixed mode, sharing), Oracle Corporation
+	Memory: 406923680 bytes (388 MiB) / 1044381696 bytes (996 MiB) up to 1044381696 bytes (996 MiB)
+	CPUs: 4
+	Processor Vendor: GenuineIntel
+	Processor Name: Intel(R) Core(TM) i3-4030U CPU @ 1.90GHz
+	Identifier: Intel64 Family 6 Model 69 Stepping 1
+	Microarchitecture: Haswell (Client)
+	Frequency (GHz): 1.90
+	Number of physical packages: 1
+	Number of physical CPUs: 2
+	Number of logical CPUs: 4
+	Graphics card #0 name: Intel(R) HD Graphics Family
+	Graphics card #0 vendor: Intel Corporation (0x8086)
+	Graphics card #0 VRAM (MB): 1024.00
+	Graphics card #0 deviceId: 0x0a16
+	Graphics card #0 versionInfo: DriverVersion=20.19.15.5171
+	Memory slot #0 capacity (MB): 4096.00
+	Memory slot #0 clockSpeed (GHz): 1.60
+	Memory slot #0 type: DDR3
+	Virtual memory max (MB): 35979.63
+	Virtual memory used (MB): 6294.71
+	Swap memory total (MB): 32000.00
+	Swap memory used (MB): 845.12
+	JVM Flags: 0 total; 
+	Server Running: true
+	Player Count: 0 / 8; []
+	Data Packs: vanilla, mod:canary (incompatible), mod:forge
+	World Generation: Stable
+	Type: Integrated Server (map_client.txt)
+	Is Modded: Definitely; Client brand changed to 'forge'; Server brand changed to 'forge'
+	ModLauncher: 9.1.3+9.1.3+main.9b69c82a
+	ModLauncher launch target: forgeclientuserdev
+	ModLauncher naming: mcp
+	ModLauncher services: 
+		 mixin PLUGINSERVICE 
+		 eventbus PLUGINSERVICE 
+		 slf4jfixer PLUGINSERVICE 
+		 object_holder_definalize PLUGINSERVICE 
+		 runtime_enum_extender PLUGINSERVICE 
+		 unprotect PLUGINSERVICE 
+		 capability_token_subclass PLUGINSERVICE 
+		 accesstransformer PLUGINSERVICE 
+		 runtimedistcleaner PLUGINSERVICE 
+		 mixin TRANSFORMATIONSERVICE 
+		 ForgeLoomMixinRemapperInjector TRANSFORMATIONSERVICE 
+		 fml TRANSFORMATIONSERVICE 
+	FML Language Providers: 
+		minecraft@1.0
+		lowcodefml@null
+		javafml@null
+	Mod List: 
+		forge-1.18.2-40.1.73-minecraft-project-@-merged-na|Minecraft                     |minecraft                     |1.18.2              |DONE      |Manifest: NOSIGNATURE
+		main                                              |Canary                        |canary                        |0.0.2               |DONE      |Manifest: NOSIGNATURE
+		                                                  |Forge                         |forge                         |40.1.73             |DONE      |Manifest: NOSIGNATURE
+	Crash Report UUID: 51a8c42c-7c0e-48ee-a159-6e46a90ee5d7
+	FML: 40.1
+	Forge: net.minecraftforge:40.1.73

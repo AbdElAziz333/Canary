@@ -1,11 +1,11 @@
 package com.abdelaziz.canary.common.world.listeners;
 
-import net.minecraft.world.level.border.BorderChangeListener;
-import net.minecraft.world.level.border.WorldBorder;
+import net.minecraft.world.border.WorldBorder;
+import net.minecraft.world.border.WorldBorderListener;
 
 import java.util.ArrayList;
 
-public class WorldBorderListenerOnceMulti implements BorderChangeListener {
+public class WorldBorderListenerOnceMulti implements WorldBorderListener {
 
     private final ArrayList<WorldBorderListenerOnce> delegate;
 
@@ -25,57 +25,57 @@ public class WorldBorderListenerOnceMulti implements BorderChangeListener {
     }
 
     @Override
-    public void onBorderSizeSet(WorldBorder border, double size) {
+    public void onSizeChange(WorldBorder border, double size) {
         for (WorldBorderListenerOnce listener : this.delegate) {
-            listener.onBorderSizeSet(border, size);
+            listener.onSizeChange(border, size);
         }
         this.delegate.clear();
     }
 
     @Override
-    public void onBorderSizeLerping(WorldBorder border, double fromSize, double toSize, long time) {
+    public void onInterpolateSize(WorldBorder border, double fromSize, double toSize, long time) {
         for (WorldBorderListenerOnce listener : this.delegate) {
-            listener.onBorderSizeLerping(border, fromSize, toSize, time);
+            listener.onInterpolateSize(border, fromSize, toSize, time);
         }
         this.delegate.clear();
     }
 
     @Override
-    public void onBorderCenterSet(WorldBorder border, double centerX, double centerZ) {
+    public void onCenterChanged(WorldBorder border, double centerX, double centerZ) {
         for (WorldBorderListenerOnce listener : this.delegate) {
-            listener.onBorderCenterSet(border, centerX, centerZ);
+            listener.onCenterChanged(border, centerX, centerZ);
         }
         this.delegate.clear();
     }
 
     @Override
-    public void onBorderSetWarningTime(WorldBorder border, int warningTime) {
+    public void onWarningTimeChanged(WorldBorder border, int warningTime) {
         for (WorldBorderListenerOnce listener : this.delegate) {
-            listener.onBorderSetWarningTime(border, warningTime);
+            listener.onWarningTimeChanged(border, warningTime);
         }
         this.delegate.clear();
     }
 
     @Override
-    public void onBorderSetWarningBlocks(WorldBorder border, int warningBlockDistance) {
+    public void onWarningBlocksChanged(WorldBorder border, int warningBlockDistance) {
         for (WorldBorderListenerOnce listener : this.delegate) {
-            listener.onBorderSetWarningBlocks(border, warningBlockDistance);
+            listener.onWarningBlocksChanged(border, warningBlockDistance);
         }
         this.delegate.clear();
     }
 
     @Override
-    public void onBorderSetDamagePerBlock(WorldBorder border, double damagePerBlock) {
+    public void onDamagePerBlockChanged(WorldBorder border, double damagePerBlock) {
         for (WorldBorderListenerOnce listener : this.delegate) {
-            listener.onBorderSetDamagePerBlock(border, damagePerBlock);
+            listener.onDamagePerBlockChanged(border, damagePerBlock);
         }
         this.delegate.clear();
     }
 
     @Override
-    public void onBorderSetDamageSafeZOne(WorldBorder border, double safeZoneRadius) {
+    public void onSafeZoneChanged(WorldBorder border, double safeZoneRadius) {
         for (WorldBorderListenerOnce listener : this.delegate) {
-            listener.onBorderSetDamageSafeZOne(border, safeZoneRadius);
+            listener.onSafeZoneChanged(border, safeZoneRadius);
         }
         this.delegate.clear();
     }

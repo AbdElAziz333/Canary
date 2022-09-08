@@ -1,20 +1,21 @@
 package com.abdelaziz.canary.common.config;
 
 import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
-import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.loading.LoadingModList;
 import net.minecraftforge.fml.loading.moddiscovery.ModInfo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
 /**
- * Documentation of these options: https://github.com/jellysquid3/lithium-fabric/wiki/Configuration-File
+ * Documentation of these options: https://github.com/AbdElAziz333/Canary/wiki/Configuration-File
  */
 @SuppressWarnings("CanBeFinal")
 public class CanaryConfig {
@@ -45,7 +46,7 @@ public class CanaryConfig {
         this.addMixinRule("ai.task.replace_streams", true);
 
         this.addMixinRule("alloc", true);
-        this.addMixinRule("alloc.blockstate", true);
+        this.addMixinRule("alloc.blockstate", false);//ferritecore adds a better optimization for neighbor table, disable the StateHolderMixin when ferritecore is installed
         this.addMixinRule("alloc.chunk_random", true);
         this.addMixinRule("alloc.chunk_ticking", true);
         this.addMixinRule("alloc.composter", true);
@@ -129,7 +130,6 @@ public class CanaryConfig {
         this.addMixinRule("util.inventory_comparator_tracking", true);
 
         this.addMixinRule("world", true);
-        this.addMixinRule("world.biome_manager", true);
         this.addMixinRule("world.block_entity_retrieval", true);
         this.addMixinRule("world.block_entity_ticking", true);
         this.addMixinRule("world.block_entity_ticking.sleeping", true);
@@ -190,7 +190,7 @@ public class CanaryConfig {
             }
         }
 
-  //      config.applyModOverrides();
+        config.applyModOverrides();
 
         // Check dependencies several times, because one iteration may disable a rule required by another rule
         // This terminates because each additional iteration will disable one or more rules, and there is only a finite number of rules
@@ -271,51 +271,52 @@ public class CanaryConfig {
             option.setEnabled(enabled, true);
         }
     }
-/*
+
+    // Ported from MaxNeedsSnacks/roadrunner
+
+    private static void writeDefaultConfig(File file) throws IOException {
+        File dir = file.getParentFile();
+
+        if (!dir.exists()) {
+            if (!dir.mkdirs()) {
+                throw new IOException("Could not create parent directories");
+            }
+        } else if (!dir.isDirectory()) {
+            throw new IOException("The parent file is not a directory");
+        }
+
+        try (Writer writer = new FileWriter(file)) {
+            writer.write("# This is the configuration file for Canary.\n");
+            writer.write("# This file exists for debugging purposes and should not be configured otherwise.\n");
+            writer.write("#\n");
+            writer.write("# You can find information on editing this file and all the available options here:\n");
+            writer.write("# https://github.com/AbdElAziz333/Canary/wiki/Configuration-File\n");
+            writer.write("#\n");
+            writer.write("# By default, this file will be empty except for this notice.\n");
+        }
+    }
+
     private void applyModOverrides() {
-        for (ModInfo container : LoadingModList.get().getMods()) {
-            String meta = container.getModId();
+        for (ModInfo mod : LoadingModList.get().getMods()) {
+            String modid = mod.getModId();
+            Path path = mod.getOwningFile().getFile().findResource("canary.overrides.properties");
+            if (Files.exists(path)) {
+                Properties props = new Properties();
 
-            if (meta.containsCustomValue(JSON_KEY_CANARY_OPTIONS)) {
-                Properties overrides = meta.getCustomValue(JSON_KEY_CANARY_OPTIONS);
-
-                if (overrides.getType() != CvType.OBJECT) {
-                    LOGGER.warn("Mod '{}' contains invalid Lithium option overrides, ignoring", meta.getId());
+                try (InputStream stream = Files.newInputStream(path)) {
+                    props.load(stream);
+                } catch (IOException e) {
+                    LOGGER.warn("Could not load overrides file for mod '{}', ignoring", modid);
                     continue;
                 }
 
-                for (Map.Entry<String, Properties> entry : overrides.getAsObject()) {
-                    this.applyModOverride(meta, entry.getKey(), entry.getValue());
+                for (Map.Entry<Object, Object> entry : props.entrySet()) {
+                    applyModOverride(modid, entry.getKey().toString(), entry.getValue().toString());
                 }
             }
         }
     }
 
-    private void applyModOverride(String meta, String name, Properties value) {
-        Option option = this.options.get(name);
-
-        if (option == null) {
-            LOGGER.warn("Mod '{}' attempted to override option '{}', which doesn't exist, ignoring", meta.getId(), name);
-            return;
-        }
-
-        if (value.getType() != CvType.BOOLEAN) {
-            LOGGER.warn("Mod '{}' attempted to override option '{}' with an invalid value, ignoring", meta.getId(), name);
-            return;
-        }
-
-        boolean enabled = value.getAsBoolean();
-
-        // disabling the option takes precedence over enabling
-        if (!enabled && option.isEnabled()) {
-            option.clearModsDefiningValue();
-        }
-
-        if (!enabled || option.isEnabled() || option.getDefiningMods().isEmpty()) {
-            option.addModOverride(enabled, meta.getId());
-        }
-    }
-*/
     /**
      * Returns the effective option for the specified class name. This traverses the package path of the given mixin
      * and checks each root for configuration rules. If a configuration rule disables a package, all mixins located in
@@ -360,25 +361,28 @@ public class CanaryConfig {
         return changed;
     }
 
-    private static void writeDefaultConfig(File file) throws IOException {
-        File dir = file.getParentFile();
+    private void applyModOverride(String modid, String name, String value) {
+        Option option = this.options.get(name);
 
-        if (!dir.exists()) {
-            if (!dir.mkdirs()) {
-                throw new IOException("Could not create parent directories");
-            }
-        } else if (!dir.isDirectory()) {
-            throw new IOException("The parent file is not a directory");
+        if (option == null) {
+            LOGGER.warn("Mod '{}' attempted to override option '{}', which doesn't exist, ignoring", modid, name);
+            return;
         }
 
-        try (Writer writer = new FileWriter(file)) {
-            writer.write("# This is the configuration file for Canary.\n");
-            writer.write("# This file exists for debugging purposes and should not be configured otherwise.\n");
-            writer.write("#\n");
-            writer.write("# You can find information on editing this file and all the available options here:\n");
-            writer.write("# https://github.com/jellysquid3/lithium-fabric/wiki/Configuration-File\n");
-            writer.write("#\n");
-            writer.write("# By default, this file will be empty except for this notice.\n");
+        boolean enabled = Boolean.parseBoolean(value);
+
+        if (!value.equals(Boolean.toString(enabled))) {
+            LOGGER.warn("Mod '{}' attempted to override option '{}' with an invalid value, ignoring", modid, name);
+            return;
+        }
+
+        // disabling the option takes precedence over enabling
+        if (!enabled && option.isEnabled()) {
+            option.clearModsDefiningValue();
+        }
+
+        if (!enabled || option.isEnabled() || option.getDefiningMods().isEmpty()) {
+            option.addModOverride(enabled, modid);
         }
     }
 

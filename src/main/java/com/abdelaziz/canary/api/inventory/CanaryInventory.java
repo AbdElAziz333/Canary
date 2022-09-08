@@ -1,10 +1,10 @@
 package com.abdelaziz.canary.api.inventory;
 
-import net.minecraft.core.NonNullList;
-import net.minecraft.world.Container;
-import net.minecraft.world.entity.vehicle.AbstractMinecartContainer;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
+import net.minecraft.block.entity.LootableContainerBlockEntity;
+import net.minecraft.entity.vehicle.VehicleInventory;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.collection.DefaultedList;
 
 /**
  * Provides the ability for mods to allow Canary's hopper optimizations to access their inventories' for item transfers.
@@ -13,11 +13,11 @@ import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
  * It is not required to implement this interface, but doing so will allow the mod's inventories to benefit from
  * Canary's optimizations.
  * <p>
- * This interface should be implemented by your {@link net.minecraft.world.Container} or
- * {@link net.minecraft.world.entity.npc.InventoryCarrier} type to access the stack list.
+ * This interface should be implemented by your {@link net.minecraft.inventory.Inventory} or
+ * {@link net.minecraft.inventory.SidedInventory} type to access the stack list.
  * <p>
- * An inventory must not extend {@link net.minecraft.world.level.block.entity.BlockEntity} if it has a supporting block that
- * implements {@link net.minecraft.world.WorldlyContainerHolder}.
+ * An inventory must not extend {@link net.minecraft.block.entity.BlockEntity} if it has a supporting block that
+ * implements {@link net.minecraft.block.InventoryProvider}.
  * <p>
  * The hopper interaction behavior of a CanaryInventory should only change if the content of the inventory
  * stack list also changes. For example, an inventory which only accepts an item if it already contains an item of the
@@ -27,14 +27,14 @@ import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
  *
  * @author 2No2Name
  */
-public interface CanaryInventory extends Container {
+public interface CanaryInventory extends Inventory {
 
     /**
      * Getter for the inventory stack list of this inventory.
      *
      * @return inventory stack list
      */
-    NonNullList<ItemStack> getInventoryCanary();
+    DefaultedList<ItemStack> getInventoryCanary();
 
     /**
      * Setter for the inventory stack list of this inventory.
@@ -42,7 +42,7 @@ public interface CanaryInventory extends Container {
      *
      * @param inventory inventory stack list
      */
-    void setInventoryCanary(NonNullList<ItemStack> inventory);
+    void setInventoryCanary(DefaultedList<ItemStack> inventory);
 
     /**
      * Generates the loot like a hopper access would do in vanilla.
@@ -51,11 +51,11 @@ public interface CanaryInventory extends Container {
      * loot generation method. Otherwise its loot may be generated too late.
      */
     default void generateLootCanary() {
-        if (this instanceof RandomizableContainerBlockEntity) {
-            ((RandomizableContainerBlockEntity) this).unpackLootTable(null);
+        if (this instanceof LootableContainerBlockEntity) {
+            ((LootableContainerBlockEntity) this).checkLootInteraction(null);
         }
-        if (this instanceof AbstractMinecartContainer) {
-            ((AbstractMinecartContainer) this).unpackChestVehicleLootTable(null);
+        if (this instanceof VehicleInventory) {
+            ((VehicleInventory) this).generateInventoryLoot(null);
         }
     }
 }

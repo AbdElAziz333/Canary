@@ -4,11 +4,11 @@ license = "LGPL-3.0-only"
 issueTrackerURL = "https://github.com/AbdElAziz333/Canary/issues"
 [[mods]]
 modId = "canary"
-version = "${file.jarVersion}"
+version = "${version}"
 displayName = "Canary"
 #updateJSONURL="https://change.me.example.invalid/updates.json"
-#displayURL="https://change.me.to.your.mods.homepage.example.invalid/"
-logoFile = "icon.png"
+displayURL = "https://www.curseforge.com/minecraft/mc-mods/canary"
+logoFile = "logo.png"
 credits = "AbdElAziz, JellySquid, 2No2Name"
 authors = "AbdElAziz"
 displayTest = "MATCH_VERSION"
@@ -26,7 +26,7 @@ Canary is a free and open-source optimization mod for Minecraft which makes a wi
 
 [[dependencies.canary]]
     modId="minecraft"
-    mandatory=true
-    versionRange="[1.19.1,1.20)"
-    ordering="NONE"
+mandatory = true
+versionRange = "[1.19.2,)"
+ordering = "NONE"
     side="BOTH"

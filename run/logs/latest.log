@@ -1,0 +1,140 @@
+[02:11:00] [main/INFO] (Launcher) ModLauncher running: args [--launchTarget, forgeclientuserdev, --version, MOD_DEV, --assetIndex, 1.19.2-1.19, --assetsDir, C:\Users\abdel\.gradle\caches\fabric-loom\assets, --gameDir, ., --fml.forgeVersion, 43.1.16, --fml.mcVersion, 1.19.2, --fml.forgeGroup, net.minecraftforge, --fml.mcpVersion, 20220805.130853, -mixin.config, canary.mixins.json]
+[02:11:00] [main/INFO] (Launcher) ModLauncher 10.0.8+10.0.8+main.0ef7e830 starting: java version 17.0.3 by Oracle Corporation; OS Windows 10 arch amd64 version 10.0
+[02:11:01] [main/INFO] (mixin) SpongePowered MIXIN Subsystem Version=0.8.5 Source=union:/C:/Users/abdel/.gradle/caches/transforms-3/2eb5234b62c44ef35a57d9d9f4d0854e/transformed/alfd-transformed-39a68676d1a7b6e6dd684f640664b1e59940edca9ecc607651e5f54fdea53dd5/mixin-patched-0.8.5.7.jar%23112!/ Service=ModLauncher Env=CLIENT
+[02:11:04] [main/WARN] (ModFileParser) Mod file C:\Users\abdel\.gradle\caches\transforms-3\ff2c104bfc91424d38d23622c94a98d4\transformed\alfd-transformed-39a68676d1a7b6e6dd684f640664b1e59940edca9ecc607651e5f54fdea53dd5\javafmllanguage-1.19.2-43.1.16.jar is missing mods.toml file
+[02:11:04] [main/WARN] (ModFileParser) Mod file C:\Users\abdel\.gradle\caches\transforms-3\20f45e6795230a0756d6ca005f7fb132\transformed\alfd-transformed-39a68676d1a7b6e6dd684f640664b1e59940edca9ecc607651e5f54fdea53dd5\lowcodelanguage-1.19.2-43.1.16.jar is missing mods.toml file
+[02:11:04] [main/WARN] (ModFileParser) Mod file C:\Users\abdel\.gradle\caches\transforms-3\2aeaa84c6d87727a1f437d77609adfaf\transformed\alfd-transformed-39a68676d1a7b6e6dd684f640664b1e59940edca9ecc607651e5f54fdea53dd5\mclanguage-1.19.2-43.1.16.jar is missing mods.toml file
+[02:11:04] [main/WARN] (ModFileParser) Mod file C:\Users\abdel\.gradle\caches\transforms-3\701a484d05cbbe0519bb4293b7d5fd25\transformed\alfd-transformed-39a68676d1a7b6e6dd684f640664b1e59940edca9ecc607651e5f54fdea53dd5\fmlcore-1.19.2-43.1.16.jar is missing mods.toml file
+[02:11:04] [main/INFO] (ModDiscoverer) Found mod file javafmllanguage-1.19.2-43.1.16.jar of type LANGPROVIDER with provider net.minecraftforge.fml.loading.moddiscovery.MinecraftLocator@19b30c92
+[02:11:04] [main/INFO] (ModDiscoverer) Found mod file lowcodelanguage-1.19.2-43.1.16.jar of type LANGPROVIDER with provider net.minecraftforge.fml.loading.moddiscovery.MinecraftLocator@19b30c92
+[02:11:04] [main/INFO] (ModDiscoverer) Found mod file mclanguage-1.19.2-43.1.16.jar of type LANGPROVIDER with provider net.minecraftforge.fml.loading.moddiscovery.MinecraftLocator@19b30c92
+[02:11:04] [main/INFO] (ModDiscoverer) Found mod file fmlcore-1.19.2-43.1.16.jar of type LIBRARY with provider net.minecraftforge.fml.loading.moddiscovery.MinecraftLocator@19b30c92
+[02:11:04] [main/INFO] (ModDiscoverer) Found mod file forge-1.19.2-43.1.16-minecraft-project-@-merged-named.jar of type MOD with provider net.minecraftforge.fml.loading.moddiscovery.MinecraftLocator@19b30c92
+[02:11:04] [main/INFO] (ModDiscoverer) Found mod file main of type MOD with provider net.minecraftforge.fml.loading.moddiscovery.MinecraftLocator@19b30c92
+[02:11:04] [main/INFO] (ModDiscoverer) Found mod file  of type MOD with provider net.minecraftforge.fml.loading.moddiscovery.MinecraftLocator@19b30c92
+[02:11:04] [main/INFO] (JarInJarDependencyLocator) No dependencies to load found. Skipping!
+[02:11:16] [main/INFO] (mixin) Compatibility level set to JAVA_17
+[02:11:16] [main/INFO] (LaunchServiceHandler) Launching target 'forgeclientuserdev' with arguments [--version, MOD_DEV, --gameDir, ., --assetsDir, C:\Users\abdel\.gradle\caches\fabric-loom\assets, --assetIndex, 1.19.2-1.19]
+[02:11:16] [main/INFO] (unprotect) Found 6854 Minecraft classes
+[02:11:17] [main/INFO] (Canary) Loaded configuration file for Canary: 104 options available, 0 override(s) found
+[02:11:42] [pool-3-thread-1/INFO] (Minecraft) Building unoptimized datafixer
+[02:11:51] [Render thread/WARN] (Minecraft) Assets URL 'union:/C:/Users/abdel/Desktop/Modded%20Minecraft/My%20Mods/Performance%20Mods/Canary/.gradle/loom-cache/1.19.2/net.fabricmc.yarn.1_19_2.1.19.2+build.3-v2-forge-1.19.2-43.1.16/forge-1.19.2-43.1.16-minecraft-project-@-merged-named.jar%23179!/assets/.mcassetsroot' uses unexpected schema
+[02:11:51] [Render thread/WARN] (Minecraft) Assets URL 'union:/C:/Users/abdel/Desktop/Modded%20Minecraft/My%20Mods/Performance%20Mods/Canary/.gradle/loom-cache/1.19.2/net.fabricmc.yarn.1_19_2.1.19.2+build.3-v2-forge-1.19.2-43.1.16/forge-1.19.2-43.1.16-minecraft-project-@-merged-named.jar%23179!/data/.mcassetsroot' uses unexpected schema
+[02:11:51] [Render thread/INFO] (Minecraft) Environment: authHost='https://authserver.mojang.com', accountsHost='https://api.mojang.com', sessionHost='https://sessionserver.mojang.com', servicesHost='https://api.minecraftservices.com', name='PROD'
+[02:11:51] [Render thread/INFO] (Minecraft) Setting user: Dev
+[02:11:52] [Render thread/INFO] (Minecraft) Backend library: LWJGL version 3.3.1 build 7
+[02:11:56] [modloading-worker-0/INFO] (ForgeMod) Forge mod loading, version 43.1.16, for MC 1.19.2 with MCP 20220805.130853
+[02:11:56] [modloading-worker-0/INFO] (MinecraftForge) MinecraftForge v43.1.16 Initialized
+[02:12:00] [Render thread/INFO] (ForgeGameTestHooks) Enabled Gametest Namespaces: []
+[02:12:01] [Render thread/INFO] (Minecraft) Narrator library for x64 successfully loaded
+[02:12:01] [Render thread/INFO] (Minecraft) Reloading ResourceManager: Default, Mod Resources
+[02:12:04] [Forge Version Check/INFO] (VersionChecker) [forge] Starting version check at https://files.minecraftforge.net/net/minecraftforge/forge/promotions_slim.json
+[02:12:06] [Forge Version Check/INFO] (VersionChecker) [forge] Found status: AHEAD Current: 43.1.16 Target: null
+[02:12:21] [Render thread/WARN] (Minecraft) Missing sound for event: minecraft:item.goat_horn.play
+[02:12:21] [Render thread/WARN] (Minecraft) Missing sound for event: minecraft:entity.goat.screaming.horn_break
+[02:12:23] [Render thread/INFO] (Minecraft) OpenAL initialized on device OpenAL Soft on Speakers (Realtek High Definition Audio)
+[02:12:23] [Render thread/INFO] (Minecraft) Sound engine started
+[02:12:24] [Render thread/INFO] (Minecraft) Created: 1024x512x4 minecraft:textures/atlas/blocks.png-atlas
+[02:12:24] [Render thread/INFO] (Minecraft) Created: 256x128x4 minecraft:textures/atlas/signs.png-atlas
+[02:12:24] [Render thread/INFO] (Minecraft) Created: 512x512x4 minecraft:textures/atlas/banner_patterns.png-atlas
+[02:12:24] [Render thread/INFO] (Minecraft) Created: 512x512x4 minecraft:textures/atlas/shield_patterns.png-atlas
+[02:12:24] [Render thread/INFO] (Minecraft) Created: 256x256x4 minecraft:textures/atlas/chest.png-atlas
+[02:12:24] [Render thread/INFO] (Minecraft) Created: 512x256x4 minecraft:textures/atlas/beds.png-atlas
+[02:12:24] [Render thread/INFO] (Minecraft) Created: 512x256x4 minecraft:textures/atlas/shulker_boxes.png-atlas
+[02:12:26] [Render thread/WARN] (Minecraft) Shader rendertype_entity_translucent_emissive could not find sampler named Sampler2 in the specified shader program.
+[02:12:27] [Render thread/INFO] (Minecraft) Created: 256x256x0 minecraft:textures/atlas/particles.png-atlas
+[02:12:27] [Render thread/INFO] (Minecraft) Created: 256x256x0 minecraft:textures/atlas/paintings.png-atlas
+[02:12:27] [Render thread/INFO] (Minecraft) Created: 128x128x0 minecraft:textures/atlas/mob_effects.png-atlas
+[02:12:29] [Realms Notification Availability checker #1/INFO] (Minecraft) Could not authorize you against Realms server: Invalid session id
+[02:12:34] [Render thread/INFO] (Minecraft) Deleting level New World (2)
+[02:12:34] [Render thread/INFO] (Minecraft) Attempt 1...
+[02:12:36] [Render thread/INFO] (Minecraft) Deleting level New World
+[02:12:36] [Render thread/INFO] (Minecraft) Attempt 1...
+[02:12:44] [Render thread/INFO] (Minecraft) Loaded 7 recipes
+[02:12:45] [Render thread/INFO] (Minecraft) Loaded 1179 advancements
+[02:12:49] [Render thread/INFO] (Minecraft) Loaded 7 recipes
+[02:12:50] [Render thread/INFO] (Minecraft) Loaded 1179 advancements
+[02:13:02] [Server thread/INFO] (Minecraft) Starting integrated minecraft server version 1.19.2
+[02:13:02] [Server thread/INFO] (Minecraft) Generating keypair
+[02:13:02] [Server thread/WARN] (ForgeConfigSpec) Configuration file .\saves\New World\serverconfig\forge-server.toml is not correct. Correcting
+[02:13:02] [Server thread/WARN] (ForgeConfigSpec) Incorrect key server was corrected from null to its default, SimpleCommentedConfig:{}. 
+[02:13:02] [Server thread/WARN] (ForgeConfigSpec) Incorrect key server.removeErroringBlockEntities was corrected from null to its default, false. 
+[02:13:02] [Server thread/WARN] (ForgeConfigSpec) Incorrect key server.removeErroringEntities was corrected from null to its default, false. 
+[02:13:02] [Server thread/WARN] (ForgeConfigSpec) Incorrect key server.fullBoundingBoxLadders was corrected from null to its default, false. 
+[02:13:02] [Server thread/WARN] (ForgeConfigSpec) Incorrect key server.zombieBaseSummonChance was corrected from null to its default, 0.1. 
+[02:13:02] [Server thread/WARN] (ForgeConfigSpec) Incorrect key server.zombieBabyChance was corrected from null to its default, 0.05. 
+[02:13:02] [Server thread/WARN] (ForgeConfigSpec) Incorrect key server.fixAdvancementLoading was corrected from null to its default, true. 
+[02:13:02] [Server thread/WARN] (ForgeConfigSpec) Incorrect key server.permissionHandler was corrected from null to its default, forge:default_handler. 
+[02:13:06] [Server thread/INFO] (Minecraft) Preparing start region for dimension minecraft:overworld
+[02:13:09] [Render thread/INFO] (Minecraft) Preparing spawn area: 0%
+[02:13:09] [Render thread/INFO] (Minecraft) Preparing spawn area: 0%
+[02:13:09] [Render thread/INFO] (Minecraft) Preparing spawn area: 0%
+[02:13:09] [Render thread/INFO] (Minecraft) Preparing spawn area: 0%
+[02:13:09] [Render thread/INFO] (Minecraft) Preparing spawn area: 0%
+[02:13:09] [Render thread/INFO] (Minecraft) Preparing spawn area: 0%
+[02:13:09] [Render thread/INFO] (Minecraft) Preparing spawn area: 0%
+[02:13:10] [Render thread/INFO] (Minecraft) Preparing spawn area: 0%
+[02:13:10] [Render thread/INFO] (Minecraft) Preparing spawn area: 0%
+[02:13:11] [Render thread/INFO] (Minecraft) Preparing spawn area: 0%
+[02:13:11] [Render thread/INFO] (Minecraft) Preparing spawn area: 0%
+[02:13:12] [Render thread/INFO] (Minecraft) Preparing spawn area: 0%
+[02:13:12] [Render thread/INFO] (Minecraft) Preparing spawn area: 4%
+[02:13:13] [Render thread/INFO] (Minecraft) Preparing spawn area: 6%
+[02:13:16] [Render thread/INFO] (Minecraft) Preparing spawn area: 6%
+[02:13:16] [Render thread/INFO] (Minecraft) Preparing spawn area: 6%
+[02:13:16] [Render thread/INFO] (Minecraft) Preparing spawn area: 6%
+[02:13:16] [Render thread/INFO] (Minecraft) Preparing spawn area: 6%
+[02:13:16] [Render thread/INFO] (Minecraft) Preparing spawn area: 6%
+[02:13:16] [Render thread/INFO] (Minecraft) Preparing spawn area: 6%
+[02:13:16] [Render thread/INFO] (Minecraft) Preparing spawn area: 6%
+[02:13:19] [Render thread/INFO] (Minecraft) Preparing spawn area: 53%
+[02:13:19] [Render thread/INFO] (Minecraft) Preparing spawn area: 53%
+[02:13:19] [Render thread/INFO] (Minecraft) Preparing spawn area: 53%
+[02:13:19] [Render thread/INFO] (Minecraft) Preparing spawn area: 53%
+[02:13:19] [Render thread/INFO] (Minecraft) Preparing spawn area: 53%
+[02:13:23] [Render thread/INFO] (Minecraft) Preparing spawn area: 68%
+[02:13:23] [Render thread/INFO] (Minecraft) Preparing spawn area: 68%
+[02:13:23] [Render thread/INFO] (Minecraft) Preparing spawn area: 68%
+[02:13:23] [Render thread/INFO] (Minecraft) Preparing spawn area: 68%
+[02:13:23] [Render thread/INFO] (Minecraft) Preparing spawn area: 68%
+[02:13:23] [Render thread/INFO] (Minecraft) Preparing spawn area: 68%
+[02:13:23] [Render thread/INFO] (Minecraft) Preparing spawn area: 68%
+[02:13:23] [Render thread/INFO] (Minecraft) Preparing spawn area: 68%
+[02:13:23] [Server thread/INFO] (PermissionAPI) Successfully initialized permission handler forge:default_handler
+[02:13:23] [Render thread/INFO] (Minecraft) Time elapsed: 16921 ms
+[02:13:25] [Server thread/INFO] (Minecraft) Changing view distance to 5, from 10
+[02:13:25] [Server thread/INFO] (Minecraft) Changing simulation distance to 5, from 0
+[02:13:25] [Server thread/WARN] (Minecraft) Can't keep up! Is the server overloaded? Running 2234ms or 44 ticks behind
+[02:13:31] [Render thread/WARN] (SystemPropertyUtil) Unable to parse the boolean system property 'java.net.preferIPv6Addresses':system - using the default value: false
+[02:13:40] [Netty Local Client IO #0/INFO] (NetworkHooks) Connected to a modded server.
+[02:13:41] [Server thread/INFO] (AdvancementLoadFix) Using new advancement loading for net.minecraft.advancement.PlayerAdvancementTracker@76831a30
+[02:13:42] [Server thread/INFO] (Minecraft) Dev[local:E:4492539c] logged in with entity id 1 at (7.5, -63.0, 2.5)
+[02:13:42] [Server thread/INFO] (Minecraft) Dev joined the game
+[02:13:45] [Server thread/WARN] (Minecraft) Can't keep up! Is the server overloaded? Running 4140ms or 82 ticks behind
+[02:13:46] [Render thread/INFO] (Minecraft) Loaded 0 advancements
+[02:13:56] [Server thread/INFO] (Minecraft) Saving and pausing game...
+[02:13:56] [Server thread/INFO] (Minecraft) Saving chunks for level 'ServerLevel[New World]'/minecraft:overworld
+[02:13:56] [Server thread/INFO] (Minecraft) Saving chunks for level 'ServerLevel[New World]'/minecraft:the_end
+[02:13:56] [Server thread/INFO] (Minecraft) Saving chunks for level 'ServerLevel[New World]'/minecraft:the_nether
+[02:14:19] [Server thread/INFO] (Minecraft) Saving and pausing game...
+[02:14:19] [Server thread/INFO] (Minecraft) Saving chunks for level 'ServerLevel[New World]'/minecraft:overworld
+[02:14:19] [Server thread/INFO] (Minecraft) Saving chunks for level 'ServerLevel[New World]'/minecraft:the_end
+[02:14:19] [Server thread/INFO] (Minecraft) Saving chunks for level 'ServerLevel[New World]'/minecraft:the_nether
+[02:14:21] [Server thread/INFO] (Minecraft) Saving and pausing game...
+[02:14:21] [Server thread/INFO] (Minecraft) Saving chunks for level 'ServerLevel[New World]'/minecraft:overworld
+[02:14:21] [Server thread/INFO] (Minecraft) Saving chunks for level 'ServerLevel[New World]'/minecraft:the_end
+[02:14:21] [Server thread/INFO] (Minecraft) Saving chunks for level 'ServerLevel[New World]'/minecraft:the_nether
+[02:14:39] [Server thread/INFO] (Minecraft) Dev lost connection: Disconnected
+[02:14:39] [Server thread/INFO] (Minecraft) Dev left the game
+[02:14:39] [Server thread/INFO] (Minecraft) Stopping singleplayer server as player logged out
+[02:14:40] [Server thread/INFO] (Minecraft) Stopping server
+[02:14:40] [Server thread/INFO] (Minecraft) Saving players
+[02:14:40] [Server thread/INFO] (Minecraft) Saving worlds
+[02:14:42] [Server thread/INFO] (Minecraft) Saving chunks for level 'ServerLevel[New World]'/minecraft:overworld
+[02:14:59] [Server thread/INFO] (Minecraft) Saving chunks for level 'ServerLevel[New World]'/minecraft:the_end
+[02:14:59] [Server thread/INFO] (Minecraft) Saving chunks for level 'ServerLevel[New World]'/minecraft:the_nether
+[02:14:59] [Server thread/INFO] (Minecraft) ThreadedAnvilChunkStorage (New World): All chunks are saved
+[02:14:59] [Server thread/INFO] (Minecraft) ThreadedAnvilChunkStorage (DIM1): All chunks are saved
+[02:14:59] [Server thread/INFO] (Minecraft) ThreadedAnvilChunkStorage (DIM-1): All chunks are saved
+[02:14:59] [Server thread/INFO] (Minecraft) ThreadedAnvilChunkStorage: All dimensions are saved
+[02:15:05] [Render thread/INFO] (Minecraft) Stopping!

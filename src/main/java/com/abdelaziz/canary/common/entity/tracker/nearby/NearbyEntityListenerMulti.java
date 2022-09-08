@@ -1,7 +1,7 @@
 package com.abdelaziz.canary.common.entity.tracker.nearby;
 
 import com.abdelaziz.canary.common.util.tuples.Range6Int;
-import net.minecraft.world.entity.Entity;
+import net.minecraft.entity.Entity;
 
 import java.util.ArrayList;
 import java.util.List;

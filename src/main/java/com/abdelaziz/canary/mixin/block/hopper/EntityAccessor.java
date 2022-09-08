@@ -1,7 +1,7 @@
 package com.abdelaziz.canary.mixin.block.hopper;
 
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.entity.EntityInLevelCallback;
+import net.minecraft.entity.Entity;
+import net.minecraft.world.entity.EntityChangeListener;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
@@ -9,5 +9,5 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface EntityAccessor {
 
     @Accessor
-    EntityInLevelCallback getChangeListener();
+    EntityChangeListener getChangeListener();
 }

@@ -1,7 +1,7 @@
 package com.abdelaziz.canary.mixin.collections.gamerules;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.GameRules;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
@@ -17,21 +17,21 @@ public class GameRulesMixin {
     @Mutable
     @Shadow
     @Final
-    private Map<GameRules.Key<?>, GameRules.Value<?>> GAME_RULE_TYPES;
+    private Map<GameRules.Key<?>, GameRules.Rule<?>> rules;
 
     @Inject(
             method = "<init>()V",
             at = @At("RETURN")
     )
     private void reinitializeMap(CallbackInfo ci) {
-        this.GAME_RULE_TYPES = new Object2ObjectOpenHashMap<>(this.GAME_RULE_TYPES);
+        this.rules = new Object2ObjectOpenHashMap<>(this.rules);
     }
 
     @Inject(
             method = "<init>(Ljava/util/Map;)V",
             at = @At("RETURN")
     )
-    private void reinitializeMap(Map<?, ?> GAME_RULE_TYPES, CallbackInfo ci) {
-        this.GAME_RULE_TYPES = new Object2ObjectOpenHashMap<>(this.GAME_RULE_TYPES);
+    private void reinitializeMap(Map<?, ?> rules, CallbackInfo ci) {
+        this.rules = new Object2ObjectOpenHashMap<>(this.rules);
     }
 }

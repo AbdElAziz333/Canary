@@ -1,0 +1,107 @@
+---- Minecraft Crash Report ----
+// Daisy, daisy...
+
+Time: 2022-09-08 01:41:33
+Description: Exception in server tick loop
+
+org.spongepowered.asm.mixin.transformer.throwables.MixinTransformerError: An unexpected critical error was encountered
+	at org.spongepowered.asm.mixin.transformer.MixinProcessor.applyMixins(MixinProcessor.java:392) ~[mixin-patched-0.8.5.7.jar:?] {}
+	at org.spongepowered.asm.mixin.transformer.MixinTransformer.transformClass(MixinTransformer.java:250) ~[mixin-patched-0.8.5.7.jar:?] {}
+	at org.spongepowered.asm.service.modlauncher.MixinTransformationHandler.processClass(MixinTransformationHandler.java:131) ~[mixin-patched-0.8.5.7.jar:?] {}
+	at org.spongepowered.asm.launch.MixinLaunchPluginLegacy.processClass(MixinLaunchPluginLegacy.java:131) ~[mixin-patched-0.8.5.7.jar:?] {}
+	at cpw.mods.modlauncher.serviceapi.ILaunchPluginService.processClassWithFlags(ILaunchPluginService.java:156) ~[modlauncher-10.0.8.jar:10.0.8+10.0.8+main.0ef7e830] {}
+	at cpw.mods.modlauncher.LaunchPluginHandler.offerClassNodeToPlugins(LaunchPluginHandler.java:88) ~[modlauncher-10.0.8.jar:?] {}
+	at cpw.mods.modlauncher.ClassTransformer.transform(ClassTransformer.java:120) ~[modlauncher-10.0.8.jar:?] {}
+	at cpw.mods.modlauncher.TransformingClassLoader.maybeTransformClassBytes(TransformingClassLoader.java:50) ~[modlauncher-10.0.8.jar:?] {}
+	at cpw.mods.cl.ModuleClassLoader.readerToClass(ModuleClassLoader.java:113) ~[securejarhandler-2.1.4.jar:?] {}
+	at cpw.mods.cl.ModuleClassLoader.lambda$findClass$15(ModuleClassLoader.java:219) ~[securejarhandler-2.1.4.jar:?] {}
+	at cpw.mods.cl.ModuleClassLoader.loadFromModule(ModuleClassLoader.java:229) ~[securejarhandler-2.1.4.jar:?] {}
+	at cpw.mods.cl.ModuleClassLoader.findClass(ModuleClassLoader.java:219) ~[securejarhandler-2.1.4.jar:?] {}
+	at cpw.mods.cl.ModuleClassLoader.loadClass(ModuleClassLoader.java:135) ~[securejarhandler-2.1.4.jar:?] {}
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:520) ~[?:?] {}
+	at net.minecraft.server.world.ServerWorld.<init>(ServerWorld.java:203) ~[forge-1.19.2-43.1.16-minecraft-project-@-merged-named.jar%23179!/:?] {re:mixin,pl:accesstransformer:B,pl:unprotect:A,re:classloading,pl:accesstransformer:B,pl:mixin:APP:canary.mixins.json:ai.nearby_entity_tracking.ServerWorldAccessor,pl:mixin:APP:canary.mixins.json:alloc.chunk_random.ServerWorldMixin,pl:mixin:APP:canary.mixins.json:chunk.entity_class_groups.ServerWorldAccessor,pl:mixin:APP:canary.mixins.json:entity.inactive_navigations.ServerWorldMixin,pl:mixin:A,pl:unprotect:A}
+	at net.minecraft.server.MinecraftServer.createWorlds(MinecraftServer.java:329) ~[forge-1.19.2-43.1.16-minecraft-project-@-merged-named.jar%23179!/:?] {re:mixin,pl:accesstransformer:B,pl:unprotect:A,re:classloading,pl:accesstransformer:B,pl:unprotect:A}
+	at net.minecraft.server.MinecraftServer.loadWorld(MinecraftServer.java:300) ~[forge-1.19.2-43.1.16-minecraft-project-@-merged-named.jar%23179!/:?] {re:mixin,pl:accesstransformer:B,pl:unprotect:A,re:classloading,pl:accesstransformer:B,pl:unprotect:A}
+	at net.minecraft.server.integrated.IntegratedServer.setupServer(IntegratedServer.java:62) ~[forge-1.19.2-43.1.16-minecraft-project-@-merged-named.jar%23179!/:?] {re:classloading,pl:unprotect:A,pl:runtimedistcleaner:A}
+	at net.minecraft.server.MinecraftServer.runServer(MinecraftServer.java:625) ~[forge-1.19.2-43.1.16-minecraft-project-@-merged-named.jar%23179!/:?] {re:mixin,pl:accesstransformer:B,pl:unprotect:A,re:classloading,pl:accesstransformer:B,pl:unprotect:A}
+	at net.minecraft.server.MinecraftServer.method_29739(MinecraftServer.java:244) ~[forge-1.19.2-43.1.16-minecraft-project-@-merged-named.jar%23179!/:?] {re:mixin,pl:accesstransformer:B,pl:unprotect:A,re:classloading,pl:accesstransformer:B,pl:unprotect:A}
+	at java.lang.Thread.run(Thread.java:833) [?:?] {re:mixin}
+Caused by: org.spongepowered.asm.mixin.injection.throwables.InjectionError: Critical injection failure: Callback method onAddEntity(Lnet/minecraft/world/entity/EntityLike;ZLorg/spongepowered/asm/mixin/injection/callback/CallbackInfoReturnable;)V in canary.mixins.json:ai.nearby_entity_tracking.ServerEntityManagerMixin failed injection check, (0/1) succeeded. Scanned 1 target(s). No refMap loaded.
+	at org.spongepowered.asm.mixin.injection.struct.InjectionInfo.postInject(InjectionInfo.java:468) ~[mixin-patched-0.8.5.7.jar:?] {}
+	at org.spongepowered.asm.mixin.transformer.MixinTargetContext.applyInjections(MixinTargetContext.java:1362) ~[mixin-patched-0.8.5.7.jar:?] {}
+	at org.spongepowered.asm.mixin.transformer.MixinApplicatorStandard.applyInjections(MixinApplicatorStandard.java:1051) ~[mixin-patched-0.8.5.7.jar:?] {}
+	at org.spongepowered.asm.mixin.transformer.MixinApplicatorStandard.applyMixin(MixinApplicatorStandard.java:400) ~[mixin-patched-0.8.5.7.jar:?] {}
+	at org.spongepowered.asm.mixin.transformer.MixinApplicatorStandard.apply(MixinApplicatorStandard.java:325) ~[mixin-patched-0.8.5.7.jar:?] {}
+	at org.spongepowered.asm.mixin.transformer.TargetClassContext.apply(TargetClassContext.java:383) ~[mixin-patched-0.8.5.7.jar:?] {}
+	at org.spongepowered.asm.mixin.transformer.TargetClassContext.applyMixins(TargetClassContext.java:365) ~[mixin-patched-0.8.5.7.jar:?] {}
+	at org.spongepowered.asm.mixin.transformer.MixinProcessor.applyMixins(MixinProcessor.java:363) ~[mixin-patched-0.8.5.7.jar:?] {}
+	... 20 more
+
+
+A detailed walkthrough of the error, its code path and all known details is as follows:
+---------------------------------------------------------------------------------------
+
+-- System Details --
+Details:
+	Minecraft Version: 1.19.2
+	Minecraft Version ID: 1.19.2
+	Operating System: Windows 10 (amd64) version 10.0
+	Java Version: 17.0.3, Oracle Corporation
+	Java VM Version: Java HotSpot(TM) 64-Bit Server VM (mixed mode, sharing), Oracle Corporation
+	Memory: 121603584 bytes (115 MiB) / 664797184 bytes (634 MiB) up to 1044381696 bytes (996 MiB)
+	CPUs: 4
+	Processor Vendor: GenuineIntel
+	Processor Name: Intel(R) Core(TM) i3-4030U CPU @ 1.90GHz
+	Identifier: Intel64 Family 6 Model 69 Stepping 1
+	Microarchitecture: Haswell (Client)
+	Frequency (GHz): 1.90
+	Number of physical packages: 1
+	Number of physical CPUs: 2
+	Number of logical CPUs: 4
+	Graphics card #0 name: Intel(R) HD Graphics Family
+	Graphics card #0 vendor: Intel Corporation (0x8086)
+	Graphics card #0 VRAM (MB): 1024.00
+	Graphics card #0 deviceId: 0x0a16
+	Graphics card #0 versionInfo: DriverVersion=20.19.15.5171
+	Memory slot #0 capacity (MB): 4096.00
+	Memory slot #0 clockSpeed (GHz): 1.60
+	Memory slot #0 type: DDR3
+	Virtual memory max (MB): 35979.63
+	Virtual memory used (MB): 6709.90
+	Swap memory total (MB): 32000.00
+	Swap memory used (MB): 1221.50
+	JVM Flags: 0 total; 
+	Server Running: true
+	Player Count: 0 / 8; []
+	Data Packs: vanilla, mod:canary, mod:forge
+	World Generation: Stable
+	Type: Integrated Server (map_client.txt)
+	Is Modded: Definitely; Client brand changed to 'forge'; Server brand changed to 'forge'
+	Launched Version: MOD_DEV
+	ModLauncher: 10.0.8+10.0.8+main.0ef7e830
+	ModLauncher launch target: forgeclientuserdev
+	ModLauncher naming: mcp
+	ModLauncher services: 
+		mixin-patched-0.8.5.7.jar mixin PLUGINSERVICE 
+		eventbus-6.0.3.jar eventbus PLUGINSERVICE 
+		fmlloader-1.19.2-43.1.16.jar slf4jfixer PLUGINSERVICE 
+		fmlloader-1.19.2-43.1.16.jar object_holder_definalize PLUGINSERVICE 
+		fmlloader-1.19.2-43.1.16.jar runtime_enum_extender PLUGINSERVICE 
+		unprotect-1.2.0.jar unprotect PLUGINSERVICE 
+		fmlloader-1.19.2-43.1.16.jar capability_token_subclass PLUGINSERVICE 
+		accesstransformers-8.0.4.jar accesstransformer PLUGINSERVICE 
+		fmlloader-1.19.2-43.1.16.jar runtimedistcleaner PLUGINSERVICE 
+		modlauncher-10.0.8.jar mixin TRANSFORMATIONSERVICE 
+		modlauncher-10.0.8.jar ForgeLoomMixinRemapperInjector TRANSFORMATIONSERVICE 
+		modlauncher-10.0.8.jar fml TRANSFORMATIONSERVICE 
+	FML Language Providers: 
+		minecraft@1.0
+		lowcodefml@null
+		javafml@null
+	Mod List: 
+		forge-1.19.2-43.1.16-minecraft-project-@-merged-na|Minecraft                     |minecraft                     |1.19.2              |DONE      |Manifest: NOSIGNATURE
+		main                                              |Canary                        |canary                        |0.0.2               |DONE      |Manifest: NOSIGNATURE
+		                                                  |Forge                         |forge                         |43.1.16             |DONE      |Manifest: NOSIGNATURE
+	Crash Report UUID: 9c0556da-1037-4d7a-8319-b67c84ed256b
+	FML: 43.1
+	Forge: net.minecraftforge:43.1.16

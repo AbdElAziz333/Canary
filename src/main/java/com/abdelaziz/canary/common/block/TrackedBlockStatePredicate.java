@@ -1,6 +1,6 @@
 package com.abdelaziz.canary.common.block;
 
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.block.BlockState;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;

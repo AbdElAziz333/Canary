@@ -4,10 +4,10 @@ import com.google.common.collect.ImmutableList;
 import it.unimi.dsi.fastutil.HashCommon;
 import it.unimi.dsi.fastutil.objects.Reference2IntMap;
 import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap;
-import net.minecraft.core.IdMap;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.level.chunk.Palette;
-import net.minecraft.world.level.chunk.PaletteResize;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.util.collection.IndexedIterable;
+import net.minecraft.world.chunk.Palette;
+import net.minecraft.world.chunk.PaletteResizeListener;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,15 +22,15 @@ import static it.unimi.dsi.fastutil.Hash.FAST_LOAD_FACTOR;
 public class LithiumHashPalette<T> implements Palette<T> {
     private static final int ABSENT_VALUE = -1;
 
-    private final IdMap<T> idList;
-    private final PaletteResize<T> resizeHandler;
+    private final IndexedIterable<T> idList;
+    private final PaletteResizeListener<T> resizeHandler;
     private final int indexBits;
 
     private final Reference2IntMap<T> table;
     private T[] entries;
     private int size = 0;
 
-    public LithiumHashPalette(IdMap<T> idList, PaletteResize<T> resizeHandler, int indexBits, T[] entries, Reference2IntMap<T> table, int size) {
+    public LithiumHashPalette(IndexedIterable<T> idList, PaletteResizeListener<T> resizeHandler, int indexBits, T[] entries, Reference2IntMap<T> table, int size) {
         this.idList = idList;
         this.resizeHandler = resizeHandler;
         this.indexBits = indexBits;
@@ -39,7 +39,7 @@ public class LithiumHashPalette<T> implements Palette<T> {
         this.size = size;
     }
 
-    public LithiumHashPalette(IdMap<T> idList, int bits, PaletteResize<T> resizeHandler, List<T> list) {
+    public LithiumHashPalette(IndexedIterable<T> idList, int bits, PaletteResizeListener<T> resizeHandler, List<T> list) {
         this(idList, bits, resizeHandler);
 
         for (T t : list) {
@@ -48,7 +48,7 @@ public class LithiumHashPalette<T> implements Palette<T> {
     }
 
     @SuppressWarnings("unchecked")
-    public LithiumHashPalette(IdMap<T> idList, int bits, PaletteResize<T> resizeHandler) {
+    public LithiumHashPalette(IndexedIterable<T> idList, int bits, PaletteResizeListener<T> resizeHandler) {
         this.idList = idList;
         this.indexBits = bits;
         this.resizeHandler = resizeHandler;
@@ -60,8 +60,12 @@ public class LithiumHashPalette<T> implements Palette<T> {
         this.table.defaultReturnValue(ABSENT_VALUE);
     }
 
+    public static <A> Palette<A> create(int bits, IndexedIterable<A> idList, PaletteResizeListener<A> listener, List<A> list) {
+        return new LithiumHashPalette<>(idList, bits, listener, list);
+    }
+
     @Override
-    public int idFor(T obj) {
+    public int index(T obj) {
         int id = this.table.getInt(obj);
 
         if (id == ABSENT_VALUE) {
@@ -69,17 +73,6 @@ public class LithiumHashPalette<T> implements Palette<T> {
         }
 
         return id;
-    }
-
-    @Override
-    public boolean maybeHas(Predicate<T> predicate) {
-        for (int i = 0; i < this.size; ++i) {
-            if (predicate.test(this.entries[i])) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     private int computeEntry(T obj) {
@@ -116,7 +109,18 @@ public class LithiumHashPalette<T> implements Palette<T> {
     }
 
     @Override
-    public T valueFor(int id) {
+    public boolean hasAny(Predicate<T> predicate) {
+        for (int i = 0; i < this.size; ++i) {
+            if (predicate.test(this.entries[i])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public T get(int id) {
         T[] entries = this.entries;
 
         if (id >= 0 && id < entries.length) {
@@ -127,35 +131,24 @@ public class LithiumHashPalette<T> implements Palette<T> {
     }
 
     @Override
-    public void read(FriendlyByteBuf buf) {
+    public void readPacket(PacketByteBuf buf) {
         this.clear();
 
         int entryCount = buf.readVarInt();
 
         for (int i = 0; i < entryCount; ++i) {
-            this.addEntry(this.idList.byId(buf.readVarInt()));
+            this.addEntry(this.idList.get(buf.readVarInt()));
         }
     }
 
     @Override
-    public void write(FriendlyByteBuf buf) {
+    public void writePacket(PacketByteBuf buf) {
         int size = this.size;
         buf.writeVarInt(size);
 
         for (int i = 0; i < size; ++i) {
-            buf.writeVarInt(this.idList.getId(this.valueFor(i)));
+            buf.writeVarInt(this.idList.getRawId(this.get(i)));
         }
-    }
-
-    @Override
-    public int getSerializedSize() {
-        int size = FriendlyByteBuf.getVarIntSize(this.size);
-
-        for (int i = 0; i < this.size; ++i) {
-            size += FriendlyByteBuf.getVarIntSize(this.idList.getId(this.valueFor(i)));
-        }
-
-        return size;
     }
 
     @Override
@@ -184,7 +177,14 @@ public class LithiumHashPalette<T> implements Palette<T> {
         return builder.build();
     }
 
-    public static <A> Palette<A> create(int bits, IdMap<A> idList, PaletteResize<A> listener, List<A> list) {
-        return new LithiumHashPalette<>(idList, bits, listener, list);
+    @Override
+    public int getPacketSize() {
+        int size = PacketByteBuf.getVarIntLength(this.size);
+
+        for (int i = 0; i < this.size; ++i) {
+            size += PacketByteBuf.getVarIntLength(this.idList.getRawId(this.get(i)));
+        }
+
+        return size;
     }
 }

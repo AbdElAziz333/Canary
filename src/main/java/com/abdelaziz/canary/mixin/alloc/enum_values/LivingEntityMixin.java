@@ -1,8 +1,8 @@
 package com.abdelaziz.canary.mixin.alloc.enum_values;
 
 import com.abdelaziz.canary.common.util.EquipmentSlotConstants;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.LivingEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -14,7 +14,7 @@ public class LivingEntityMixin {
             method = "getEquipmentChanges()Ljava/util/Map;",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/world/entity/EquipmentSlot;values()[Lnet/minecraft/world/entity/EquipmentSlot;"
+                    target = "Lnet/minecraft/entity/EquipmentSlot;values()[Lnet/minecraft/entity/EquipmentSlot;"
             )
     )
     private EquipmentSlot[] removeAllocation() {

@@ -2,22 +2,22 @@ package com.abdelaziz.canary.common.ai.pathing;
 
 import com.abdelaziz.canary.common.block.BlockCountingSection;
 import com.abdelaziz.canary.common.block.BlockStateFlags;
-import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.chunk.LevelChunkSection;
-import net.minecraft.world.level.pathfinder.BlockPathTypes;
+import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.ai.pathing.PathNodeType;
+import net.minecraft.world.chunk.ChunkSection;
 
 public abstract class PathNodeCache {
-    private static boolean isChunkSectionDangerousNeighbor(LevelChunkSection section) {
-        return section.getStates()
-                .maybeHas(state -> getNeighborPathNodeType(state) != BlockPathTypes.OPEN);
+    private static boolean isChunkSectionDangerousNeighbor(ChunkSection section) {
+        return section.getBlockStateContainer()
+                .hasAny(state -> getNeighborPathNodeType(state) != PathNodeType.OPEN);
     }
 
-    public static BlockPathTypes getPathNodeType(BlockState state) {
+    public static PathNodeType getPathNodeType(BlockState state) {
         return ((BlockStatePathingCache) state).getPathNodeType();
     }
 
-    public static BlockPathTypes getNeighborPathNodeType(BlockBehaviour.BlockStateBase state) {
+    public static PathNodeType getNeighborPathNodeType(AbstractBlock.AbstractBlockState state) {
         return ((BlockStatePathingCache) state).getNeighborPathNodeType();
     }
 
@@ -29,9 +29,9 @@ public abstract class PathNodeCache {
      * @return True if this neighboring section is free of any dangers, otherwise false if it could
      * potentially contain dangers
      */
-    public static boolean isSectionSafeAsNeighbor(LevelChunkSection section) {
+    public static boolean isSectionSafeAsNeighbor(ChunkSection section) {
         // Empty sections can never contribute a danger
-        if (section.hasOnlyAir()) {
+        if (section.isEmpty()) {
             return true;
         }
 

@@ -1,7 +1,7 @@
 package com.abdelaziz.canary.mixin.chunk.no_locking;
 
-import net.minecraft.util.ThreadingDetector;
-import net.minecraft.world.level.chunk.PalettedContainer;
+import net.minecraft.util.thread.LockHelper;
+import net.minecraft.world.chunk.PalettedContainer;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
@@ -31,7 +31,7 @@ public class PalettedContainerMixin {
     @Shadow
     @Final
     @Mutable
-    private ThreadingDetector threadingDetector;
+    private LockHelper lockHelper;
 
     @Inject(
             method = {
@@ -42,7 +42,7 @@ public class PalettedContainerMixin {
             at = @At("TAIL")
     )
     public void removeLockHelper(CallbackInfo ci) {
-        this.threadingDetector = null;
+        this.lockHelper = null;
     }
 
     /**

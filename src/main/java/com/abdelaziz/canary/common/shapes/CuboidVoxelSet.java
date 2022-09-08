@@ -1,9 +1,9 @@
 package com.abdelaziz.canary.common.shapes;
 
-import net.minecraft.core.Direction;
-import net.minecraft.world.phys.shapes.DiscreteVoxelShape;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.shape.VoxelSet;
 
-public class CuboidVoxelSet extends DiscreteVoxelShape {
+public class CuboidVoxelSet extends VoxelSet {
     private final int minX, minY, minZ, maxX, maxY, maxZ;
 
     protected CuboidVoxelSet(int xSize, int ySize, int zSize, double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
@@ -18,24 +18,24 @@ public class CuboidVoxelSet extends DiscreteVoxelShape {
     }
 
     @Override
-    public boolean isFull(int x, int y, int z) {
+    public boolean contains(int x, int y, int z) {
         return x >= this.minX && x < this.maxX &&
                 y >= this.minY && y < this.maxY &&
                 z >= this.minZ && z < this.maxZ;
     }
 
     @Override
-    public void fill(int x, int y, int z) {
+    public void set(int x, int y, int z) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public int firstFull(Direction.Axis axis) {
+    public int getMin(Direction.Axis axis) {
         return axis.choose(this.minX, this.minY, this.minZ);
     }
 
     @Override
-    public int lastFull(Direction.Axis axis) {
+    public int getMax(Direction.Axis axis) {
         return axis.choose(this.maxX, this.maxY, this.maxZ);
     }
 
@@ -43,4 +43,5 @@ public class CuboidVoxelSet extends DiscreteVoxelShape {
     public boolean isEmpty() {
         return this.minX >= this.maxX || this.minY >= this.maxY || this.minZ >= this.maxZ;
     }
+
 }

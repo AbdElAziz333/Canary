@@ -2,9 +2,9 @@ package com.abdelaziz.canary.common.hopper;
 
 import com.abdelaziz.canary.common.block.entity.inventory_change_tracking.InventoryChangeTracker;
 import com.abdelaziz.canary.mixin.block.hopper.DoubleInventoryAccessor;
-import net.minecraft.world.CompoundContainer;
-import net.minecraft.world.Container;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.inventory.DoubleInventory;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -75,7 +75,7 @@ public class CanaryDoubleStackList extends CanaryStackList {
     }
 
     @Override
-    public int getSignalStrength(Container inventory) {
+    public int getSignalStrength(Inventory inventory) {
         //signal strength override state has to be stored in the halves, because this object may be replaced with a copy at any time
         boolean signalStrengthOverride = this.first.hasSignalStrengthOverride() || this.second.hasSignalStrengthOverride();
         if (signalStrengthOverride) {
@@ -107,8 +107,8 @@ public class CanaryDoubleStackList extends CanaryStackList {
      * @param masterStackList the stacklist of the inventory that comparators read from (double inventory for double chests)
      * @param inventory       the blockentity / inventory that this stacklist is inside
      */
-    public void runComparatorUpdatePatternOnFailedExtract(CanaryStackList masterStackList, Container inventory) {
-        if (inventory instanceof CompoundContainer) {
+    public void runComparatorUpdatePatternOnFailedExtract(CanaryStackList masterStackList, Inventory inventory) {
+        if (inventory instanceof DoubleInventory) {
             this.first.runComparatorUpdatePatternOnFailedExtract(
                     this, ((DoubleInventoryAccessor) inventory).getFirst()
             );

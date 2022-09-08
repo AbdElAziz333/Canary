@@ -2,11 +2,10 @@ package com.abdelaziz.canary.common.entity;
 
 import it.unimi.dsi.fastutil.objects.Reference2ByteOpenHashMap;
 import com.abdelaziz.canary.common.reflection.ReflectionUtil;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
-import net.minecraft.world.entity.monster.Shulker;
-import net.minecraft.world.entity.vehicle.Minecart;
-import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.boss.dragon.EnderDragonEntity;
+import net.minecraft.entity.mob.ShulkerEntity;
+import net.minecraft.entity.vehicle.MinecartEntity;
 
 import java.util.Objects;
 import java.util.function.Predicate;
@@ -24,17 +23,17 @@ public class EntityClassGroup {
     public static final EntityClassGroup MINECART_BOAT_LIKE_COLLISION; //aka entities that will attempt to collide with all other entities when moving
 
     static {
-        String remapped_method_30949 = ObfuscationReflectionHelper.findMethod(Entity.class, "m_7337_", new Class[]{Entity.class}).getName();
+        String remapped_method_30949 = "collidesWith";
         MINECART_BOAT_LIKE_COLLISION = new EntityClassGroup(
                 (Class<?> entityClass) -> ReflectionUtil.hasMethodOverride(entityClass, Entity.class, true, remapped_method_30949, Entity.class));
 
         //sanity check: in case intermediary mappings changed, we fail
-        if ((!MINECART_BOAT_LIKE_COLLISION.contains(Minecart.class))) {
+        if ((!MINECART_BOAT_LIKE_COLLISION.contains(MinecartEntity.class))) {
             throw new AssertionError();
         }
-        if ((MINECART_BOAT_LIKE_COLLISION.contains(Shulker.class))) {
+        if ((MINECART_BOAT_LIKE_COLLISION.contains(ShulkerEntity.class))) {
             //should not throw an Error here, because another mod *could* add the method to ShulkerEntity. Wwarning when this sanity check fails.
-            Logger.getLogger("Lithium EntityClassGroup").warning("Either Lithium EntityClassGroup is broken or something else gave Shulkers the minecart-like collision behavior.");
+            Logger.getLogger("Canary EntityClassGroup").warning("Either Canary EntityClassGroup is broken or something else gave Shulkers the minecart-like collision behavior.");
         }
         MINECART_BOAT_LIKE_COLLISION.clear();
     }
@@ -86,11 +85,11 @@ public class EntityClassGroup {
         public static final NoDragonClassGroup BOAT_SHULKER_LIKE_COLLISION; //aka entities that other entities will do block-like collisions with when moving
 
         static {
-            String remapped_method_30948 = ObfuscationReflectionHelper.findMethod(Entity.class, "m_5829_", new Class[]{Entity.class}).getName();
+            String remapped_method_30948 = "isCollidable";
             BOAT_SHULKER_LIKE_COLLISION = new NoDragonClassGroup(
                     (Class<?> entityClass) -> ReflectionUtil.hasMethodOverride(entityClass, Entity.class, true, remapped_method_30948));
 
-            if ((!BOAT_SHULKER_LIKE_COLLISION.contains(Shulker.class))) {
+            if ((!BOAT_SHULKER_LIKE_COLLISION.contains(ShulkerEntity.class))) {
                 throw new AssertionError();
             }
             BOAT_SHULKER_LIKE_COLLISION.clear();
@@ -98,7 +97,7 @@ public class EntityClassGroup {
 
         public NoDragonClassGroup(Predicate<Class<?>> classFitEvaluator) {
             super(classFitEvaluator);
-            if (classFitEvaluator.test(EnderDragon.class)) {
+            if (classFitEvaluator.test(EnderDragonEntity.class)) {
                 throw new IllegalArgumentException("EntityClassGroup.NoDragonClassGroup cannot be initialized: Must exclude EnderDragonEntity!");
             }
         }

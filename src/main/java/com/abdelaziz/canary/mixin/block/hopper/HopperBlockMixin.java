@@ -2,54 +2,47 @@ package com.abdelaziz.canary.mixin.block.hopper;
 
 import com.abdelaziz.canary.common.hopper.UpdateReceiver;
 import com.abdelaziz.canary.common.world.blockentity.BlockEntityGetter;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.world.WorldlyContainerHolder;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.block.BaseEntityBlock;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.HopperBlock;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.block.*;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static net.minecraft.client.renderer.LevelRenderer.DIRECTIONS;
-
 @Mixin(HopperBlock.class)
-public abstract class HopperBlockMixin extends BaseEntityBlock {
+public abstract class HopperBlockMixin extends BlockWithEntity {
 
-    protected HopperBlockMixin(BlockBehaviour.Properties settings) {
+    protected HopperBlockMixin(Settings settings) {
         super(settings);
     }
 
     @SuppressWarnings("deprecation")
     @Override
-    public BlockState updateShape(BlockState myBlockState, Direction direction, BlockState newState, LevelAccessor world, BlockPos myPos, BlockPos posFrom) {
+    public BlockState getStateForNeighborUpdate(BlockState myBlockState, Direction direction, BlockState newState, WorldAccess world, BlockPos myPos, BlockPos posFrom) {
         //invalidate cache when composters change state
-        if (!world.isClientSide() && newState.getBlock() instanceof WorldlyContainerHolder) {
+        if (!world.isClient() && newState.getBlock() instanceof InventoryProvider) {
             this.updateHopper(world, myBlockState, myPos, posFrom);
         }
-        return super.updateShape(myBlockState, direction, newState, world, myPos, posFrom);
+        return super.getStateForNeighborUpdate(myBlockState, direction, newState, world, myPos, posFrom);
 
     }
 
-    @Inject(method = "neighborChanged(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/Block;Lnet/minecraft/core/BlockPos;Z)V", at = @At(value = "HEAD"))
-    private void updateBlockEntity(BlockState myBlockState, Level world, BlockPos myPos, Block block, BlockPos posFrom, boolean moved, CallbackInfo ci) {
+    @Inject(method = "neighborUpdate(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;Lnet/minecraft/util/math/BlockPos;Z)V", at = @At(value = "HEAD"))
+    private void updateBlockEntity(BlockState myBlockState, World world, BlockPos myPos, Block block, BlockPos posFrom, boolean moved, CallbackInfo ci) {
         //invalidate cache when the block is replaced
-        if (!world.isClientSide()) {
+        if (!world.isClient()) {
             this.updateHopper(world, myBlockState, myPos, posFrom);
         }
     }
 
-    private void updateHopper(LevelAccessor world, BlockState myBlockState, BlockPos myPos, BlockPos posFrom) {
-        Direction facing = myBlockState.getValue(HopperBlock.FACING);
+    private void updateHopper(WorldAccess world, BlockState myBlockState, BlockPos myPos, BlockPos posFrom) {
+        Direction facing = myBlockState.get(HopperBlock.FACING);
         boolean above = posFrom.getY() == myPos.getY() + 1;
-        if (above || posFrom.getX() == myPos.getX() + facing.getStepX() && posFrom.getY() == myPos.getY() + facing.getStepY() && posFrom.getZ() == myPos.getZ() + facing.getStepZ()) {
+        if (above || posFrom.getX() == myPos.getX() + facing.getOffsetX() && posFrom.getY() == myPos.getY() + facing.getOffsetY() && posFrom.getZ() == myPos.getZ() + facing.getOffsetZ()) {
             BlockEntity hopper = ((BlockEntityGetter) world).getLoadedExistingBlockEntity(myPos);
             if (hopper instanceof UpdateReceiver updateReceiver) {
                 updateReceiver.onNeighborUpdate(above);
@@ -57,12 +50,12 @@ public abstract class HopperBlockMixin extends BaseEntityBlock {
         }
     }
 
-    @Inject(method = "onPlace(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Z)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/HopperBlock;updateEnabled(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)V", shift = At.Shift.AFTER))
-    private void workAroundVanillaUpdateSuppression(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean moved, CallbackInfo ci) {
+    @Inject(method = "onBlockAdded(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Z)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/HopperBlock;updateEnabled(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;)V", shift = At.Shift.AFTER))
+    private void workAroundVanillaUpdateSuppression(BlockState state, World world, BlockPos pos, BlockState oldState, boolean moved, CallbackInfo ci) {
         //invalidate caches of nearby hoppers when placing an update suppressed hopper
         if (world.getBlockState(pos) != state) {
             for (Direction direction : DIRECTIONS) {
-                BlockEntity hopper = ((BlockEntityGetter) world).getLoadedExistingBlockEntity(pos.relative(direction));
+                BlockEntity hopper = ((BlockEntityGetter) world).getLoadedExistingBlockEntity(pos.offset(direction));
                 if (hopper instanceof UpdateReceiver updateReceiver) {
                     updateReceiver.onNeighborUpdate(direction == Direction.DOWN);
                 }

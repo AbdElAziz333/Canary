@@ -1,9 +1,9 @@
 package com.abdelaziz.canary.common.ai.pathing;
 
-import net.minecraft.world.level.pathfinder.BlockPathTypes;
+import net.minecraft.entity.ai.pathing.PathNodeType;
 
 public interface BlockStatePathingCache {
-    BlockPathTypes getPathNodeType();
+    PathNodeType getPathNodeType();
 
-    BlockPathTypes getNeighborPathNodeType();
+    PathNodeType getNeighborPathNodeType();
 }

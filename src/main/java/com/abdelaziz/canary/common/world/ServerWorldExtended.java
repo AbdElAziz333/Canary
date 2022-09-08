@@ -1,9 +1,9 @@
 package com.abdelaziz.canary.common.world;
 
-import net.minecraft.world.entity.Mob;
+import net.minecraft.entity.mob.MobEntity;
 
 public interface ServerWorldExtended {
-    void setNavigationActive(Mob mobEntity);
+    void setNavigationActive(MobEntity mobEntity);
 
-    void setNavigationInactive(Mob mobEntity);
+    void setNavigationInactive(MobEntity mobEntity);
 }

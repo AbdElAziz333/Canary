@@ -1,13 +1,13 @@
 package com.abdelaziz.canary.common.block.entity.inventory_change_tracking;
 
-import net.minecraft.world.Container;
+import net.minecraft.inventory.Inventory;
 
 public interface InventoryChangeListener {
-    void handleStackListReplaced(Container inventory);
+    void handleStackListReplaced(Inventory inventory);
 
-    void handleInventoryContentModified(Container inventory);
+    void handleInventoryContentModified(Inventory inventory);
 
-    void handleInventoryRemoved(Container inventory);
+    void handleInventoryRemoved(Inventory inventory);
 
-    void handleComparatorAdded(Container inventory);
+    void handleComparatorAdded(Inventory inventory);
 }

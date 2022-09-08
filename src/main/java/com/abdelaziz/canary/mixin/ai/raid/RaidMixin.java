@@ -1,8 +1,8 @@
 package com.abdelaziz.canary.mixin.ai.raid;
 
-import net.minecraft.server.level.ServerBossEvent;
-import net.minecraft.util.Mth;
-import net.minecraft.world.entity.raid.Raid;
+import net.minecraft.entity.boss.ServerBossBar;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.village.raid.Raid;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -15,10 +15,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class RaidMixin {
     @Shadow
     @Final
-    private ServerBossEvent raidEvent;
+    private ServerBossBar bar;
 
     @Shadow
-    public abstract float getHealthOfLivingRaiders();
+    public abstract float getCurrentRaiderHealth();
 
     @Shadow
     private float totalHealth;
@@ -31,7 +31,7 @@ public abstract class RaidMixin {
     @Inject(method = "tick()V", at = @At("HEAD"))
     private void onTick(CallbackInfo ci) {
         if (this.isBarDirty) {
-            this.raidEvent.setProgress(Mth.clamp(this.getHealthOfLivingRaiders() / this.totalHealth, 0.0F, 1.0F));
+            this.bar.setPercent(MathHelper.clamp(this.getCurrentRaiderHealth() / this.totalHealth, 0.0F, 1.0F));
 
             this.isBarDirty = false;
         }
@@ -42,7 +42,7 @@ public abstract class RaidMixin {
      * @author JellySquid
      */
     @Overwrite
-    public void updateBossbar() {
+    public void updateBar() {
         this.isBarDirty = true;
     }
 

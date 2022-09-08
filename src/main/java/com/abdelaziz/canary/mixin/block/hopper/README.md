@@ -1,23 +1,23 @@
-# Lithium Hopper Optimizations
+# Canary Hopper Optimizations
 
 ## Assumptions made about other inventories
 
 (likely incomplete)
 Inventories that implement restrictions for hopper item insertion do not depend on the size of the inserted stack.
 Hoppers always transfer a single item, inventories do not reject a stack if they are able to receive a single item from
-the stack (the receiving inventory slot is not filled to its limit and the item type is correct). This allows lithium to
+the stack (the receiving inventory slot is not filled to its limit and the item type is correct). This allows canary to
 avoid creating a copy of the transferred item stack when the transfer is going to fail.
 
 ## Inventory Stack List
 
-LithiumStackList replaces the inventory stack lists. It keeps an inventory content modification counter and caches the
+CanaryStackList replaces the inventory stack lists. It keeps an inventory content modification counter and caches the
 signal strength until the inventory content is modified.
 
-## Lithium Inventory
+## Canary Inventory
 
-LithiumInventory is any inventory that can have its stack list replaced with LithiumStackList. Making any inventory a
-LithiumInventory just requires implementing the getters and setter of the stack list. This is done in the
-InventoryAccessors class. An inventory implementing LithiumInventory allows hoppers to use the LithiumStackList's
+CanaryInventory is any inventory that can have its stack list replaced with CanaryStackList. Making any inventory a
+CanaryInventory just requires implementing the getters and setter of the stack list. This is done in the
+InventoryAccessors class. An inventory implementing CanaryInventory allows hoppers to use the CanaryStackList's
 additional data for some optimizations.
 
 ## Inventory Caching
@@ -39,12 +39,12 @@ interacts with the same inventory again. If both the hopper the inventory the ho
 since the last failed transfer attempt, it is known that the current attempt will fail as well. Therefore, the whole
 transfer logic can be skipped, however, the side effects (comparator updates) of the failed transfer have to be
 mimicked. Hoppers use the inventory modification counters to determine whether the transfer attempt can be skipped. The
-comparator side effects (ComparatorUpdatePattern) are computed in HopperHelper and cached in the LithiumStackList. The
+comparator side effects (ComparatorUpdatePattern) are computed in HopperHelper and cached in the CanaryStackList. The
 side effect cache is invalidated when the inventory is modified. The ComparatorUpdatePattern is only guaranteed to be
 calculated like vanilla if mods do not add item types with a non-power-of-two maximum stack size.
 
-The inventory modification counters are updated in LithiumStackList and ItemStackMixin. ItemStacks keep a reference to
-the LithiumStackList they are in, and they notify the LithiumStackList when their stack size is manipulated. ItemStacks
+The inventory modification counters are updated in CanaryStackList and ItemStackMixin. ItemStacks keep a reference to
+the CanaryStackList they are in, and they notify the CanaryStackList when their stack size is manipulated. ItemStacks
 can only be in one inventory at a time.
 
 ## Entity Interaction Shortcuts
@@ -66,11 +66,11 @@ nearby block entities. Breaking a comparator does not reset it until the block e
 
 If any bugs show up, they will need to be fixed.
 
-## How Lithium hoppers work different from vanilla
+## How Canary hoppers work different from vanilla
 
-- Lithium Optimized Inventories:
+- Canary Optimized Inventories:
     - Any vanilla inventory vanilla hoppers can interact with (Composters excluded!)
-    - Custom Stack list (LithiumStackList):
+    - Custom Stack list (CanaryStackList):
       Replaces the vanilla stack list when a hopper accesses the inventory. It stores additional data:
         - Cached signal strength (int)
             - Stored when signal strength is calculated
@@ -93,7 +93,7 @@ If any bugs show up, they will need to be fixed.
             - Only used when stack lists is a double chest half
             - Set when double stack list is created when double inventory is accessed by a hopper
 
-- Lithium Sectioned Entity Movement Trackers:
+- Canary Sectioned Entity Movement Trackers:
     - Certain classes of Entities are configured to be tracked: Inventory and ItemEntity
     - Entity Sections store the timestamp of the last change for each tracked class
     - Entities of tracked classes notify their entity section every time their position change or when they are added or
@@ -124,7 +124,7 @@ If any bugs show up, they will need to be fixed.
             - When the user no longer uses the tracker, it has to un-register and the number of users will be decreased.
               When it reaches 0, it is removed from the sets of trackers and can be garbage collected.
 
-- Lithium Hopper behavior:
+- Canary Hopper behavior:
     - Data:
         - Own inventory modification counter at last item collection attempt
         - Own inventory modification counter at last insert attempt
@@ -138,9 +138,9 @@ If any bugs show up, they will need to be fixed.
         - Current insertion / extraction inventory (only block inventories)
         - Current expected block entity removal count for each current insertion / extraction inventory (only
           BLOCK_ENTITY)
-        - Current lithium insertion / extraction inventory (only lithium optimized inventories)
-        - Last known stack list of each current lithium insertion / extraction inventory
-        - Last known inventory modification count of each current lithium insertion / extraction inventory
+        - Current canary insertion / extraction inventory (only canary optimized inventories)
+        - Last known stack list of each current canary insertion / extraction inventory
+        - Last known inventory modification count of each current canary insertion / extraction inventory
             - Updated just before attempting to transfer items
             - Used to skip transfer attempts
             - Only used if the last known stack list is also the current stack list of the same inventory

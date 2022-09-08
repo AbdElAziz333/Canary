@@ -1,8 +1,8 @@
 package com.abdelaziz.canary.common.world.chunk;
 
 import com.mojang.datafixers.util.Either;
-import net.minecraft.server.level.ChunkHolder;
-import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.server.world.ChunkHolder;
+import net.minecraft.world.chunk.Chunk;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -10,12 +10,12 @@ public interface ChunkHolderExtended {
     /**
      * @return The existing future for the status at ordinal {@param index} or null if none exists
      */
-    CompletableFuture<Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure>> getFutureByStatus(int index);
+    CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>> getFutureByStatus(int index);
 
     /**
      * Updates the future for the status at ordinal {@param index}.
      */
-    void setFutureForStatus(int index, CompletableFuture<Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure>> future);
+    void setFutureForStatus(int index, CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>> future);
 
     /**
      * Updates the last accessed timestamp for this chunk. This is used to determine if a ticket was recently
