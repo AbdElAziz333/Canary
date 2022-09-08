@@ -18,10 +18,10 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(Entity.class)
 public abstract class EntityMixin {
     @Shadow
-    public World world;
+    public abstract Vec3d getEyePos();
 
     @Shadow
-    public abstract Vec3d getEyePos();
+    public World world;
 
     @Shadow
     public boolean noClip;

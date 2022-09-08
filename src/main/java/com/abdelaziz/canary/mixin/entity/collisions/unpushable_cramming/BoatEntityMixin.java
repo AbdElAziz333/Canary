@@ -1,8 +1,8 @@
 package com.abdelaziz.canary.mixin.entity.collisions.unpushable_cramming;
 
-import com.google.common.base.Predicates;
 import com.abdelaziz.canary.common.entity.pushable.EntityPushablePredicate;
 import com.abdelaziz.canary.common.world.WorldHelper;
+import com.google.common.base.Predicates;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.util.math.Box;

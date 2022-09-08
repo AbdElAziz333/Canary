@@ -1,8 +1,6 @@
 package com.abdelaziz.canary.mixin.entity.collisions.unpushable_cramming;
 
-import com.abdelaziz.canary.common.entity.pushable.BlockCachingEntity;
 import com.abdelaziz.canary.common.entity.pushable.EntityPushablePredicate;
-import com.abdelaziz.canary.common.entity.pushable.PushableEntityClassGroup;
 import com.abdelaziz.canary.common.util.collections.MaskedList;
 import com.abdelaziz.canary.common.world.ClimbingMobCachingSection;
 import net.minecraft.block.BlockState;
@@ -42,16 +40,30 @@ public abstract class EntityTrackingSectionMixin<T extends EntityLike> implement
     @Unique
     private MaskedList<Entity> pushableEntities;
 
-    /**
-     * Whether entities with this feet BlockState should be considered to be pushable. Some entity types are not pushable
-     * when they are inside climbable blocks like ladders. Returns true for edge-cases
-     * like entity in a trapdoor (which maybe is climbable due to a ladder below).
-     *
-     * @param cachedFeetBlockState cached BlockState at entity feet
-     * @return whether the entity should be treated as pushable
-     */
-    private static boolean entityPushableHeuristic(BlockState cachedFeetBlockState) {
-        return cachedFeetBlockState == null || !cachedFeetBlockState.isIn(BlockTags.CLIMBABLE);
+    @Override
+    public void collectPushableEntities(World world, Entity except, Box box, EntityPushablePredicate<? super Entity> entityPushablePredicate, ArrayList<Entity> entities) {
+        Iterator<?> entityIterator;
+        if (this.pushableEntities != null) {
+            entityIterator = this.pushableEntities.iterator();
+        } else {
+            entityIterator = this.collection.iterator();
+        }
+        int i = 0;
+        int j = 0;
+        while (entityIterator.hasNext()) {
+            Entity entity = (Entity) entityIterator.next();
+            if (entity.getBoundingBox().intersects(box) && !entity.isSpectator() && entity != except && !(entity instanceof EnderDragonEntity)) {
+                i++;
+                if (entityPushablePredicate.test(entity)) { //This predicate has side effects, might cause BlockCachingEntity to cache block and update its visibility
+                    j++;
+                    //skip the dragon piece check due to dragon pieces always being non pushable
+                    entities.add(entity);
+                }
+            }
+        }
+        if (this.pushableEntities == null && i >= 25 && i >= (j * 2)) {
+            this.startFilteringPushableEntities();
+        }
     }
 
     private void startFilteringPushableEntities() {
@@ -97,31 +109,6 @@ public abstract class EntityTrackingSectionMixin<T extends EntityLike> implement
         }
     }
 
-    @Override
-    public void collectPushableEntities(World world, Entity except, Box box, EntityPushablePredicate<? super Entity> entityPushablePredicate, ArrayList<Entity> entities) {
-        Iterator<?> entityIterator;
-        if (this.pushableEntities != null) {
-            entityIterator = this.pushableEntities.iterator();
-        } else {
-            entityIterator = this.collection.iterator();
-        }
-        int i = 0;
-        int j = 0;
-        while (entityIterator.hasNext()) {
-            Entity entity = (Entity) entityIterator.next();
-            if (entity.getBoundingBox().intersects(box) && !entity.isSpectator() && entity != except && !(entity instanceof EnderDragonEntity)) {
-                i++;
-                if (entityPushablePredicate.test(entity)) { //This predicate has side effects, might cause BlockCachingEntity to cache block and update its visibility
-                    j++;
-                    //skip the dragon piece check due to dragon pieces always being non pushable
-                    entities.add(entity);
-                }
-            }
-        }
-        if (this.pushableEntities == null && i >= 25 && i >= (j * 2)) {
-            this.startFilteringPushableEntities();
-        }
-    }
 
     @Inject(method = "add(Lnet/minecraft/world/entity/EntityLike;)V", at = @At("RETURN"))
     private void onEntityAdded(T entityLike, CallbackInfo ci) {
@@ -149,5 +136,17 @@ public abstract class EntityTrackingSectionMixin<T extends EntityLike> implement
             }
         }
         return entityLike;
+    }
+
+    /**
+     * Whether entities with this feet BlockState should be considered to be pushable. Some entity types are not pushable
+     * when they are inside climbable blocks like ladders. Returns true for edge-cases
+     * like entity in a trapdoor (which maybe is climbable due to a ladder below).
+     *
+     * @param cachedFeetBlockState cached BlockState at entity feet
+     * @return whether the entity should be treated as pushable
+     */
+    private static boolean entityPushableHeuristic(BlockState cachedFeetBlockState) {
+        return cachedFeetBlockState == null || !cachedFeetBlockState.isIn(BlockTags.CLIMBABLE);
     }
 }

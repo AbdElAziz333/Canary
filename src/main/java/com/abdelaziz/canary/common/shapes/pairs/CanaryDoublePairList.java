@@ -9,14 +9,14 @@ import net.minecraft.util.shape.PairList;
  * flat arrays and tries to organize code in a manner that hits the JIT's happy path. In my testing, this is about
  * ~50% faster than the vanilla implementation.
  */
-public final class LithiumDoublePairList implements PairList {
+public final class CanaryDoublePairList implements PairList {
     private final double[] merged;
     private final int[] indicesFirst;
     private final int[] indicesSecond;
 
     private final DoubleArrayList pairs;
 
-    public LithiumDoublePairList(DoubleList aPoints, DoubleList bPoints, boolean flag1, boolean flag2) {
+    public CanaryDoublePairList(DoubleList aPoints, DoubleList bPoints, boolean flag1, boolean flag2) {
         int size = aPoints.size() + bPoints.size();
 
         this.merged = new double[size];

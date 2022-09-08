@@ -22,6 +22,17 @@ import java.util.List;
 public class EntityMixin {
     private static final List<VoxelShape> GET_ENTITIES_LATER = Collections.unmodifiableList(new ArrayList<>());
 
+    @Redirect(
+            method = "adjustMovementForCollisions(Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/math/Vec3d;",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/world/World;getEntityCollisions(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Box;)Ljava/util/List;"
+            )
+    )
+    private List<VoxelShape> getEntitiesLater(World world, Entity entity, Box box) {
+        return GET_ENTITIES_LATER;
+    }
+
     /**
      * @author 2No2Name
      * @reason Replace with optimized implementation
@@ -103,16 +114,5 @@ public class EntityMixin {
             }
         }
         return new Vec3d(velX, velY, velZ);
-    }
-
-    @Redirect(
-            method = "adjustMovementForCollisions(Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/math/Vec3d;",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/World;getEntityCollisions(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Box;)Ljava/util/List;"
-            )
-    )
-    private List<VoxelShape> getEntitiesLater(World world, Entity entity, Box box) {
-        return GET_ENTITIES_LATER;
     }
 }
