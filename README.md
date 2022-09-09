@@ -1,4 +1,4 @@
-<img src="src/main/resources/icon.png" width="128">
+<img src="src/main/resources/logo.png" width="128">
 
 # Canary for Minecraft Forge
 ![Github License](https://img.shields.io/github/license/AbdElAziz333/Canary)
@@ -30,7 +30,6 @@ default configuration, which includes all stable optimizations by default.
 See [the Wiki page](https://github.com/AbdElAziz333/Canary/wiki/Configuration-File) on the configuration file
 format and all available options. The wiki may be outdated.
 
-
 ### Support the Original Creators
 
 Canary is impossible without the high-quality contributions made by the original Lithium developers, and as such, i would like to ask you support them, for more information you can see [this section](https://github.com/CaffeineMC/lithium-fabric#support-the-developers) in the official repository's readme.
@@ -42,3 +41,18 @@ Canary is licensed under GNU LGPLv3, a free and open-source license. For more in
 
 ### Issues and Feature Requests
 If you'd like to get help with the mod, feel free to open an issue here on GitHub, and if you want to propose new features or otherwise contribute to the mod, we will gladly accept pull requests, as well!
+
+### Building from sources
+Support is not provided for setting up build environments or compiling the mod. We ask that users who are looking to get their hands dirty with the code have a basic understanding of compiling Java/Gradle projects. The basic overview is provided here for those familiar.
+
+#### Requirements
+JDK 17
+You can either install this through a package manager such as Chocolatey on Windows or SDKMAN! on other platforms. If you'd prefer to not use a package manager, you can always grab the installers or packages directly from AdoptOpenJDK.
+Gradle 7 or newer (optional)
+The Gradle wrapper is provided in this repository can be used instead of installing a suitable version of Gradle yourself. However, if you are building many projects, you may prefer to install it yourself through a suitable package manager as to save disk space and to avoid many Gradle daemons sitting around in memory.
+Building with Gradle
+Canary uses a typical Gradle project structure and can be built by simply running the default build task. After Gradle finishes building the project, you can find the build artifacts (typical mod binaries, and their sources) in build/libs.
+
+Tip: If this is a one-off build, and you would prefer the Gradle daemon does not stick around in memory afterwards, try adding the --no-daemon flag to ensure that the daemon is torn down after the build is complete. However, subsequent builds of the project will start more slowly if the Gradle daemon is not available to be re-used.
+
+Build artifacts ending in api are for developers compiling against Lithium's API.
