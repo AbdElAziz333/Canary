@@ -36,7 +36,7 @@ public class CanaryConfig {
         this.addMixinRule("ai.pathing", true);
         this.addMixinRule("ai.poi", true);
         this.addMixinRule("ai.poi.fast_portals", true);
-        this.addMixinRule("ai.poi.poi.tasks", true);
+        this.addMixinRule("ai.poi.tasks", true);
         this.addMixinRule("ai.raid", true);
         this.addMixinRule("ai.sensor", true);
         this.addMixinRule("ai.sensor.secondary_poi", true);
@@ -46,7 +46,7 @@ public class CanaryConfig {
         this.addMixinRule("ai.task.replace_streams", true);
 
         this.addMixinRule("alloc", true);
-        this.addMixinRule("alloc.blockstate", false);//ferritecore adds a better optimization for neighbor table, disable the StateHolderMixin when ferritecore is installed
+        this.addMixinRule("alloc.blockstate", true);
         this.addMixinRule("alloc.chunk_random", true);
         this.addMixinRule("alloc.chunk_ticking", true);
         this.addMixinRule("alloc.composter", true);
@@ -69,7 +69,7 @@ public class CanaryConfig {
         this.addMixinRule("chunk.entity_class_groups", true);
         this.addMixinRule("chunk.no_locking", true);
         this.addMixinRule("chunk.no_validation", true);
-        this.addMixinRule("chunk.palette", true);
+        //this.addMixinRule("chunk.palette", true);
         this.addMixinRule("chunk.serialization", true);
 
         this.addMixinRule("collections", true);
@@ -137,6 +137,7 @@ public class CanaryConfig {
         this.addMixinRule("world.block_entity_ticking.sleeping.campfire", true);
         this.addMixinRule("world.block_entity_ticking.sleeping.furnace", true);
         this.addMixinRule("world.block_entity_ticking.sleeping.hopper", true);
+        this.addMixinRule("world.block_entity_ticking.sleeping.shulker_box", true);
         this.addMixinRule("world.block_entity_ticking.support_cache", false); //have to check whether the cached state bugfix fixes any detectable vanilla bugs first
         this.addMixinRule("world.block_entity_ticking.world_border", true);
         this.addMixinRule("world.chunk_access", true);
@@ -272,8 +273,6 @@ public class CanaryConfig {
         }
     }
 
-    // Ported from MaxNeedsSnacks/roadrunner
-
     private static void writeDefaultConfig(File file) throws IOException {
         File dir = file.getParentFile();
 
@@ -295,6 +294,8 @@ public class CanaryConfig {
             writer.write("# By default, this file will be empty except for this notice.\n");
         }
     }
+
+    // Ported from MaxNeedsSnacks/roadrunner
 
     private void applyModOverrides() {
         for (ModInfo mod : LoadingModList.get().getMods()) {

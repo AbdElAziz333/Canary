@@ -11,7 +11,7 @@ public abstract class TrackedBlockStatePredicate implements Predicate<BlockState
     static {
         FULLY_INITIALIZED = new AtomicBoolean(false);
         if (!BlockStateFlags.ENABLED) { //classload the BlockStateFlags class which initializes the content of ALL_FLAGS
-            System.out.println("Lithium Cached BlockState Flags are disabled!");
+            System.out.println("Canary Cached BlockState Flags are disabled!");
         }
     }
 
@@ -19,7 +19,7 @@ public abstract class TrackedBlockStatePredicate implements Predicate<BlockState
 
     public TrackedBlockStatePredicate(int index) {
         if (FULLY_INITIALIZED.get()) {
-            throw new IllegalStateException("Lithium Cached BlockState Flags: Cannot register more flags after assuming to be fully initialized.");
+            throw new IllegalStateException("Canary Cached BlockState Flags: Cannot register more flags after assuming to be fully initialized.");
         }
         this.index = index;
     }

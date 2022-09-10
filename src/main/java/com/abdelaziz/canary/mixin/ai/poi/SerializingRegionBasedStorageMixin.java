@@ -1,5 +1,6 @@
 package com.abdelaziz.canary.mixin.ai.poi;
 
+import com.abdelaziz.canary.common.world.interests.RegionBasedStorageColumn;
 import com.google.common.collect.AbstractIterator;
 import com.mojang.datafixers.DataFixer;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
@@ -43,7 +44,7 @@ public abstract class SerializingRegionBasedStorageMixin<R> implements RegionBas
     @Shadow
     protected abstract void loadDataAt(ChunkPos pos);
 
-    private Long2ObjectOpenHashMap<BitSet> columns;
+    private Long2ObjectOpenHashMap<RegionBasedStorageColumn> columns;
 
     @SuppressWarnings("rawtypes")
     @Inject(method = "<init>", at = @At("RETURN"))
@@ -52,16 +53,39 @@ public abstract class SerializingRegionBasedStorageMixin<R> implements RegionBas
         this.loadedElements = new ListeningLong2ObjectOpenHashMap<>(this::onEntryAdded, this::onEntryRemoved);
     }
 
+    private static long getChunkFromSection(long section) {
+        int x = ChunkSectionPos.unpackX(section);
+        int z = ChunkSectionPos.unpackZ(section);
+        return ChunkPos.toLong(x, z);
+    }
+
+    private static boolean isSectionValid(int y) {
+        return y >= 0 && y < RegionBasedStorageColumn.SECTIONS_IN_CHUNK;
+    }
+
     private void onEntryRemoved(long key, Optional<R> value) {
         // NO-OP... vanilla never removes anything, leaking entries.
         // We might want to fix this.
+        int y = ChunkSectionPos.unpackY(key);
+
+        if (!isSectionValid(y)) {
+            return;
+        }
+
+        long pos = getChunkFromSection(key);
+        RegionBasedStorageColumn flags = this.columns.get(pos);
+
+        if (flags != null && flags.clear(y)) {
+            this.columns.remove(pos);
+        }
     }
 
     private void onEntryAdded(long key, Optional<R> value) {
         int y = Pos.SectionYIndex.fromSectionCoord(this.world, ChunkSectionPos.unpackY(key));
 
         // We only care about items belonging to a valid sub-chunk
-        if (y < 0 || y >= Pos.SectionYIndex.getNumYSections(this.world)) {
+        //if (y < 0 || y >= Pos.SectionYIndex.getNumYSections(this.world)) {
+        if (!isSectionValid(y)) {
             return;
         }
 
@@ -70,27 +94,27 @@ public abstract class SerializingRegionBasedStorageMixin<R> implements RegionBas
 
         long pos = ChunkPos.toLong(x, z);
 
-        BitSet flags = this.columns.get(pos);
+        RegionBasedStorageColumn flags = this.columns.get(pos);
 
         if (flags == null) {
-            this.columns.put(pos, flags = new BitSet(Pos.SectionYIndex.getNumYSections(this.world)));
+            this.columns.put(pos, flags = new RegionBasedStorageColumn()); //Pos.SectionYIndex.getNumYSections(this.world)
         }
 
         flags.set(y, value.isPresent());
     }
 
     @Override
-    public Stream<R> getWithinChunkColumn(int chunkX, int chunkZ) {
-        BitSet sectionsWithPOI = this.getNonEmptyPOISections(chunkX, chunkZ);
+    public Stream<R> getWithinChunkColumn(int chunkX, int chunkZ) { //getNonEmptyPOISections
+        RegionBasedStorageColumn sectionsWithPOI = this.getNonEmptyPOISections(chunkX, chunkZ);
 
         // No items are present in this column
-        if (sectionsWithPOI.isEmpty()) {
+        if (sectionsWithPOI.noSectionsPresent()) {
             return Stream.empty();
         }
 
         List<R> list = new ArrayList<>();
         int minYSection = Pos.SectionYCoord.getMinYSection(this.world);
-        for (int chunkYIndex = sectionsWithPOI.nextSetBit(0); chunkYIndex != -1; chunkYIndex = sectionsWithPOI.nextSetBit(chunkYIndex + 1)) {
+        for (int chunkYIndex = sectionsWithPOI.nextNonEmptySection(0); chunkYIndex != -1; chunkYIndex = sectionsWithPOI.nextNonEmptySection(chunkYIndex + 1)) {
             int chunkY = chunkYIndex + minYSection;
             //noinspection SimplifyOptionalCallChains
             R r = this.loadedElements.get(ChunkSectionPos.asLong(chunkX, chunkY, chunkZ)).orElse(null);
@@ -104,10 +128,10 @@ public abstract class SerializingRegionBasedStorageMixin<R> implements RegionBas
 
     @Override
     public Iterable<R> getInChunkColumn(int chunkX, int chunkZ) {
-        BitSet sectionsWithPOI = this.getNonEmptyPOISections(chunkX, chunkZ);
+        RegionBasedStorageColumn sectionsWithPOI = this.getNonEmptyPOISections(chunkX, chunkZ);
 
         // No items are present in this column
-        if (sectionsWithPOI.isEmpty()) {
+        if (sectionsWithPOI.noSectionsPresent()) {
             return Collections::emptyIterator;
         }
 
@@ -115,7 +139,7 @@ public abstract class SerializingRegionBasedStorageMixin<R> implements RegionBas
         HeightLimitView world = this.world;
 
         return () -> new AbstractIterator<>() {
-            private int nextBit = sectionsWithPOI.nextSetBit(0);
+            private int nextBit = sectionsWithPOI.nextNonEmptySection(0);
 
 
             @Override
@@ -125,7 +149,7 @@ public abstract class SerializingRegionBasedStorageMixin<R> implements RegionBas
                     Optional<R> next = loadedElements.get(ChunkSectionPos.asLong(chunkX, Pos.SectionYCoord.fromSectionIndex(world, this.nextBit), chunkZ));
 
                     // Find and advance to the next set bit
-                    this.nextBit = sectionsWithPOI.nextSetBit(this.nextBit + 1);
+                    this.nextBit = sectionsWithPOI.nextNonEmptySection(this.nextBit + 1);
 
                     if (next.isPresent()) {
                         return next.get();
@@ -137,10 +161,10 @@ public abstract class SerializingRegionBasedStorageMixin<R> implements RegionBas
         };
     }
 
-    private BitSet getNonEmptyPOISections(int chunkX, int chunkZ) {
+    private RegionBasedStorageColumn getNonEmptyPOISections(int chunkX, int chunkZ) {
         long pos = ChunkPos.toLong(chunkX, chunkZ);
 
-        BitSet flags = this.getNonEmptySections(pos, false);
+        RegionBasedStorageColumn flags = this.getNonEmptySections(pos, false);
 
         if (flags != null) {
             return flags;
@@ -151,8 +175,8 @@ public abstract class SerializingRegionBasedStorageMixin<R> implements RegionBas
         return this.getNonEmptySections(pos, true);
     }
 
-    private BitSet getNonEmptySections(long pos, boolean required) {
-        BitSet set = this.columns.get(pos);
+    private RegionBasedStorageColumn getNonEmptySections(long pos, boolean required) {
+        RegionBasedStorageColumn set = this.columns.get(pos);
 
         if (set == null && required) {
             throw new NullPointerException("No data is present for column: " + new ChunkPos(pos));

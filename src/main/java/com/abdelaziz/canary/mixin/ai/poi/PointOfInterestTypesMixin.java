@@ -9,6 +9,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
 import java.util.Map;
 
@@ -17,14 +18,13 @@ import java.util.Map;
  */
 @Mixin(PointOfInterestTypes.class)
 public class PointOfInterestTypesMixin {
-    @Mutable
-    @Shadow
-    @Final
-    private static Map<BlockState, PointOfInterestType> POI_STATES_TO_TYPE;
+    @Accessor("POI_STATES_TO_TYPE")
+    public static Map<BlockState, PointOfInterestType> getBlockStateToPointOfInterestType() {
+        throw new UnsupportedOperationException("Replaced by Mixin");
+    }
 
-    static {
-        POI_STATES_TO_TYPE = new Reference2ReferenceOpenHashMap<>(POI_STATES_TO_TYPE);
-
-        PointOfInterestTypeHelper.init(POI_STATES_TO_TYPE.keySet());
+    @Accessor("POI_STATES_TO_TYPE")
+    public static void setBlockStateToPointOfInterestType(Map<BlockState, PointOfInterestType> newMap) {
+        throw new UnsupportedOperationException("Replaced by Mixin");
     }
 }

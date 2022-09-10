@@ -20,7 +20,7 @@ public class ListeningLong2ObjectOpenHashMap<V> extends Long2ObjectOpenHashMap<V
 
         if (ret != v) {
             if (ret != null) {
-                this.removeCallback.apply(k, v);
+                this.removeCallback.apply(k, ret);
             }
 
             this.addCallback.apply(k, v);

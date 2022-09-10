@@ -44,13 +44,12 @@ public class ServerEntityManagerListenerMixin<T extends EntityLike> implements T
         this.notifyMovementListeners();
     }
 
-    /*
-        @ModifyVariable(method = "updateEntityPosition()V", at = @At("RETURN"))
+        /* @ModifyVariable(method = "updateEntityPosition()V", at = @At("RETURN"))
         private long updateEntityTrackerEngine(long sectionPos) {
             this.notifyMovementListeners();
             return sectionPos;
-        }
-    */
+        } */
+
     @Inject(
             method = "updateEntityPosition()V",
             at = @At(

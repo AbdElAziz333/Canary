@@ -42,7 +42,8 @@ public class CanaryMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        if (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "alloc.blockstate.StateHolderMixin") && (FMLLoader.getLoadingModList().getModFileById("ferritecore") != null)) {
+        //Ferritecore adds a better optimization for neighbor table, disable the StateMixin when ferritecore is installed
+        if (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "alloc.blockstate") && (FMLLoader.getLoadingModList().getModFileById("ferritecore") != null)) {
             return false;
         }
 
