@@ -23,8 +23,9 @@ import java.util.List;
  */
 public class VoxelShapeSimpleCube extends VoxelShape implements VoxelShapeCaster {
     static final double EPSILON = 1.0E-7D;
-    public final boolean isTiny;
+
     final double minX, minY, minZ, maxX, maxY, maxZ;
+    public final boolean isTiny;
 
     public VoxelShapeSimpleCube(VoxelSet voxels, double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
         super(voxels);
@@ -40,34 +41,6 @@ public class VoxelShapeSimpleCube extends VoxelShape implements VoxelShapeCaster
                 this.minX + 3 * EPSILON >= this.maxX ||
                         this.minY + 3 * EPSILON >= this.maxY ||
                         this.minZ + 3 * EPSILON >= this.maxZ;
-    }
-
-    private static double calculatePenetration(double a1, double a2, double b1, double b2, double maxDist) {
-        double penetration;
-
-        if (maxDist > 0.0D) {
-            penetration = a1 - b2;
-
-            if ((penetration < -EPSILON) || (maxDist < penetration)) {
-                //already far enough inside this shape to not collide with the surface or
-                //outside the shape and still far enough away for no collision at all
-                return maxDist;
-            }
-            //allow moving up to the shape but not into it. This also includes going backwards by at most EPSILON.
-        } else {
-            //whole code again, just negated for the other direction
-            penetration = a2 - b1;
-
-            if ((penetration > EPSILON) || (maxDist > penetration)) {
-                return maxDist;
-            }
-        }
-
-        return penetration;
-    }
-
-    private static boolean lessThan(double a, double b) {
-        return (a + EPSILON) < b;
     }
 
     @Override
@@ -114,6 +87,30 @@ public class VoxelShapeSimpleCube extends VoxelShape implements VoxelShapeCaster
             default:
                 throw new IllegalArgumentException();
         }
+    }
+
+    private static double calculatePenetration(double a1, double a2, double b1, double b2, double maxDist) {
+        double penetration;
+
+        if (maxDist > 0.0D) {
+            penetration = a1 - b2;
+
+            if ((penetration < -EPSILON) || (maxDist < penetration)) {
+                //already far enough inside this shape to not collide with the surface or
+                //outside the shape and still far enough away for no collision at all
+                return maxDist;
+            }
+            //allow moving up to the shape but not into it. This also includes going backwards by at most EPSILON.
+        } else {
+            //whole code again, just negated for the other direction
+            penetration = a2 - b1;
+
+            if ((penetration > EPSILON) || (maxDist > penetration)) {
+                return maxDist;
+            }
+        }
+
+        return penetration;
     }
 
     @Override
@@ -168,6 +165,7 @@ public class VoxelShapeSimpleCube extends VoxelShape implements VoxelShapeCaster
         throw new IllegalArgumentException();
     }
 
+
     @Override
     public boolean isEmpty() {
         return (this.minX >= this.maxX) || (this.minY >= this.maxY) || (this.minZ >= this.maxZ);
@@ -184,6 +182,10 @@ public class VoxelShapeSimpleCube extends VoxelShape implements VoxelShapeCaster
         }
 
         return 0;
+    }
+
+    private static boolean lessThan(double a, double b) {
+        return (a + EPSILON) < b;
     }
 
     @Override

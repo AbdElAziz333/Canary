@@ -34,7 +34,6 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.BooleanSupplier;
 
 import static net.minecraft.block.entity.HopperBlockEntity.getInputItemEntities;
 

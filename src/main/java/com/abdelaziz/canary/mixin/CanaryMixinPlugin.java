@@ -3,7 +3,6 @@ package com.abdelaziz.canary.mixin;
 import com.abdelaziz.canary.common.Canary;
 import com.abdelaziz.canary.common.config.CanaryConfig;
 import com.abdelaziz.canary.common.config.Option;
-import net.minecraftforge.fml.loading.FMLLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.tree.ClassNode;

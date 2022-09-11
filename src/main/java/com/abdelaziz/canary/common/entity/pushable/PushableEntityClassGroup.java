@@ -27,8 +27,8 @@ public class PushableEntityClassGroup {
     public static final EntityClassGroup MAYBE_PUSHABLE;
 
     static {
-        String remapped_isClimbing = "isClimbing";
-        String remapped_isPushable = "isPushable";
+        String remapped_isClimbing = "m_6147_";
+        String remapped_isPushable = "m_6094_";
         CACHABLE_UNPUSHABILITY = new EntityClassGroup(
                 (Class<?> entityClass) -> {
                     if (LivingEntity.class.isAssignableFrom(entityClass) && !PlayerEntity.class.isAssignableFrom(entityClass)) {
