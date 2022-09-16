@@ -98,6 +98,7 @@ public class CanaryConfig {
         this.addMixinRule("entity.fast_hand_swing", true);
         this.addMixinRule("entity.fast_powder_snow_check", true);
         this.addMixinRule("entity.fast_retrieval", true);
+        this.addMixinRule("entity.hopper_minecart", true);
         this.addMixinRule("entity.inactive_navigations", true);
         this.addMixinRule("entity.replace_entitytype_predicates", true);
         this.addMixinRule("entity.skip_equipment_change_check", true);
