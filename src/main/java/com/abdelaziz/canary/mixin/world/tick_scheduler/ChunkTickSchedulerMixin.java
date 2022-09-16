@@ -1,10 +1,10 @@
 package com.abdelaziz.canary.mixin.world.tick_scheduler;
 
+import com.abdelaziz.canary.common.world.scheduler.OrderedTickQueue;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.longs.Long2ReferenceAVLTreeMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap;
-import me.jellysquid.mods.lithium.common.world.scheduler.OrderedTickQueue;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.TickPriority;
