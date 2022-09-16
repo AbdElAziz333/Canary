@@ -48,7 +48,7 @@ public abstract class SerializingRegionBasedStorageMixin<R> implements RegionBas
 
     @SuppressWarnings("rawtypes")
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void init(Path path, Function codecFactory, Function factory, DataFixer dataFixer, DataFixTypes dataFixTypes, boolean dsync, DynamicRegistryManager dynamicRegistryManager, HeightLimitView world, CallbackInfo ci) {
+    private void init(Path path, Function codecFactory, Function factory, DataFixer dataFixer, DataFixTypes dataFixTypes, boolean dsync, HeightLimitView world, CallbackInfo ci) {
         this.columns = new Long2ObjectOpenHashMap<>();
         this.loadedElements = new ListeningLong2ObjectOpenHashMap<>(this::onEntryAdded, this::onEntryRemoved);
     }

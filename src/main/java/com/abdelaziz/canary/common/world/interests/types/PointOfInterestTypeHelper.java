@@ -14,7 +14,6 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Predicate;
 
 /**
  * Replaces the type of the blockstate to POI map with a faster collection type which uses reference equality.
