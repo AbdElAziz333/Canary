@@ -1,7 +1,6 @@
 package com.abdelaziz.canary.common.hopper;
 
 import com.abdelaziz.canary.api.inventory.CanaryDefaultedList;
-import com.abdelaziz.canary.common.block.entity.inventory_change_tracking.InventoryChangeTracker;
 import com.abdelaziz.canary.mixin.block.hopper.DefaultedListAccessor;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.inventory.Inventory;
@@ -19,8 +18,6 @@ public class CanaryStackList extends DefaultedList<ItemStack> implements CanaryD
     private long modCount;
     private int occupiedSlots;
     private int fullSlots;
-
-    InventoryChangeTracker inventoryModificationCallback;
 
     public CanaryStackList(DefaultedList<ItemStack> original, int maxCountPerStack) {
         //noinspection unchecked
@@ -232,12 +229,5 @@ public class CanaryStackList extends DefaultedList<ItemStack> implements CanaryD
     @Override
     public void changedInteractionConditions() {
         this.modCount++;
-    }
-
-    public void setInventoryModificationCallback(InventoryChangeTracker inventoryModificationCallback) {
-        if (this.inventoryModificationCallback != null && this.inventoryModificationCallback != inventoryModificationCallback) {
-            this.inventoryModificationCallback.emitCallbackReplaced();
-        }
-        this.inventoryModificationCallback = inventoryModificationCallback;
     }
 }

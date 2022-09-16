@@ -33,7 +33,7 @@ public abstract class ChunkSectionMixin implements BlockCountingSection {
     public abstract void calculateCounts();
 
     @Override
-    public boolean anyMatch(TrackedBlockStatePredicate trackedBlockStatePredicate) {
+    public boolean anyMatch(TrackedBlockStatePredicate trackedBlockStatePredicate, boolean fallback) {
         return this.countsByFlag[trackedBlockStatePredicate.getIndex()] != (short) 0;
     }
 

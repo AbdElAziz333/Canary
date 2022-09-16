@@ -11,6 +11,7 @@ import com.abdelaziz.canary.common.world.interests.RegionBasedStorageSectionExte
 import net.minecraft.datafixer.DataFixTypes;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.ChunkSectionPos;
+import net.minecraft.util.registry.DynamicRegistryManager;
 import net.minecraft.world.HeightLimitView;
 import net.minecraft.world.storage.SerializingRegionBasedStorage;
 import org.spongepowered.asm.mixin.Final;
@@ -45,6 +46,13 @@ public abstract class SerializingRegionBasedStorageMixin<R> implements RegionBas
 
     private Long2ObjectOpenHashMap<RegionBasedStorageColumn> columns;
 
+    @SuppressWarnings("rawtypes")
+    @Inject(method = "<init>", at = @At("RETURN"))
+    private void init(Path path, Function codecFactory, Function factory, DataFixer dataFixer, DataFixTypes dataFixTypes, boolean dsync, DynamicRegistryManager dynamicRegistryManager, HeightLimitView world, CallbackInfo ci) {
+        this.columns = new Long2ObjectOpenHashMap<>();
+        this.loadedElements = new ListeningLong2ObjectOpenHashMap<>(this::onEntryAdded, this::onEntryRemoved);
+    }
+
     private static long getChunkFromSection(long section) {
         int x = ChunkSectionPos.unpackX(section);
         int z = ChunkSectionPos.unpackZ(section);
@@ -53,13 +61,6 @@ public abstract class SerializingRegionBasedStorageMixin<R> implements RegionBas
 
     private static boolean isSectionValid(int y) {
         return y >= 0 && y < RegionBasedStorageColumn.SECTIONS_IN_CHUNK;
-    }
-
-    @SuppressWarnings("rawtypes")
-    @Inject(method = "<init>", at = @At("RETURN"))
-    private void init(Path path, Function codecFactory, Function factory, DataFixer dataFixer, DataFixTypes dataFixTypes, boolean dsync, HeightLimitView world, CallbackInfo ci) {
-        this.columns = new Long2ObjectOpenHashMap<>();
-        this.loadedElements = new ListeningLong2ObjectOpenHashMap<>(this::onEntryAdded, this::onEntryRemoved);
     }
 
     private void onEntryRemoved(long key, Optional<R> value) {

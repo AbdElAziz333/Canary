@@ -1,10 +1,10 @@
 package com.abdelaziz.canary.mixin.entity.collisions.fluid;
 
-import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import com.abdelaziz.canary.common.block.BlockCountingSection;
 import com.abdelaziz.canary.common.block.BlockStateFlags;
 import com.abdelaziz.canary.common.block.TrackedBlockStatePredicate;
 import com.abdelaziz.canary.common.util.Pos;
+import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import net.minecraft.entity.Entity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.tag.FluidTags;
@@ -61,7 +61,7 @@ public abstract class EntityMixin {
                 Chunk chunk = this.world.getChunk(chunkX, chunkZ);
                 for (int chunkYIndex = chunkYIndex1; chunkYIndex <= chunkYIndex2; chunkYIndex++) {
                     ChunkSection section = chunk.getSectionArray()[chunkYIndex];
-                    if (((BlockCountingSection) section).anyMatch(blockStateFlag)) {
+                    if (((BlockCountingSection) section).anyMatch(blockStateFlag, true)) {
                         //fluid found, cannot skip code
                         return;
                     }

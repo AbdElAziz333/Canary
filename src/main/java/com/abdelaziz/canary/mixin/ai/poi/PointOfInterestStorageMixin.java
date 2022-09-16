@@ -9,7 +9,6 @@ import com.abdelaziz.canary.common.world.interests.RegionBasedStorageSectionExte
 import com.abdelaziz.canary.common.world.interests.iterator.NearbyPointOfInterestStream;
 import com.abdelaziz.canary.common.world.interests.iterator.SinglePointOfInterestTypeFilter;
 import com.abdelaziz.canary.common.world.interests.iterator.SphereChunkOrderedPoiSetSpliterator;
-import com.abdelaziz.canary.common.world.interests.types.PointOfInterestTypeHelper;
 import net.minecraft.datafixer.DataFixTypes;
 import net.minecraft.util.annotation.Debug;
 import net.minecraft.util.math.BlockPos;
@@ -45,34 +44,6 @@ public abstract class PointOfInterestStorageMixin extends SerializingRegionBased
 
     public PointOfInterestStorageMixin(Path path, Function<Runnable, Codec<PointOfInterestSet>> codecFactory, Function<Runnable, PointOfInterestSet> factory, DataFixer dataFixer, DataFixTypes dataFixTypes, boolean dsync, HeightLimitView world) {
         super(path, codecFactory, factory, dataFixer, dataFixTypes, dsync, world);
-    }
-
-    @Shadow
-    public abstract Stream<PointOfInterest> getInSquare(Predicate<PointOfInterestType> typePredicate, BlockPos pos, int radius, PointOfInterestStorage.OccupationStatus occupationStatus);
-
-    /**
-     * @reason Avoid Stream API
-     * @author Jellysquid
-     */
-    @Overwrite
-    public void initForPalette(ChunkPos chunkPos_1, ChunkSection section) {
-        ChunkSectionPos sectionPos = ChunkSectionPos.from(chunkPos_1, section.getYOffset() >> 4);
-
-        PointOfInterestSet set = this.get(sectionPos.asLong()).orElse(null);
-
-        if (set != null) {
-            set.updatePointsOfInterest(consumer -> {
-                if (PointOfInterestTypeHelper.shouldScan(section)) {
-                    this.scanAndPopulate(section, sectionPos, consumer);
-                }
-            });
-        } else {
-            if (PointOfInterestTypeHelper.shouldScan(section)) {
-                set = this.getOrCreate(sectionPos.asLong());
-
-                this.scanAndPopulate(section, sectionPos, set::add);
-            }
-        }
     }
 
     /**

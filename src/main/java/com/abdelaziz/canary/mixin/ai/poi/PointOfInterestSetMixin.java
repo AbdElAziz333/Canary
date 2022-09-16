@@ -6,6 +6,7 @@ import it.unimi.dsi.fastutil.objects.Reference2ReferenceMaps;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 import com.abdelaziz.canary.common.world.interests.PointOfInterestSetExtended;
 import com.abdelaziz.canary.common.world.interests.iterator.SinglePointOfInterestTypeFilter;
+import net.minecraft.util.registry.RegistryEntry;
 import net.minecraft.world.poi.PointOfInterest;
 import net.minecraft.world.poi.PointOfInterestSet;
 import net.minecraft.world.poi.PointOfInterestStorage;

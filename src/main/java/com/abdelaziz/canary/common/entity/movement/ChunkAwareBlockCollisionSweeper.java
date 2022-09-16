@@ -1,11 +1,11 @@
 package com.abdelaziz.canary.common.entity.movement;
 
-import com.abdelaziz.canary.common.entity.CanaryEntityCollisions;
-import com.abdelaziz.canary.common.shapes.VoxelShapeCaster;
-import com.google.common.collect.AbstractIterator;
 import com.abdelaziz.canary.common.block.BlockCountingSection;
 import com.abdelaziz.canary.common.block.BlockStateFlags;
+import com.abdelaziz.canary.common.entity.CanaryEntityCollisions;
+import com.abdelaziz.canary.common.shapes.VoxelShapeCaster;
 import com.abdelaziz.canary.common.util.Pos;
+import com.google.common.collect.AbstractIterator;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.ShapeContext;
@@ -119,14 +119,6 @@ public class ChunkAwareBlockCollisionSweeper extends AbstractIterator<VoxelShape
         return null;
     }
 
-    private static int expandMin(int coord) {
-        return coord - 1;
-    }
-
-    private static int expandMax(int coord) {
-        return coord + 1;
-    }
-
     /**
      * Checks the cached information whether the {@param chunkY} section of the {@param chunk} has oversized blocks.
      *
@@ -135,9 +127,80 @@ public class ChunkAwareBlockCollisionSweeper extends AbstractIterator<VoxelShape
     private static boolean hasChunkSectionOversizedBlocks(Chunk chunk, int chunkY) {
         if (BlockStateFlags.ENABLED) {
             ChunkSection section = chunk.getSectionArray()[chunkY];
-            return section != null && ((BlockCountingSection) section).anyMatch(BlockStateFlags.OVERSIZED_SHAPE);
+            return section != null && ((BlockCountingSection) section).anyMatch(BlockStateFlags.OVERSIZED_SHAPE, true);
         }
         return true; //like vanilla, assume that a chunk section has oversized blocks, when the section mixin isn't loaded
+    }
+
+    private static int expandMin(int coord) {
+        return coord - 1;
+    }
+
+    private static int expandMax(int coord) {
+        return coord + 1;
+    }
+
+    private boolean nextSection() {
+        do {
+            do {
+                //find the coordinates of the next section inside the area expanded by 1 block on all sides
+                //note: this.minX, maxX etc are not expanded, so there are lots of +1 and -1 around.
+                if (
+                        this.cachedChunk != null &&
+                                this.chunkYIndex < Pos.SectionYIndex.getMaxYSectionIndexInclusive(this.view) &&
+                                this.chunkYIndex < Pos.SectionYIndex.fromBlockCoord(this.view, expandMax(this.maxY))
+                ) {
+                    this.chunkYIndex++;
+                    this.cachedChunkSection = this.cachedChunk.getSectionArray()[this.chunkYIndex];
+                } else {
+                    this.chunkYIndex = MathHelper.clamp(
+                            Pos.SectionYIndex.fromBlockCoord(this.view, expandMin(this.minY)),
+                            Pos.SectionYIndex.getMinYSectionIndex(this.view),
+                            Pos.SectionYIndex.getMaxYSectionIndexInclusive(this.view)
+                    );
+
+                    if ((this.chunkX < Pos.ChunkCoord.fromBlockCoord(expandMax(this.maxX)))) {
+                        //first initialization takes this branch
+                        this.chunkX++;
+                    } else {
+                        this.chunkX = Pos.ChunkCoord.fromBlockCoord(expandMin(this.minX));
+
+                        if (this.chunkZ < Pos.ChunkCoord.fromBlockCoord(expandMax(this.maxZ))) {
+                            this.chunkZ++;
+                        } else {
+                            return false; //no more sections to iterate
+                        }
+                    }
+                    //Casting to Chunk is not checked, together with other mods this could cause a ClassCastException
+                    this.cachedChunk = (Chunk) this.view.getChunkAsView(this.chunkX, this.chunkZ);
+                    if (this.cachedChunk != null) {
+                        this.cachedChunkSection = this.cachedChunk.getSectionArray()[this.chunkYIndex];
+                    }
+                }
+                //skip empty chunks and empty chunk sections
+            } while (this.cachedChunk == null || this.cachedChunkSection == null || this.cachedChunkSection.isEmpty());
+
+            this.sectionOversizedBlocks = hasChunkSectionOversizedBlocks(this.cachedChunk, this.chunkYIndex);
+
+            int sizeExtension = this.sectionOversizedBlocks ? 1 : 0;
+
+            this.cEndX = Math.min(this.maxX + sizeExtension, Pos.BlockCoord.getMaxInSectionCoord(this.chunkX));
+            int cEndY = Math.min(this.maxY + sizeExtension, Pos.BlockCoord.getMaxYInSectionIndex(this.view, this.chunkYIndex));
+            this.cEndZ = Math.min(this.maxZ + sizeExtension, Pos.BlockCoord.getMaxInSectionCoord(this.chunkZ));
+
+            this.cStartX = Math.max(this.minX - sizeExtension, Pos.BlockCoord.getMinInSectionCoord(this.chunkX));
+            int cStartY = Math.max(this.minY - sizeExtension, Pos.BlockCoord.getMinYInSectionIndex(this.view, this.chunkYIndex));
+            this.cStartZ = Math.max(this.minZ - sizeExtension, Pos.BlockCoord.getMinInSectionCoord(this.chunkZ));
+            this.cX = this.cStartX;
+            this.cY = cStartY;
+            this.cZ = this.cStartZ;
+
+            this.cTotalSize = (this.cEndX - this.cStartX + 1) * (cEndY - cStartY + 1) * (this.cEndZ - this.cStartZ + 1);
+            //skip completely empty section iterations
+        } while (this.cTotalSize == 0);
+        this.cIterated = 0;
+
+        return true;
     }
 
     /**
@@ -206,68 +269,5 @@ public class ChunkAwareBlockCollisionSweeper extends AbstractIterator<VoxelShape
         }
 
         return this.endOfData();
-    }
-
-    private boolean nextSection() {
-        do {
-            do {
-                //find the coordinates of the next section inside the area expanded by 1 block on all sides
-                //note: this.minX, maxX etc are not expanded, so there are lots of +1 and -1 around.
-                if (
-                        this.cachedChunk != null &&
-                                this.chunkYIndex < Pos.SectionYIndex.getMaxYSectionIndexInclusive(this.view) &&
-                                this.chunkYIndex < Pos.SectionYIndex.fromBlockCoord(this.view, expandMax(this.maxY))
-                ) {
-                    this.chunkYIndex++;
-                    this.cachedChunkSection = this.cachedChunk.getSectionArray()[this.chunkYIndex];
-                } else {
-                    this.chunkYIndex = MathHelper.clamp(
-                            Pos.SectionYIndex.fromBlockCoord(this.view, expandMin(this.minY)),
-                            Pos.SectionYIndex.getMinYSectionIndex(this.view),
-                            Pos.SectionYIndex.getMaxYSectionIndexInclusive(this.view)
-                    );
-
-                    if ((this.chunkX < Pos.ChunkCoord.fromBlockCoord(expandMax(this.maxX)))) {
-                        //first initialization takes this branch
-                        this.chunkX++;
-                    } else {
-                        this.chunkX = Pos.ChunkCoord.fromBlockCoord(expandMin(this.minX));
-
-                        if (this.chunkZ < Pos.ChunkCoord.fromBlockCoord(expandMax(this.maxZ))) {
-                            this.chunkZ++;
-                        } else {
-                            return false; //no more sections to iterate
-                        }
-                    }
-                    //Casting to Chunk is not checked, together with other mods this could cause a ClassCastException
-                    this.cachedChunk = (Chunk) this.view.getChunkAsView(this.chunkX, this.chunkZ);
-                    if (this.cachedChunk != null) {
-                        this.cachedChunkSection = this.cachedChunk.getSectionArray()[this.chunkYIndex];
-                    }
-                }
-                //skip empty chunks and empty chunk sections
-            } while (this.cachedChunk == null || this.cachedChunkSection == null || this.cachedChunkSection.isEmpty());
-
-            this.sectionOversizedBlocks = hasChunkSectionOversizedBlocks(this.cachedChunk, this.chunkYIndex);
-
-            int sizeExtension = this.sectionOversizedBlocks ? 1 : 0;
-
-            this.cEndX = Math.min(this.maxX + sizeExtension, Pos.BlockCoord.getMaxInSectionCoord(this.chunkX));
-            int cEndY = Math.min(this.maxY + sizeExtension, Pos.BlockCoord.getMaxYInSectionIndex(this.view, this.chunkYIndex));
-            this.cEndZ = Math.min(this.maxZ + sizeExtension, Pos.BlockCoord.getMaxInSectionCoord(this.chunkZ));
-
-            this.cStartX = Math.max(this.minX - sizeExtension, Pos.BlockCoord.getMinInSectionCoord(this.chunkX));
-            int cStartY = Math.max(this.minY - sizeExtension, Pos.BlockCoord.getMinYInSectionIndex(this.view, this.chunkYIndex));
-            this.cStartZ = Math.max(this.minZ - sizeExtension, Pos.BlockCoord.getMinInSectionCoord(this.chunkZ));
-            this.cX = this.cStartX;
-            this.cY = cStartY;
-            this.cZ = this.cStartZ;
-
-            this.cTotalSize = (this.cEndX - this.cStartX + 1) * (cEndY - cStartY + 1) * (this.cEndZ - this.cStartZ + 1);
-            //skip completely empty section iterations
-        } while (this.cTotalSize == 0);
-        this.cIterated = 0;
-
-        return true;
     }
 }
