@@ -42,10 +42,12 @@ public abstract class LandPathNodeMakerMixin {
             // since fluids will always pass this check.
             if (!blockState.canPathfindThrough(blockView, blockPos, NavigationType.LAND)) {
                 cir.setReturnValue(PathNodeType.BLOCKED);
+                return;
             }
 
             // All checks succeed, this path node really is open!
             cir.setReturnValue(type);
+            return;
         }
 
         // Return the cached value since we found an obstacle earlier
@@ -85,6 +87,7 @@ public abstract class LandPathNodeMakerMixin {
             // against this chunk section will always fail, allowing us to fast-exit.
             if (section == null || PathNodeCache.isSectionSafeAsNeighbor(section)) {
                 cir.setReturnValue(type);
+                return;
             }
         }
 
@@ -124,6 +127,7 @@ public abstract class LandPathNodeMakerMixin {
 
                     if (neighborType != PathNodeType.OPEN) {
                         cir.setReturnValue(neighborType);
+                        return;
                     }
                 }
             }
