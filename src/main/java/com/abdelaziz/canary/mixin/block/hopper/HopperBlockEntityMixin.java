@@ -699,12 +699,16 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
         if (this.needsCooldown()) {
             return;
         }
-        if (!this.shouldCheckSleep) {
-            this.shouldCheckSleep = true;
-            return;
-        }
+
         //TODO check sleeping conditions less often, otherwise this might be quite expensive
         if (this instanceof SleepingBlockEntity thisSleepingBlockEntity) {
+            if (thisSleepingBlockEntity.isSleeping()) {
+                return;
+            }
+            if (!this.shouldCheckSleep) {
+                this.shouldCheckSleep = true;
+                return;
+            }
             if (this instanceof InventoryChangeTracker thisTracker) {
                 boolean listenToExtractTracker = false;
                 boolean listenToInsertTracker = false;
