@@ -713,7 +713,7 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
 
                 CanaryStackList thisStackList = InventoryHelper.getCanaryStackList(this);
 
-                if (this.extractionMode != HopperCachingState.BlockInventory.BLOCK_STATE && thisStackList.getFullSlots() == thisStackList.size()) {
+                if (this.extractionMode != HopperCachingState.BlockInventory.BLOCK_STATE && thisStackList.getFullSlots() != thisStackList.size()) {
                     if (this.extractionMode == HopperCachingState.BlockInventory.REMOVAL_TRACKING_BLOCK_ENTITY) {
                         Inventory blockInventory = this.extractBlockInventory;
                         if (this.extractStackList != null &&
