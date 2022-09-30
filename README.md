@@ -10,10 +10,6 @@
 
 Canary is a general-purpose optimization mod and unofficial fork of the Fabric mod [Lithium](https://github.com/CaffeineMC/lithium-fabric) for Minecraft, this mod aims to optimize many areas of the game in order to provide better overall performance. It works on both the **client and server**, and **doesn't require the mod to be installed on both sides**.
 
-### Installation
-
-https://www.curseforge.com/minecraft/mc-mods/canary
-
 ### What makes Canary different?
 
 One of the most important design goals in Canary is *correctness*. Unlike other mods which apply optimizations to the
