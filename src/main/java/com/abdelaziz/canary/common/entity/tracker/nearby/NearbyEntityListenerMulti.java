@@ -16,7 +16,8 @@ public class NearbyEntityListenerMulti implements NearbyEntityListener {
 
     public void addListener(NearbyEntityListener listener) {
         if (this.range != null) {
-            throw new IllegalStateException("Cannot add sublisteners after listening range was set!");
+            //throw new IllegalStateException("Cannot add sublisteners after listening range was set!");
+            return;
         }
         this.listeners.add(listener);
     }
