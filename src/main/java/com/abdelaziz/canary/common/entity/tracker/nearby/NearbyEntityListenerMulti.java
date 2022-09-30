@@ -1,7 +1,9 @@
 package com.abdelaziz.canary.common.entity.tracker.nearby;
 
+import com.abdelaziz.canary.common.entity.tracker.EntityTrackerEngine;
 import com.abdelaziz.canary.common.util.tuples.Range6Int;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.math.ChunkSectionPos;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +18,8 @@ public class NearbyEntityListenerMulti implements NearbyEntityListener {
 
     public void addListener(NearbyEntityListener listener) {
         if (this.range != null) {
-            throw new IllegalStateException("Cannot add sublisteners after listening range was set!");
+            //throw new IllegalStateException("Cannot add sublisteners after listening range was set!");
+            return;
         }
         this.listeners.add(listener);
     }
