@@ -3,7 +3,7 @@ package com.abdelaziz.canary.mixin.entity.collisions.unpushable_cramming;
 import com.abdelaziz.canary.common.entity.pushable.BlockCachingEntity;
 import com.abdelaziz.canary.common.entity.pushable.EntityPushablePredicate;
 import com.abdelaziz.canary.common.entity.pushable.PushableEntityClassGroup;
-import com.abdelaziz.canary.common.util.collections.MaskedList;
+import com.abdelaziz.canary.common.util.collections.ReferenceMaskedList;
 import com.abdelaziz.canary.common.world.ClimbingMobCachingSection;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
@@ -40,7 +40,7 @@ public abstract class EntityTrackingSectionMixin<T extends EntityLike> implement
      * and therefore cannot be pushed (only applied to some entity types) are hidden by the mask until the cache is cleared.
      */
     @Unique
-    private MaskedList<Entity> pushableEntities;
+    private ReferenceMaskedList<Entity> pushableEntities;
 
     /**
      * Whether entities with this feet BlockState should be considered to be pushable. Some entity types are not pushable
@@ -55,7 +55,7 @@ public abstract class EntityTrackingSectionMixin<T extends EntityLike> implement
     }
 
     private void startFilteringPushableEntities() {
-        this.pushableEntities = new MaskedList<>();
+        this.pushableEntities = new ReferenceMaskedList<>();
         for (T entity : this.collection) {
             this.onStartClimbingCachingEntity((Entity) entity);
         }
