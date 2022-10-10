@@ -48,7 +48,7 @@ public class CanaryConfig {
         this.addMixinRule("ai.task.replace_streams", true);
 
         this.addMixinRule("alloc", true);
-        this.addMixinRule("alloc.blockstate", false);//Ferritecore adds a better optimization for neighbor table, disable the StateMixin when ferritecore is installed
+        this.addMixinRule("alloc.blockstate", true);//Ferritecore adds a better optimization for neighbor table, disable the StateMixin when ferritecore is installed
         this.addMixinRule("alloc.chunk_random", true);
         this.addMixinRule("alloc.chunk_ticking", true);
         this.addMixinRule("alloc.composter", true);
@@ -191,6 +191,7 @@ public class CanaryConfig {
         while (config.applyDependencies()) {
             ;
         }
+        config.applyModOverrides();
 
         return config;
     }
@@ -211,7 +212,7 @@ public class CanaryConfig {
             writer.write("# This file exists for debugging purposes and should not be configured otherwise.\n");
             writer.write("#\n");
             writer.write("# You can find information on editing this file and all the available options here:\n");
-            writer.write("# https://github.com/jellysquid3/canary-fabric/wiki/Configuration-File\n");
+            writer.write("# https://github.com/AbdElAziz333/Canary/wiki/Configuration-File\n");
             writer.write("#\n");
             writer.write("# By default, this file will be empty except for this notice.\n");
         }
