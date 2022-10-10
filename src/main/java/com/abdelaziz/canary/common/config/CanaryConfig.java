@@ -156,6 +156,9 @@ public class CanaryConfig {
         this.addRuleDependency("entity.collisions.fluid", "chunk", true);
         this.addRuleDependency("entity.collisions.fluid", "chunk.block_counting", true);
 
+        this.addRuleDependency("entity.collisions.unpushable_cramming", "chunk.entity_class_groups", true);
+
+
     }
 
     /**
