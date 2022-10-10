@@ -380,7 +380,7 @@ public class CanaryConfig {
     private boolean applyDependencies() {
         boolean changed = false;
         for (Option optionWithDependency : this.optionsWithDependencies) {
-            changed |= optionWithDependency.disableIfDependenciesNotMet(LOGGER);
+            changed |= optionWithDependency.disableIfDependenciesNotMet(LOGGER, this);
         }
         return changed;
     }
@@ -394,5 +394,17 @@ public class CanaryConfig {
                 .stream()
                 .filter(Option::isOverridden)
                 .count();
+    }
+
+    public Option getParent(Option option) {
+        String optionName = option.getName();
+        int split;
+
+        if ((split = optionName.lastIndexOf('.')) != -1) {
+            String key = optionName.substring(0, split);
+            return this.options.get(key);
+
+        }
+        return null;
     }
 }

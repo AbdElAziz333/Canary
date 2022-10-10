@@ -46,6 +46,10 @@ public class Option {
         return this.isUserDefined() || this.isModDefined();
     }
 
+    public boolean isEnabledRecursive(CanaryConfig config) {
+        return this.enabled && (config.getParent(this) == null || config.getParent(this).isEnabledRecursive(config));
+    }
+
     public boolean isUserDefined() {
         return this.userDefined;
     }
@@ -73,12 +77,12 @@ public class Option {
         this.dependencies.put(dependencyOption, requiredValue);
     }
 
-    public boolean disableIfDependenciesNotMet(Logger logger) {
+    public boolean disableIfDependenciesNotMet(Logger logger, CanaryConfig config) {
         if (this.dependencies != null && this.isEnabled()) {
             for (Object2BooleanMap.Entry<Option> dependency : this.dependencies.object2BooleanEntrySet()) {
                 Option option = dependency.getKey();
                 boolean requiredValue = dependency.getBooleanValue();
-                if (option.isEnabled() != requiredValue) {
+                if (option.isEnabledRecursive(config) != requiredValue) {
                     this.enabled = false;
                     logger.warn("Option '{}' requires '{}={}' but found '{}'. Setting '{}={}'.", this.name, option.name, requiredValue, option.isEnabled(), this.name, this.enabled);
                     return true;
