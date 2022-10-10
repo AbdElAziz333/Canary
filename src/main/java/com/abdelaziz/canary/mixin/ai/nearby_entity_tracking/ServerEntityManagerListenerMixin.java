@@ -43,13 +43,11 @@ public class ServerEntityManagerListenerMixin<T extends EntityLike> {
         //Fix #284 Summoned inventory minecarts do not immediately notify hoppers of their presence when created using summon command
         this.notifyMovementListeners();
     }
-/*
-    @ModifyVariable(method = "updateEntityPosition()V", at = @At("RETURN"))
-    private long updateEntityTrackerEngine(long sectionPos) {
+
+    @Inject(method = "updateEntityPosition()V", at = @At("RETURN"))
+    private void updateEntityTrackerEngine(CallbackInfo ci) {
         this.notifyMovementListeners();
-        return sectionPos;
     }
-    */
 
     @Inject(
             method = "updateEntityPosition()V",

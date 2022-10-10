@@ -34,6 +34,6 @@ public class ArmorStandEntityMixin implements EquipmentEntity.EquipmentTrackingE
             at = @At("RETURN")
     )
     private void trackEquipChange(DamageSource damageSource, CallbackInfo ci) {
-        this.OnEquipmentChanged();
+        this.canaryOnEquipmentChanged();
     }
 }
