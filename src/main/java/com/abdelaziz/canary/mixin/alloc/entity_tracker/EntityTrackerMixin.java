@@ -1,15 +1,15 @@
 package com.abdelaziz.canary.mixin.alloc.entity_tracker;
 
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
-import net.minecraft.server.world.EntityTrackingListener;
-import net.minecraft.server.world.ThreadedAnvilChunkStorage;
+import net.minecraft.server.level.ChunkMap;
+import net.minecraft.server.network.ServerPlayerConnection;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 import java.util.Set;
 
-@Mixin(ThreadedAnvilChunkStorage.EntityTracker.class)
+@Mixin(ChunkMap.TrackedEntity.class)
 public class EntityTrackerMixin {
 
     /**
@@ -24,7 +24,7 @@ public class EntityTrackerMixin {
                     remap = false
             )
     )
-    private Set<EntityTrackingListener> useFasterCollection() {
+    private Set<ServerPlayerConnection> useFasterCollection() {
         return new ReferenceOpenHashSet<>();
     }
 }

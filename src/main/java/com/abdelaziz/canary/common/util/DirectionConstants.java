@@ -1,6 +1,6 @@
 package com.abdelaziz.canary.common.util;
 
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.Direction;
 
 /**
  * Pre-initialized constants to avoid unnecessary allocations.

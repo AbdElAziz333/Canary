@@ -1,6 +1,6 @@
 package com.abdelaziz.canary.common.util;
 
-import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.world.entity.EquipmentSlot;
 
 /**
  * Pre-initialized constants to avoid unnecessary allocations.
