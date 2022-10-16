@@ -1,13 +1,13 @@
 package com.abdelaziz.canary.common.util;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.chunk.ChunkSection;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.chunk.LevelChunkSection;
 
 public class Distances {
 
     public static double getMinChunkToBlockDistanceL2Sq(BlockPos origin, int chunkX, int chunkZ) {
-        int chunkMinX = ChunkSection.blockCoordFromChunkCoord(chunkX);
-        int chunkMinZ = ChunkSection.blockCoordFromChunkCoord(chunkZ);
+        int chunkMinX = LevelChunkSection.getBottomBlockY(chunkX);
+        int chunkMinZ = LevelChunkSection.getBottomBlockY(chunkZ);
 
         int xDistance = origin.getX() - chunkMinX;
         if (xDistance > 0) {
@@ -27,6 +27,6 @@ public class Distances {
     }
 
     public static boolean isWithinCircleRadius(BlockPos origin, double radiusSq, BlockPos pos) {
-        return origin.getSquaredDistance(pos) <= radiusSq;
+        return origin.distSqr(pos) <= radiusSq;
     }
 }

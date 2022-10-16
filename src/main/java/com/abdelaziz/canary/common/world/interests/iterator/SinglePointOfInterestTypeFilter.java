@@ -1,19 +1,19 @@
 package com.abdelaziz.canary.common.world.interests.iterator;
 
-import net.minecraft.util.registry.RegistryEntry;
-import net.minecraft.world.poi.PointOfInterestType;
+import net.minecraft.core.Holder;
+import net.minecraft.world.entity.ai.village.poi.PoiType;
 
 import java.util.function.Predicate;
 
 public record SinglePointOfInterestTypeFilter(
-        RegistryEntry<PointOfInterestType> type) implements Predicate<RegistryEntry<PointOfInterestType>> {
+        Holder<PoiType> type) implements Predicate<Holder<PoiType>> {
 
     @Override
-    public boolean test(RegistryEntry<PointOfInterestType> other) {
+    public boolean test(Holder<PoiType> other) {
         return this.type == other;
     }
 
-    public RegistryEntry<PointOfInterestType> getType() {
+    public Holder<PoiType> getType() {
         return this.type;
     }
 }

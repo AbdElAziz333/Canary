@@ -1,11 +1,11 @@
 package com.abdelaziz.canary.common.world.interests;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.RegistryEntry;
-import net.minecraft.world.border.WorldBorder;
-import net.minecraft.world.poi.PointOfInterest;
-import net.minecraft.world.poi.PointOfInterestStorage;
-import net.minecraft.world.poi.PointOfInterestType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.world.entity.ai.village.poi.PoiManager;
+import net.minecraft.world.entity.ai.village.poi.PoiRecord;
+import net.minecraft.world.entity.ai.village.poi.PoiType;
+import net.minecraft.world.level.border.WorldBorder;
 
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -30,6 +30,6 @@ public interface PointOfInterestStorageExtended {
      * @param worldBorder        The world border the POI must be inside.
      * @return The first accepted position (respecting the described order)
      */
-    Optional<PointOfInterest> findNearestForPortalLogic(BlockPos pos, int radius, RegistryEntry<PointOfInterestType> type, PointOfInterestStorage.OccupationStatus status,
-                                                        Predicate<PointOfInterest> afterSortPredicate, WorldBorder worldBorder);
+    Optional<PoiRecord> findNearestForPortalLogic(BlockPos pos, int radius, Holder<PoiType> type, PoiManager.Occupancy status,
+                                                  Predicate<PoiRecord> afterSortPredicate, WorldBorder worldBorder);
 }
