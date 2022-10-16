@@ -2,20 +2,20 @@ package com.abdelaziz.canary.mixin.ai.pathing;
 
 import com.abdelaziz.canary.api.pathing.BlockPathingBehavior;
 import com.abdelaziz.canary.common.ai.pathing.PathNodeDefaults;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.ai.pathing.PathNodeType;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(Block.class)
 public class MixinBlock implements BlockPathingBehavior {
     @Override
-    public PathNodeType getPathNodeType(BlockState state) {
+    public BlockPathTypes getPathNodeType(BlockState state) {
         return PathNodeDefaults.getNodeType(state);
     }
 
     @Override
-    public PathNodeType getPathNodeTypeAsNeighbor(BlockState state) {
+    public BlockPathTypes getPathNodeTypeAsNeighbor(BlockState state) {
         return PathNodeDefaults.getNeighborNodeType(state);
     }
 }

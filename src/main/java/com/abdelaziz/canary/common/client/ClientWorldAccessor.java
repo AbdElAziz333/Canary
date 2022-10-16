@@ -1,8 +1,8 @@
 package com.abdelaziz.canary.common.client;
 
-import net.minecraft.client.world.ClientEntityManager;
-import net.minecraft.entity.Entity;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.entity.TransientEntitySectionManager;
 
 public interface ClientWorldAccessor {
-    ClientEntityManager<Entity> getEntityManager();
+    TransientEntitySectionManager<Entity> getEntityManager();
 }

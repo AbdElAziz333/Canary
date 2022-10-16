@@ -3,19 +3,21 @@ package com.abdelaziz.canary.mixin.ai.pathing;
 import com.abdelaziz.canary.common.ai.pathing.PathNodeCache;
 import com.abdelaziz.canary.common.util.Pos;
 import com.abdelaziz.canary.common.world.WorldHelper;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.ai.pathing.LandPathNodeMaker;
-import net.minecraft.entity.ai.pathing.NavigationType;
-import net.minecraft.entity.ai.pathing.PathNodeType;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.CollisionView;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.ChunkSection;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.CollisionGetter;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.LevelChunkSection;
+import net.minecraft.world.level.pathfinder.BlockPathTypes;
+import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.level.pathfinder.WalkNodeEvaluator;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import javax.swing.text.html.BlockView;
 
 /**
  * Determining the type of node offered by a block state is a very slow operation due to the nasty chain of tag,
@@ -23,25 +25,25 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * cache which stores the result of this complicated code path. This provides a significant speed-up in path-finding
  * code and should be relatively safe.
  */
-@Mixin(LandPathNodeMaker.class)
+@Mixin(WalkNodeEvaluator.class)
 public abstract class LandPathNodeMakerMixin {
     /**
      * @reason Use optimized implementation
      * @author JellySquid
      */
-    @Inject(method = "getCommonNodeType", at = @At("HEAD"), cancellable = true)
-    private static void getCommonNodeType(BlockView blockView, BlockPos blockPos, CallbackInfoReturnable<PathNodeType> cir) {
+    @Inject(method = "getBlockPathTypeRaw", at = @At("HEAD"), cancellable = true)
+    private static void getCommonNodeType(BlockGetter blockView, BlockPos blockPos, CallbackInfoReturnable<BlockPathTypes> cir) {
         BlockState blockState = blockView.getBlockState(blockPos);
-        PathNodeType type = PathNodeCache.getPathNodeType(blockState);
+        BlockPathTypes type = PathNodeCache.getPathNodeType(blockState);
 
         // If the node type is open, it means that we were unable to determine a more specific type, so we need
         // to check the fallback path.
-        if (type == PathNodeType.OPEN || type == PathNodeType.WATER) {
+        if (type == BlockPathTypes.OPEN || type == BlockPathTypes.WATER) {
             // This is only ever called in vanilla after all other possibilities are exhausted, but before fluid checks
             // It should be safe to perform it last in actuality and take advantage of the cache for fluid types as well
             // since fluids will always pass this check.
-            if (!blockState.canPathfindThrough(blockView, blockPos, NavigationType.LAND)) {
-                cir.setReturnValue(PathNodeType.BLOCKED);
+            if (!blockState.isPathfindable(blockView, blockPos, PathComputationType.LAND)) {
+                cir.setReturnValue(BlockPathTypes.BLOCKED);
                 return;
             }
 
@@ -58,27 +60,27 @@ public abstract class LandPathNodeMakerMixin {
      * @reason Use optimized implementation which avoids scanning blocks for dangers where possible
      * @author JellySquid
      */
-    @Inject(method = "getNodeTypeFromNeighbors", at = @At("HEAD"), cancellable = true)
-    private static void getNodeTypeFromNeighbors(BlockView world, BlockPos.Mutable pos, PathNodeType type, CallbackInfoReturnable<PathNodeType> cir) {
+    @Inject(method = "checkNeighbourBlocks", at = @At("HEAD"), cancellable = true)
+    private static void getNodeTypeFromNeighbors(BlockGetter world, BlockPos.MutableBlockPos pos, BlockPathTypes type, CallbackInfoReturnable<BlockPathTypes> cir) {
         int x = pos.getX();
         int y = pos.getY();
         int z = pos.getZ();
 
-        ChunkSection section = null;
+        LevelChunkSection section = null;
 
         // Check that all the block's neighbors are within the same chunk column. If so, we can isolate all our block
         // reads to just one chunk and avoid hits against the server chunk manager.
-        if (world instanceof CollisionView && WorldHelper.areNeighborsWithinSameChunk(pos)) {
+        if (world instanceof CollisionGetter && WorldHelper.areNeighborsWithinSameChunk(pos)) {
             // If the y-coordinate is within bounds, we can cache the chunk section. Otherwise, the if statement to check
             // if the cached chunk section was initialized will early-exit.
-            if (!world.isOutOfHeightLimit(y)) {
+            if (!world.isOutsideBuildHeight(y)) {
                 // This cast is always safe and is necessary to obtain direct references to chunk sections.
-                Chunk chunk = (Chunk) ((CollisionView) world).getChunkAsView(Pos.ChunkCoord.fromBlockCoord(x), Pos.ChunkCoord.fromBlockCoord(z));
+                ChunkAccess chunk = (ChunkAccess) ((CollisionGetter) world).getChunkForCollisions(Pos.ChunkCoord.fromBlockCoord(x), Pos.ChunkCoord.fromBlockCoord(z));
 
                 // If the chunk is absent, the cached section above will remain null, as there is no chunk section anyways.
                 // An empty chunk or section will never pose any danger sources, which will be caught later.
                 if (chunk != null) {
-                    section = chunk.getSectionArray()[Pos.SectionYIndex.fromBlockCoord(world, y)];
+                    section = chunk.getSections()[Pos.SectionYIndex.fromBlockCoord(world, y)];
                 }
             }
 
@@ -123,9 +125,9 @@ public abstract class LandPathNodeMakerMixin {
                         continue;
                     }
 
-                    PathNodeType neighborType = PathNodeCache.getNeighborPathNodeType(state);
+                    BlockPathTypes neighborType = PathNodeCache.getNeighborPathNodeType(state);
 
-                    if (neighborType != PathNodeType.OPEN) {
+                    if (neighborType != BlockPathTypes.OPEN) {
                         cir.setReturnValue(neighborType);
                         return;
                     }
