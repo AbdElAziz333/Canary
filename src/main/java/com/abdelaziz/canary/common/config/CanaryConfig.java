@@ -85,7 +85,7 @@ public class CanaryConfig {
 
         this.addMixinRule("entity", true);
         this.addMixinRule("entity.collisions", true);
-        this.addMixinRule("entity.collisions.fluid", true);
+        //this.addMixinRule("entity.collisions.fluid", true);
         this.addMixinRule("entity.collisions.intersection", true);
         this.addMixinRule("entity.collisions.movement", true);
         this.addMixinRule("entity.collisions.suffocation", true);
@@ -159,8 +159,8 @@ public class CanaryConfig {
 
         this.addRuleDependency("util.inventory_comparator_tracking", "world.block_entity_retrieval", true);
 
-        this.addRuleDependency("entity.collisions.fluid", "chunk", true);
-        this.addRuleDependency("entity.collisions.fluid", "chunk.block_counting", true);
+        //this.addRuleDependency("entity.collisions.fluid", "chunk", true);
+        //this.addRuleDependency("entity.collisions.fluid", "chunk.block_counting", true);
 
         this.addRuleDependency("entity.collisions.unpushable_cramming", "chunk.entity_class_groups", true);
 
