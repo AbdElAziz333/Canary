@@ -22,7 +22,7 @@ public class CompositeTaskMixin<E extends LivingEntity> {
     private ShufflingList<Behavior<? super E>> behaviors;
     @Shadow
     @Final
-    private Set<MemoryModuleType<?>> memoriesToForgetWhenStopped;
+    private Set<MemoryModuleType<?>> exitErasedMemories;
 
     /**
      * @reason Replace stream code with traditional iteration
@@ -68,7 +68,7 @@ public class CompositeTaskMixin<E extends LivingEntity> {
 
         Brain<?> brain = entity.getBrain();
 
-        for (MemoryModuleType<?> module : this.memoriesToForgetWhenStopped) {
+        for (MemoryModuleType<?> module : this.exitErasedMemories) {
             brain.eraseMemory(module);
         }
     }
