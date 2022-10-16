@@ -5,13 +5,13 @@ import com.abdelaziz.canary.common.entity.tracker.EntityTrackerSection;
 import com.abdelaziz.canary.common.entity.tracker.nearby.NearbyEntityListenerMulti;
 import com.abdelaziz.canary.common.entity.tracker.nearby.NearbyEntityListenerProvider;
 import com.abdelaziz.canary.common.entity.tracker.nearby.ToggleableMovementTracker;
-import net.minecraft.entity.Entity;
-import net.minecraft.server.world.ServerEntityManager;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkSectionPos;
-import net.minecraft.world.entity.EntityLike;
-import net.minecraft.world.entity.EntityTrackingSection;
-import net.minecraft.world.entity.EntityTrackingStatus;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.SectionPos;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.entity.EntityAccess;
+import net.minecraft.world.level.entity.EntitySection;
+import net.minecraft.world.level.entity.PersistentEntitySectionManager;
+import net.minecraft.world.level.entity.Visibility;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -20,59 +20,59 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-@Mixin(targets = "net/minecraft/server/world/ServerEntityManager$Listener")
-public class ServerEntityManagerListenerMixin<T extends EntityLike> implements ToggleableMovementTracker {
+@Mixin(targets = "net/minecraft/world/level/entity/PersistentEntitySectionManager$Callback")
+public class ServerEntityManagerListenerMixin<T extends EntityAccess> implements ToggleableMovementTracker {
     @Final
     @SuppressWarnings("ShadowTarget")
     @Shadow
-    ServerEntityManager<T> manager;
+    PersistentEntitySectionManager<T> manager;
     @Shadow
     @Final
     private T entity;
     @Shadow
-    private EntityTrackingSection<T> section;
+    private EntitySection<T> currentSection;
     @Shadow
-    private long sectionPos;
+    private long currentSectionKey;
 
     private int notificationMask;
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void init(ServerEntityManager<?> outer, T entityLike, long l, EntityTrackingSection<T> entityTrackingSection, CallbackInfo ci) {
+    private void init(PersistentEntitySectionManager<?> outer, T entityLike, long l, EntitySection<T> entityTrackingSection, CallbackInfo ci) {
         this.notificationMask = EntityTrackerEngine.getNotificationMask(this.entity.getClass());
 
         //Fix #284 Summoned inventory minecarts do not immediately notify hoppers of their presence when created using summon command
         this.notifyMovementListeners();
     }
 
-    @Inject(method = "updateEntityPosition()V", at = @At("RETURN"))
+    @Inject(method = "onMove()V", at = @At("RETURN"))
     private void updateEntityTrackerEngine(CallbackInfo ci) {
         this.notifyMovementListeners();
     }
 
     @Inject(
-            method = "updateEntityPosition()V",
+            method = "onMove()V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/world/entity/EntityTrackingSection;add(Lnet/minecraft/world/entity/EntityLike;)V",
+                    target = "Lnet/minecraft/world/level/entity/EntitySection;add(Lnet/minecraft/world/level/entity/EntityAccess;)V",
                     shift = At.Shift.AFTER
             ),
             locals = LocalCapture.CAPTURE_FAILHARD
     )
-    private void onAddEntity(CallbackInfo ci, BlockPos blockPos, long newPos, EntityTrackingStatus entityTrackingStatus, EntityTrackingSection<T> entityTrackingSection) {
+    private void onAddEntity(CallbackInfo ci, BlockPos blockPos, long newPos, Visibility entityTrackingStatus, EntitySection<T> entityTrackingSection) {
         NearbyEntityListenerMulti listener = ((NearbyEntityListenerProvider) this.entity).getListener();
         if (listener != null) {
             //noinspection unchecked
             listener.forEachChunkInRangeChange(
-                    ((ServerEntityManagerAccessor<T>) this.manager).getCache(),
-                    ChunkSectionPos.from(this.sectionPos),
-                    ChunkSectionPos.from(newPos)
+                    ((ServerEntityManagerAccessor<T>) this.manager).getSectionStorage(),
+                    SectionPos.of(this.currentSectionKey),
+                    SectionPos.of(newPos)
             );
         }
         this.notifyMovementListeners();
     }
 
     @Inject(
-            method = "remove(Lnet/minecraft/entity/Entity$RemovalReason;)V",
+            method = "onRemove(Lnet/minecraft/world/entity/Entity$RemovalReason;)V",
             at = @At(
                     value = "HEAD"
             )
@@ -82,8 +82,8 @@ public class ServerEntityManagerListenerMixin<T extends EntityLike> implements T
         if (listener != null) {
             //noinspection unchecked
             listener.forEachChunkInRangeChange(
-                    ((ServerEntityManagerAccessor<T>) this.manager).getCache(),
-                    ChunkSectionPos.from(this.sectionPos),
+                    ((ServerEntityManagerAccessor<T>) this.manager).getSectionStorage(),
+                    SectionPos.of(this.currentSectionKey),
                     null
             );
         }
@@ -92,7 +92,7 @@ public class ServerEntityManagerListenerMixin<T extends EntityLike> implements T
 
     private void notifyMovementListeners() {
         if (this.notificationMask != 0) {
-            ((EntityTrackerSection) this.section).trackEntityMovement(this.notificationMask, ((Entity) this.entity).getEntityWorld().getTime());
+            ((EntityTrackerSection) this.currentSection).trackEntityMovement(this.notificationMask, ((Entity) this.entity).getCommandSenderWorld().getGameTime());
         }
     }
 

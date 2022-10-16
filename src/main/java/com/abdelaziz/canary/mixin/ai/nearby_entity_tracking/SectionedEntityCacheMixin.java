@@ -3,12 +3,12 @@ package com.abdelaziz.canary.mixin.ai.nearby_entity_tracking;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
 import com.abdelaziz.canary.common.entity.tracker.nearby.MovementTrackerCache;
 import com.abdelaziz.canary.common.entity.tracker.nearby.SectionedEntityMovementTracker;
-import net.minecraft.world.entity.EntityLike;
-import net.minecraft.world.entity.SectionedEntityCache;
+import net.minecraft.world.level.entity.EntityAccess;
+import net.minecraft.world.level.entity.EntitySectionStorage;
 import org.spongepowered.asm.mixin.Mixin;
 
-@Mixin(SectionedEntityCache.class)
-public class SectionedEntityCacheMixin<T extends EntityLike> implements MovementTrackerCache {
+@Mixin(EntitySectionStorage.class)
+public class SectionedEntityCacheMixin<T extends EntityAccess> implements MovementTrackerCache {
 
     private final Object2ReferenceOpenHashMap<SectionedEntityMovementTracker<?, ?>, SectionedEntityMovementTracker<?, ?>> sectionEntityMovementTrackers = new Object2ReferenceOpenHashMap<>();
 

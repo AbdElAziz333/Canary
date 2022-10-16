@@ -3,7 +3,7 @@ package com.abdelaziz.canary.mixin.ai.nearby_entity_tracking;
 import com.abdelaziz.canary.common.entity.tracker.nearby.NearbyEntityListener;
 import com.abdelaziz.canary.common.entity.tracker.nearby.NearbyEntityListenerMulti;
 import com.abdelaziz.canary.common.entity.tracker.nearby.NearbyEntityListenerProvider;
-import net.minecraft.entity.Entity;
+import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 

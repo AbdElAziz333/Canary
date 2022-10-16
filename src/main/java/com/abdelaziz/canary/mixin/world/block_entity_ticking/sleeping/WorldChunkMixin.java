@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 public class WorldChunkMixin {
 
     @Inject(
-            method = "m_187960_",
+            method = "method_31719", //m_187960_
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;addBlockEntityTicker(Lnet/minecraft/world/chunk/BlockEntityTickInvoker;)V"),
             locals = LocalCapture.CAPTURE_FAILHARD
     )
@@ -28,7 +28,7 @@ public class WorldChunkMixin {
     }
 
     @Inject(
-            method = "m_187960_",
+            method = "method_31719",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/chunk/WorldChunk$WrappedBlockEntityTickInvoker;setWrapped(Lnet/minecraft/world/chunk/BlockEntityTickInvoker;)V"),
             locals = LocalCapture.CAPTURE_FAILHARD
     )
@@ -37,5 +37,4 @@ public class WorldChunkMixin {
             sleepingBlockEntity.setTickWrapper((WrappedBlockEntityTickInvokerAccessor) wrappedBlockEntityTickInvoker);
         }
     }
-
 }

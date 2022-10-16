@@ -6,12 +6,12 @@ import com.abdelaziz.canary.common.entity.tracker.EntityTrackerSection;
 import com.abdelaziz.canary.common.entity.tracker.PositionedEntityTrackingSection;
 import com.abdelaziz.canary.common.entity.tracker.nearby.NearbyEntityListener;
 import com.abdelaziz.canary.common.entity.tracker.nearby.SectionedEntityMovementTracker;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.collection.TypeFilterableList;
-import net.minecraft.world.entity.EntityLike;
-import net.minecraft.world.entity.EntityTrackingSection;
-import net.minecraft.world.entity.EntityTrackingStatus;
-import net.minecraft.world.entity.SectionedEntityCache;
+import net.minecraft.util.ClassInstanceMultiMap;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.entity.EntityAccess;
+import net.minecraft.world.level.entity.EntitySection;
+import net.minecraft.world.level.entity.EntitySectionStorage;
+import net.minecraft.world.level.entity.Visibility;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -23,13 +23,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.ArrayList;
 
-@Mixin(EntityTrackingSection.class)
-public abstract class EntityTrackingSectionMixin<T extends EntityLike> implements EntityTrackerSection, PositionedEntityTrackingSection {
+@Mixin(EntitySection.class)
+public abstract class EntityTrackingSectionMixin<T extends EntityAccess> implements EntityTrackerSection, PositionedEntityTrackingSection {
     @Shadow
-    private EntityTrackingStatus status;
+    private Visibility chunkStatus;
     @Shadow
     @Final
-    private TypeFilterableList<T> collection;
+    private ClassInstanceMultiMap<T> storage;
 
     @Shadow
     public abstract boolean isEmpty();
@@ -43,38 +43,38 @@ public abstract class EntityTrackingSectionMixin<T extends EntityLike> implement
     @Override
     public void addListener(NearbyEntityListener listener) {
         this.nearbyEntityListeners.add(listener);
-        if (this.status.shouldTrack()) {
-            listener.onSectionEnteredRange(this, this.collection);
+        if (this.chunkStatus.isAccessible()) {
+            listener.onSectionEnteredRange(this, this.storage);
         }
     }
 
     @Override
-    public void removeListener(SectionedEntityCache<?> sectionedEntityCache, NearbyEntityListener listener) {
+    public void removeListener(EntitySectionStorage<?> sectionedEntityCache, NearbyEntityListener listener) {
         boolean removed = this.nearbyEntityListeners.remove(listener);
-        if (this.status.shouldTrack() && removed) {
-            listener.onSectionLeftRange(this, this.collection);
+        if (this.chunkStatus.isAccessible() && removed) {
+            listener.onSectionLeftRange(this, this.storage);
         }
         if (this.isEmpty()) {
-            sectionedEntityCache.removeSection(this.getPos());
+            sectionedEntityCache.remove(this.getPos());
         }
     }
 
     @Override
     public void addListener(SectionedEntityMovementTracker<?, ?> listener) {
         this.sectionVisibilityListeners.add(listener);
-        if (this.status.shouldTrack()) {
+        if (this.chunkStatus.isAccessible()) {
             listener.onSectionEnteredRange(this);
         }
     }
 
     @Override
-    public void removeListener(SectionedEntityCache<?> sectionedEntityCache, SectionedEntityMovementTracker<?, ?> listener) {
+    public void removeListener(EntitySectionStorage<?> sectionedEntityCache, SectionedEntityMovementTracker<?, ?> listener) {
         boolean removed = this.sectionVisibilityListeners.remove(listener);
-        if (this.status.shouldTrack() && removed) {
+        if (this.chunkStatus.isAccessible() && removed) {
             listener.onSectionLeftRange(this);
         }
         if (this.isEmpty()) {
-            sectionedEntityCache.removeSection(this.getPos());
+            sectionedEntityCache.remove(this.getPos());
         }
     }
 
@@ -116,9 +116,9 @@ public abstract class EntityTrackingSectionMixin<T extends EntityLike> implement
         }
     }
 
-    @Inject(method = "add(Lnet/minecraft/world/entity/EntityLike;)V", at = @At("RETURN"))
+    @Inject(method = "add(Lnet/minecraft/world/level/entity/EntityAccess;)V", at = @At("RETURN"))
     private void onEntityAdded(T entityLike, CallbackInfo ci) {
-        if (!this.status.shouldTrack() || this.nearbyEntityListeners.isEmpty()) {
+        if (!this.chunkStatus.isAccessible() || this.nearbyEntityListeners.isEmpty()) {
             return;
         }
         if (entityLike instanceof Entity entity) {
@@ -128,22 +128,22 @@ public abstract class EntityTrackingSectionMixin<T extends EntityLike> implement
         }
     }
 
-    @Inject(method = "remove(Lnet/minecraft/world/entity/EntityLike;)Z", at = @At("RETURN"))
+    @Inject(method = "remove(Lnet/minecraft/world/level/entity/EntityAccess;)Z", at = @At("RETURN"))
     private void onEntityRemoved(T entityLike, CallbackInfoReturnable<Boolean> cir) {
-        if (this.status.shouldTrack() && !this.nearbyEntityListeners.isEmpty() && entityLike instanceof Entity entity) {
+        if (this.chunkStatus.isAccessible() && !this.nearbyEntityListeners.isEmpty() && entityLike instanceof Entity entity) {
             for (NearbyEntityListener nearbyEntityListener : this.nearbyEntityListeners) {
                 nearbyEntityListener.onEntityLeftRange(entity);
             }
         }
     }
 
-    @ModifyVariable(method = "swapStatus(Lnet/minecraft/world/entity/EntityTrackingStatus;)Lnet/minecraft/world/entity/EntityTrackingStatus;", at = @At(value = "HEAD"), argsOnly = true)
-    public EntityTrackingStatus swapStatus(final EntityTrackingStatus newStatus) {
-        if (this.status.shouldTrack() != newStatus.shouldTrack()) {
-            if (!newStatus.shouldTrack()) {
+    @ModifyVariable(method = "updateChunkStatus(Lnet/minecraft/world/level/entity/Visibility;)Lnet/minecraft/world/level/entity/Visibility;", at = @At(value = "HEAD"), argsOnly = true)
+    public Visibility swapStatus(final Visibility newStatus) {
+        if (this.chunkStatus.isAccessible() != newStatus.isAccessible()) {
+            if (!newStatus.isAccessible()) {
                 if (!this.nearbyEntityListeners.isEmpty()) {
                     for (NearbyEntityListener nearbyEntityListener : this.nearbyEntityListeners) {
-                        nearbyEntityListener.onSectionLeftRange(this, this.collection);
+                        nearbyEntityListener.onSectionLeftRange(this, this.storage);
                     }
                 }
                 if (!this.sectionVisibilityListeners.isEmpty()) {
@@ -154,7 +154,7 @@ public abstract class EntityTrackingSectionMixin<T extends EntityLike> implement
             } else {
                 if (!this.nearbyEntityListeners.isEmpty()) {
                     for (NearbyEntityListener nearbyEntityListener : this.nearbyEntityListeners) {
-                        nearbyEntityListener.onSectionEnteredRange(this, this.collection);
+                        nearbyEntityListener.onSectionEnteredRange(this, this.storage);
                     }
                 }
                 if (!this.sectionVisibilityListeners.isEmpty()) {
@@ -168,7 +168,7 @@ public abstract class EntityTrackingSectionMixin<T extends EntityLike> implement
     }
 
     @Override
-    public <S, E extends EntityLike> void listenToMovementOnce(SectionedEntityMovementTracker<E, S> listener, int trackedClass) {
+    public <S, E extends EntityAccess> void listenToMovementOnce(SectionedEntityMovementTracker<E, S> listener, int trackedClass) {
         if (this.entityMovementListenersByType[trackedClass] == null) {
             this.entityMovementListenersByType[trackedClass] = new ArrayList<>();
         }
@@ -176,7 +176,7 @@ public abstract class EntityTrackingSectionMixin<T extends EntityLike> implement
     }
 
     @Override
-    public <S, E extends EntityLike> void removeListenToMovementOnce(SectionedEntityMovementTracker<E, S> listener, int trackedClass) {
+    public <S, E extends EntityAccess> void removeListenToMovementOnce(SectionedEntityMovementTracker<E, S> listener, int trackedClass) {
         if (this.entityMovementListenersByType[trackedClass] != null) {
             this.entityMovementListenersByType[trackedClass].remove(listener);
         }
