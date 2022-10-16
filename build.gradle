@@ -1,71 +1,143 @@
-plugins {
-    id "dev.architectury.loom" version "0.12.0-SNAPSHOT"
-    id "maven-publish"
+buildscript {
+    repositories {
+        maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
+    }
 }
 
-sourceCompatibility = targetCompatibility = JavaVersion.VERSION_17
+plugins {
+    id 'net.minecraftforge.gradle' version '5.1.+'
+}
 
-archivesBaseName = project.archives_base_name
-version = project.mod_version
-group = project.maven_group
+apply plugin: 'org.spongepowered.mixin'
 
-loom {
-    forge {
-        mixinConfigs = [
-                "canary.mixins.json"
-        ]
-    }
-    launches {
+group = 'com.abdelaziz.canary'
+version = '0.0.5'
+
+java {
+    archivesBaseName = 'canary-mc1.19.2'
+    toolchain.languageVersion = JavaLanguageVersion.of(17)
+}
+
+minecraft {
+    mappings channel: 'official', version: '1.19.2'
+
+    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+
+    runs {
+        client {
+            workingDirectory project.file('run')
+
+            property 'forge.logging.markers', 'REGISTRIES'
+
+            property 'forge.logging.console.level', 'debug'
+
+            property 'forge.enabledGameTestNamespaces', 'canary'
+
+            mods {
+                canary {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        server {
+            workingDirectory project.file('run')
+
+            property 'forge.logging.markers', 'REGISTRIES'
+
+            property 'forge.logging.console.level', 'debug'
+
+            property 'forge.enabledGameTestNamespaces', 'canary'
+
+            mods {
+                canary {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        gameTestServer {
+            workingDirectory project.file('run')
+
+            property 'forge.logging.markers', 'REGISTRIES'
+
+            property 'forge.logging.console.level', 'debug'
+
+            property 'forge.enabledGameTestNamespaces', 'canary'
+
+            mods {
+                canary {
+                    source sourceSets.main
+                }
+            }
+        }
+
         data {
-            arg "--existing", file("src/main/resources").absolutePath
+            workingDirectory project.file('run')
+
+            property 'forge.logging.markers', 'REGISTRIES'
+
+            property 'forge.logging.console.level', 'debug'
+
+            args '--mod', 'canary', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+
+            mods {
+                canary {
+                    source sourceSets.main
+                }
+            }
         }
     }
 }
 
+mixin {
+    add sourceSets.main, "canary.refmap.json"
+
+    config "canary.mixins.json"
+}
+
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
 repositories {}
 
 dependencies {
-    minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-    forge "net.minecraftforge:forge:${project.forge_version}"
-}
+    minecraft 'net.minecraftforge:forge:1.19.2-43.1.39'
 
-processResources {
-    inputs.property "version", project.version
+    // Real mod deobf dependency examples - these get remapped to your current mappings
+    // compileOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}:api") // Adds JEI API as a compile dependency
+    // runtimeOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}") // Adds the full JEI mod as a runtime dependency
+    // implementation fg.deobf("com.tterrag.registrate:Registrate:MC${mc_version}-${registrate_version}") // Adds registrate as a dependency
 
-    filesMatching("META-INF/mods.toml") {
-        expand "version": project.version
-    }
-}
+    // Examples using mod jars from ./libs
+    // implementation fg.deobf("blank:coolmod-${mc_version}:${coolmod_version}")
 
-tasks.withType(JavaCompile) {
-    options.encoding = "UTF-8"
-    options.release = 17
+    // For more info...
+    // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
+    // http://www.gradle.org/docs/current/userguide/dependency_management.html
+
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 
 jar {
     manifest {
         attributes([
-                "Specification-Title"     : project.mod_id,
-                "Specification-Vendor"    : project.mod_author,
+                "Specification-Title"     : "canary",
+                "Specification-Vendor"    : "AbdElAziz",
                 "Specification-Version"   : "1",
                 "Implementation-Title"    : project.name,
-                "Implementation-Version"  : version,
-                "Implementation-Vendor"   : project.mod_author,
+                "Implementation-Version"  : project.jar.archiveVersion,
+                "Implementation-Vendor"   : "AbdElAziz",
                 "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }
 }
 
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            artifact(remapJar) {
-                builtBy remapJar
-            }
-        }
-    }
+jar.finalizedBy('reobfJar')
 
-    repositories {
-    }
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
 }
