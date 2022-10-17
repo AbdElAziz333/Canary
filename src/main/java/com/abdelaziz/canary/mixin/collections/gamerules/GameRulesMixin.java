@@ -1,7 +1,7 @@
 package com.abdelaziz.canary.mixin.collections.gamerules;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.world.GameRules;
+import net.minecraft.world.level.GameRules;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
@@ -17,7 +17,7 @@ public class GameRulesMixin {
     @Mutable
     @Shadow
     @Final
-    private Map<GameRules.Key<?>, GameRules.Rule<?>> rules;
+    private Map<GameRules.Key<?>, GameRules.Value<?>> rules;
 
     @Inject(
             method = "<init>()V",
