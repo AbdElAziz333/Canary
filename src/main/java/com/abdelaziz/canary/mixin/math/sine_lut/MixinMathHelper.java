@@ -1,11 +1,11 @@
 package com.abdelaziz.canary.mixin.math.sine_lut;
 
 import com.abdelaziz.canary.common.util.math.CompactSineLUT;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 
-@Mixin(MathHelper.class)
+@Mixin(Mth.class)
 public class MixinMathHelper {
     /**
      * @author jellysquid3

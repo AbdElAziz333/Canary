@@ -1,14 +1,14 @@
 package com.abdelaziz.canary.mixin.gen.chunk_region;
 
 import com.abdelaziz.canary.common.util.Pos;
-import net.minecraft.block.BlockState;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.ChunkRegion;
-import net.minecraft.world.StructureWorldAccess;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.ChunkStatus;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.WorldGenRegion;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.ChunkStatus;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -19,18 +19,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
 
-@Mixin(ChunkRegion.class)
-public abstract class ChunkRegionMixin implements StructureWorldAccess {
+@Mixin(WorldGenRegion.class)
+public abstract class ChunkRegionMixin implements WorldGenLevel {
     @Shadow
     @Final
-    private ChunkPos lowerCorner;
+    private ChunkPos firstPos;
 
     @Shadow
     @Final
-    private int width;
+    private int size;
 
     // Array view of the chunks in the region to avoid an unnecessary de-reference
-    private Chunk[] chunksArr;
+    private ChunkAccess[] chunksArr;
 
     // The starting position of this region
     private int minChunkX, minChunkZ;
@@ -38,12 +38,12 @@ public abstract class ChunkRegionMixin implements StructureWorldAccess {
     /**
      * @author JellySquid
      */
-    @Inject(method = "<init>(Lnet/minecraft/server/world/ServerWorld;Ljava/util/List;Lnet/minecraft/world/chunk/ChunkStatus;I)V", at = @At("RETURN"))
-    private void init(ServerWorld world, List<Chunk> chunks, ChunkStatus chunkStatus, int i, CallbackInfo ci) {
-        this.minChunkX = this.lowerCorner.x;
-        this.minChunkZ = this.lowerCorner.z;
+    @Inject(method = "<init>(Lnet/minecraft/server/level/ServerLevel;Ljava/util/List;Lnet/minecraft/world/level/chunk/ChunkStatus;I)V", at = @At("RETURN"))
+    private void init(ServerLevel world, List<ChunkAccess> chunks, ChunkStatus chunkStatus, int i, CallbackInfo ci) {
+        this.minChunkX = this.firstPos.x;
+        this.minChunkZ = this.firstPos.z;
 
-        this.chunksArr = chunks.toArray(new Chunk[0]);
+        this.chunksArr = chunks.toArray(new ChunkAccess[0]);
     }
 
     /**
@@ -54,7 +54,7 @@ public abstract class ChunkRegionMixin implements StructureWorldAccess {
     public BlockState getBlockState(BlockPos pos) {
         int x = (Pos.ChunkCoord.fromBlockCoord(pos.getX())) - this.minChunkX;
         int z = (Pos.ChunkCoord.fromBlockCoord(pos.getZ())) - this.minChunkZ;
-        int w = this.width;
+        int w = this.size;
 
         if (x >= 0 && z >= 0 && x < w && z < w) {
             return this.chunksArr[x + z * w].getBlockState(pos);
@@ -68,10 +68,10 @@ public abstract class ChunkRegionMixin implements StructureWorldAccess {
      * @author SuperCoder7979, 2No2Name
      */
     @Overwrite
-    public Chunk getChunk(int chunkX, int chunkZ) {
+    public ChunkAccess getChunk(int chunkX, int chunkZ) {
         int x = chunkX - this.minChunkX;
         int z = chunkZ - this.minChunkZ;
-        int w = this.width;
+        int w = this.size;
 
         if (x >= 0 && z >= 0 && x < w && z < w) {
             return this.chunksArr[x + z * w];
@@ -83,7 +83,7 @@ public abstract class ChunkRegionMixin implements StructureWorldAccess {
     /**
      * Use our chunk fetch function
      */
-    public Chunk getChunk(BlockPos pos) {
+    public ChunkAccess getChunk(BlockPos pos) {
         // Skip checking chunk.getStatus().isAtLeast(ChunkStatus.EMPTY) here, because it is always true
         return this.getChunk(Pos.ChunkCoord.fromBlockCoord(pos.getX()), Pos.ChunkCoord.fromBlockCoord(pos.getZ()));
     }
