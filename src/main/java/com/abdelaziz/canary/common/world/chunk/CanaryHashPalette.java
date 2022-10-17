@@ -4,10 +4,10 @@ import com.google.common.collect.ImmutableList;
 import it.unimi.dsi.fastutil.HashCommon;
 import it.unimi.dsi.fastutil.objects.Reference2IntMap;
 import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.util.collection.IndexedIterable;
-import net.minecraft.world.chunk.Palette;
-import net.minecraft.world.chunk.PaletteResizeListener;
+import net.minecraft.core.IdMap;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.level.chunk.Palette;
+import net.minecraft.world.level.chunk.PaletteResize;
 
 import java.util.Arrays;
 import java.util.List;
@@ -16,21 +16,21 @@ import java.util.function.Predicate;
 import static it.unimi.dsi.fastutil.Hash.FAST_LOAD_FACTOR;
 
 /**
- * Generally provides better performance over the vanilla {@link net.minecraft.world.chunk.BiMapPalette} when calling
- * {@link LithiumHashPalette#index(Object)} through using a faster backing map and reducing pointer chasing.
+ * Generally provides better performance over the vanilla {@link net.minecraft.world.level.chunk.HashMapPalette} when calling
+ * {@link CanaryHashPalette#idFor(Object)} through using a faster backing map and reducing pointer chasing.
  */
-public class LithiumHashPalette<T> implements Palette<T> {
+public class CanaryHashPalette<T> implements Palette<T> {
     private static final int ABSENT_VALUE = -1;
 
-    private final IndexedIterable<T> idList;
-    private final PaletteResizeListener<T> resizeHandler;
+    private final IdMap<T> idList;
+    private final PaletteResize<T> resizeHandler;
     private final int indexBits;
 
     private final Reference2IntMap<T> table;
     private T[] entries;
     private int size = 0;
 
-    public LithiumHashPalette(IndexedIterable<T> idList, PaletteResizeListener<T> resizeHandler, int indexBits, T[] entries, Reference2IntMap<T> table, int size) {
+    public CanaryHashPalette(IdMap<T> idList, PaletteResize<T> resizeHandler, int indexBits, T[] entries, Reference2IntMap<T> table, int size) {
         this.idList = idList;
         this.resizeHandler = resizeHandler;
         this.indexBits = indexBits;
@@ -39,7 +39,7 @@ public class LithiumHashPalette<T> implements Palette<T> {
         this.size = size;
     }
 
-    public LithiumHashPalette(IndexedIterable<T> idList, int bits, PaletteResizeListener<T> resizeHandler, List<T> list) {
+    public CanaryHashPalette(IdMap<T> idList, int bits, PaletteResize<T> resizeHandler, List<T> list) {
         this(idList, bits, resizeHandler);
 
         for (T t : list) {
@@ -48,7 +48,7 @@ public class LithiumHashPalette<T> implements Palette<T> {
     }
 
     @SuppressWarnings("unchecked")
-    public LithiumHashPalette(IndexedIterable<T> idList, int bits, PaletteResizeListener<T> resizeHandler) {
+    public CanaryHashPalette(IdMap<T> idList, int bits, PaletteResize<T> resizeHandler) {
         this.idList = idList;
         this.indexBits = bits;
         this.resizeHandler = resizeHandler;
@@ -60,12 +60,12 @@ public class LithiumHashPalette<T> implements Palette<T> {
         this.table.defaultReturnValue(ABSENT_VALUE);
     }
 
-    public static <A> Palette<A> create(int bits, IndexedIterable<A> idList, PaletteResizeListener<A> listener, List<A> list) {
-        return new LithiumHashPalette<>(idList, bits, listener, list);
+    public static <A> Palette<A> create(int bits, IdMap<A> idList, PaletteResize<A> listener, List<A> list) {
+        return new CanaryHashPalette<>(idList, bits, listener, list);
     }
 
     @Override
-    public int index(T obj) {
+    public int idFor(T obj) {
         int id = this.table.getInt(obj);
 
         if (id == ABSENT_VALUE) {
@@ -109,7 +109,7 @@ public class LithiumHashPalette<T> implements Palette<T> {
     }
 
     @Override
-    public boolean hasAny(Predicate<T> predicate) {
+    public boolean maybeHas(Predicate<T> predicate) {
         for (int i = 0; i < this.size; ++i) {
             if (predicate.test(this.entries[i])) {
                 return true;
@@ -120,7 +120,7 @@ public class LithiumHashPalette<T> implements Palette<T> {
     }
 
     @Override
-    public T get(int id) {
+    public T valueFor(int id) {
         T[] entries = this.entries;
 
         if (id >= 0 && id < entries.length) {
@@ -131,23 +131,23 @@ public class LithiumHashPalette<T> implements Palette<T> {
     }
 
     @Override
-    public void readPacket(PacketByteBuf buf) {
+    public void read(FriendlyByteBuf buf) {
         this.clear();
 
         int entryCount = buf.readVarInt();
 
         for (int i = 0; i < entryCount; ++i) {
-            this.addEntry(this.idList.get(buf.readVarInt()));
+            this.addEntry(this.idList.byId(buf.readVarInt()));
         }
     }
 
     @Override
-    public void writePacket(PacketByteBuf buf) {
+    public void write(FriendlyByteBuf buf) {
         int size = this.size;
         buf.writeVarInt(size);
 
         for (int i = 0; i < size; ++i) {
-            buf.writeVarInt(this.idList.getRawId(this.get(i)));
+            buf.writeVarInt(this.idList.getId(this.valueFor(i)));
         }
     }
 
@@ -158,7 +158,7 @@ public class LithiumHashPalette<T> implements Palette<T> {
 
     @Override
     public Palette<T> copy() {
-        return new LithiumHashPalette<>(this.idList, this.resizeHandler, this.indexBits, this.entries.clone(), new Reference2IntOpenHashMap<>(this.table), this.size);
+        return new CanaryHashPalette<>(this.idList, this.resizeHandler, this.indexBits, this.entries.clone(), new Reference2IntOpenHashMap<>(this.table), this.size);
     }
 
     private void clear() {
@@ -178,11 +178,11 @@ public class LithiumHashPalette<T> implements Palette<T> {
     }
 
     @Override
-    public int getPacketSize() {
-        int size = PacketByteBuf.getVarIntLength(this.size);
+    public int getSerializedSize() {
+        int size = FriendlyByteBuf.getVarIntSize(this.size);
 
         for (int i = 0; i < this.size; ++i) {
-            size += PacketByteBuf.getVarIntLength(this.idList.getRawId(this.get(i)));
+            size += FriendlyByteBuf.getVarIntSize(this.idList.getId(this.valueFor(i)));
         }
 
         return size;

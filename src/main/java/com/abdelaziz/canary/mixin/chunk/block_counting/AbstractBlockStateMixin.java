@@ -3,18 +3,18 @@ package com.abdelaziz.canary.mixin.chunk.block_counting;
 import com.abdelaziz.canary.common.block.BlockStateFlagHolder;
 import com.abdelaziz.canary.common.block.BlockStateFlags;
 import com.abdelaziz.canary.common.block.TrackedBlockStatePredicate;
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(AbstractBlock.AbstractBlockState.class)
+@Mixin(BlockBehaviour.BlockStateBase.class)
 public class AbstractBlockStateMixin implements BlockStateFlagHolder {
     private int flags;
 
-    @Inject(method = "initShapeCache", at = @At("RETURN"))
+    @Inject(method = "initCache", at = @At("RETURN"))
     private void init(CallbackInfo ci) {
         this.initFlags();
     }
