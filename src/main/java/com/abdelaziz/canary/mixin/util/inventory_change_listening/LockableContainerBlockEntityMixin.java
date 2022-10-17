@@ -6,14 +6,14 @@ import com.abdelaziz.canary.common.block.entity.inventory_change_tracking.Invent
 import com.abdelaziz.canary.common.block.entity.inventory_change_tracking.InventoryChangeTracker;
 import com.abdelaziz.canary.common.hopper.CanaryStackList;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
-import net.minecraft.block.entity.LockableContainerBlockEntity;
-import net.minecraft.inventory.Inventory;
+import net.minecraft.world.Container;
+import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import org.spongepowered.asm.mixin.Mixin;
 
 import java.util.ArrayList;
 
-@Mixin(LockableContainerBlockEntity.class)
-public abstract class LockableContainerBlockEntityMixin implements InventoryChangeEmitter, Inventory {
+@Mixin(RandomizableContainerBlockEntity.class)
+public abstract class LockableContainerBlockEntityMixin implements InventoryChangeEmitter, Container {
     ArrayList<InventoryChangeListener> inventoryChangeListeners = null;
     ReferenceOpenHashSet<InventoryChangeListener> inventoryHandlingTypeListeners = null;
 

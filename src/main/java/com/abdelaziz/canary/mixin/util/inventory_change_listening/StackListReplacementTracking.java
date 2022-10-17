@@ -1,10 +1,10 @@
 package com.abdelaziz.canary.mixin.util.inventory_change_listening;
 
 import com.abdelaziz.canary.common.block.entity.inventory_change_tracking.InventoryChangeTracker;
-import net.minecraft.block.entity.*;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -22,10 +22,10 @@ public class StackListReplacementTracking {
         //Handled in LockableConainerBlockEntity
     }
 
-    @Mixin(LockableContainerBlockEntity.class)
+    @Mixin(BaseContainerBlockEntity.class)
     public abstract static class StackListReplacementTrackingLockableContainerBlockEntity {
-        @Inject(method = "readNbt", at = @At("RETURN" ))
-        public void readNbtStackListReplacement(NbtCompound nbt, CallbackInfo ci) {
+        @Inject(method = "load", at = @At("RETURN"))
+        public void readNbtStackListReplacement(CompoundTag nbt, CallbackInfo ci) {
             if (this instanceof InventoryChangeTracker inventoryChangeTracker) {
                 inventoryChangeTracker.emitStackListReplaced();
             }
@@ -34,40 +34,40 @@ public class StackListReplacementTracking {
 
     @Mixin(BarrelBlockEntity.class)
     public abstract static class InventoryChangeTrackingBarrelBlockEntity implements InventoryChangeTracker {
-        @Inject(method = "setInvStackList", at = @At("RETURN" ))
-        public void setInventoryStackListReplacement(DefaultedList<ItemStack> list, CallbackInfo ci) {
+        @Inject(method = "setItems", at = @At("RETURN"))
+        public void setInventoryStackListReplacement(NonNullList<ItemStack> list, CallbackInfo ci) {
             this.emitStackListReplaced();
         }
     }
 
     @Mixin(ChestBlockEntity.class)
     public abstract static class InventoryChangeTrackingChestBlockEntity implements InventoryChangeTracker {
-        @Inject(method = "setInvStackList", at = @At("RETURN" ))
-        public void setInventoryStackListReplacement(DefaultedList<ItemStack> list, CallbackInfo ci) {
+        @Inject(method = "setItems", at = @At("RETURN"))
+        public void setInventoryStackListReplacement(NonNullList<ItemStack> list, CallbackInfo ci) {
             this.emitStackListReplaced();
         }
     }
 
     @Mixin(DispenserBlockEntity.class)
     public abstract static class InventoryChangeTrackingDispenserBlockEntity implements InventoryChangeTracker {
-        @Inject(method = "setInvStackList", at = @At("RETURN" ))
-        public void setInventoryStackListReplacement(DefaultedList<ItemStack> list, CallbackInfo ci) {
+        @Inject(method = "setItems", at = @At("RETURN"))
+        public void setInventoryStackListReplacement(NonNullList<ItemStack> list, CallbackInfo ci) {
             this.emitStackListReplaced();
         }
     }
 
     @Mixin(HopperBlockEntity.class)
     public abstract static class InventoryChangeTrackingHopperBlockEntity implements InventoryChangeTracker {
-        @Inject(method = "setInvStackList", at = @At("RETURN" ))
-        public void setInventoryStackListReplacement(DefaultedList<ItemStack> list, CallbackInfo ci) {
+        @Inject(method = "setItems", at = @At("RETURN"))
+        public void setInventoryStackListReplacement(NonNullList<ItemStack> list, CallbackInfo ci) {
             this.emitStackListReplaced();
         }
     }
 
     @Mixin(ShulkerBoxBlockEntity.class)
     public abstract static class InventoryChangeTrackingShulkerBoxBlockEntity implements InventoryChangeTracker {
-        @Inject(method = "setInvStackList", at = @At("RETURN" ))
-        public void setInventoryStackListReplacement(DefaultedList<ItemStack> list, CallbackInfo ci) {
+        @Inject(method = "setItems", at = @At("RETURN"))
+        public void setInventoryStackListReplacement(NonNullList<ItemStack> list, CallbackInfo ci) {
             this.emitStackListReplaced();
         }
     }

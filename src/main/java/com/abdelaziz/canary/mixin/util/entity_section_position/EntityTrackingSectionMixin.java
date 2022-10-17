@@ -1,10 +1,10 @@
 package com.abdelaziz.canary.mixin.util.entity_section_position;
 
 import com.abdelaziz.canary.common.entity.tracker.PositionedEntityTrackingSection;
-import net.minecraft.world.entity.EntityTrackingSection;
+import net.minecraft.world.level.entity.EntitySection;
 import org.spongepowered.asm.mixin.Mixin;
 
-@Mixin(EntityTrackingSection.class)
+@Mixin(EntitySection.class)
 public class EntityTrackingSectionMixin implements PositionedEntityTrackingSection {
     private long pos;
 

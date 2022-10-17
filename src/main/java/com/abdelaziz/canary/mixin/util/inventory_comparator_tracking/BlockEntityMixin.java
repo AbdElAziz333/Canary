@@ -3,12 +3,12 @@ package com.abdelaziz.canary.mixin.util.inventory_comparator_tracking;
 import com.abdelaziz.canary.common.block.entity.inventory_change_tracking.InventoryChangeTracker;
 import com.abdelaziz.canary.common.block.entity.inventory_comparator_tracking.ComparatorTracker;
 import com.abdelaziz.canary.common.block.entity.inventory_comparator_tracking.ComparatorTracking;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,15 +19,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(BlockEntity.class)
 public class BlockEntityMixin implements ComparatorTracker {
-    //This mixin is meant for all block entities that also implement the inventory Inventory interface
+    //This mixin is meant for all block entities that also implement the inventory interface
     //Applying this mixin to all block entities seems to be the best solution to edit all of them with the same code
 
     @Shadow
     @Nullable
-    protected World world;
+    protected Level level;
     @Shadow
     @Final
-    protected BlockPos pos;
+    protected BlockPos worldPosition;
     private static final byte UNKNOWN = (byte) -1;
     private static final byte COMPARATOR_PRESENT = (byte) 1;
     private static final byte COMPARATOR_ABSENT = (byte) 0;
@@ -57,12 +57,12 @@ public class BlockEntityMixin implements ComparatorTracker {
     @Override
     public boolean hasAnyComparatorNearby() {
         if (this.hasComparators == UNKNOWN) {
-            this.hasComparators = ComparatorTracking.findNearbyComparators(this.world, this.pos) ? COMPARATOR_PRESENT : COMPARATOR_ABSENT;
+            this.hasComparators = ComparatorTracking.findNearbyComparators(this.level, this.worldPosition) ? COMPARATOR_PRESENT : COMPARATOR_ABSENT;
         }
         return this.hasComparators == COMPARATOR_PRESENT;
     }
 
-    @Inject(method = "markRemoved()V", at = @At("HEAD" ))
+    @Inject(method = "setRemoved()V", at = @At("HEAD"))
     private void forgetNearbyComparators(CallbackInfo ci) {
         //Compatibility with mods that move block entities (e.g. fabric-carpet)
         this.hasComparators = UNKNOWN;
