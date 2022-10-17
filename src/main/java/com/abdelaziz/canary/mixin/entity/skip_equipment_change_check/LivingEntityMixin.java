@@ -1,13 +1,13 @@
 package com.abdelaziz.canary.mixin.entity.skip_equipment_change_check;
 
 import com.abdelaziz.canary.common.entity.EquipmentEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -22,14 +22,14 @@ import java.util.function.Predicate;
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity implements EquipmentEntity {
 
-    private static final Predicate<ItemStack> DYNAMIC_EQUIPMENT = item -> item.isOf(Items.CROSSBOW);
+    private static final Predicate<ItemStack> DYNAMIC_EQUIPMENT = item -> item.is(Items.CROSSBOW);
 
     @Shadow
     public abstract boolean isHolding(Predicate<ItemStack> predicate);
 
     private boolean equipmentChanged = true;
 
-    public LivingEntityMixin(EntityType<?> type, World world) {
+    public LivingEntityMixin(EntityType<?> type, Level world) {
         super(type, world);
     }
 
@@ -39,7 +39,7 @@ public abstract class LivingEntityMixin extends Entity implements EquipmentEntit
     }
 
     @Inject(
-            method = "getEquipmentChanges()Ljava/util/Map;",
+            method = "collectEquipmentChanges()Ljava/util/Map;",
             at = @At("HEAD"),
             cancellable = true
     )
@@ -50,10 +50,10 @@ public abstract class LivingEntityMixin extends Entity implements EquipmentEntit
     }
 
     @Inject(
-            method = "sendEquipmentChanges()V",
+            method = "detectEquipmentUpdates()V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/LivingEntity;checkHandStackSwap(Ljava/util/Map;)V"
+                    target = "Lnet/minecraft/world/entity/LivingEntity;handleHandSwap(Ljava/util/Map;)V"
             )
     )
     private void resetEquipmentChanged(CallbackInfo ci) {
@@ -65,10 +65,10 @@ public abstract class LivingEntityMixin extends Entity implements EquipmentEntit
     }
 
     @Inject(
-            method = "eatFood(Lnet/minecraft/world/World;Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;",
+            method = "eat(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/ItemStack;)Lnet/minecraft/world/item/ItemStack;",
             at = @At("RETURN")
     )
-    private void trackEatingEquipmentChange(World world, ItemStack stack, CallbackInfoReturnable<ItemStack> cir) {
+    private void trackEatingEquipmentChange(Level world, ItemStack stack, CallbackInfoReturnable<ItemStack> cir) {
         this.canaryOnEquipmentChanged();
     }
 }

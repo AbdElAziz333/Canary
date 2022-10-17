@@ -1,13 +1,13 @@
 package com.abdelaziz.canary.common.entity;
 
-import net.minecraft.entity.ai.pathing.EntityNavigation;
+import net.minecraft.world.entity.ai.navigation.PathNavigation;
 
 public interface NavigatingEntity {
     boolean isRegisteredToWorld();
 
-    void setRegisteredToWorld(EntityNavigation navigation);
+    void setRegisteredToWorld(PathNavigation navigation);
 
-    EntityNavigation getRegisteredNavigation();
+    PathNavigation getRegisteredNavigation();
 
     void updateNavigationRegistration();
 

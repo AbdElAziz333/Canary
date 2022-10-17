@@ -3,23 +3,23 @@ package com.abdelaziz.canary.mixin.entity.inactive_navigations;
 import com.abdelaziz.canary.common.entity.NavigatingEntity;
 import com.abdelaziz.canary.common.world.ServerWorldExtended;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.ai.pathing.EntityNavigation;
-import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.WorldGenerationProgressListener;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.profiler.Profiler;
-import net.minecraft.util.registry.RegistryEntry;
-import net.minecraft.util.registry.RegistryKey;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.MutableWorldProperties;
-import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionOptions;
-import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.world.level.ServerWorldProperties;
-import net.minecraft.world.level.storage.LevelStorage;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.progress.ChunkProgressListener;
+import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.navigation.PathNavigation;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.dimension.LevelStem;
+import net.minecraft.world.level.storage.LevelStorageSource;
+import net.minecraft.world.level.storage.ServerLevelData;
+import net.minecraft.world.level.storage.WritableLevelData;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
@@ -40,7 +40,7 @@ import java.util.function.Supplier;
 /**
  * This patch is supposed to reduce the cost of setblockstate calls that change the collision shape of a block.
  * In vanilla, changing the collision shape of a block will notify *ALL* MobEntities in the world.
- * Instead, we track which EntityNavigation is going to be used by a MobEntity and
+ * Instead, we track which EntityNavigation is going to be used by a Mob and
  * call the update code on the navigation directly.
  * As EntityNavigations only care about these changes when they actually have a currentPath, we skip the iteration
  * of many EntityNavigations. For that optimization we need to track whether navigations have a path.
@@ -52,16 +52,16 @@ import java.util.function.Supplier;
  * As the number of block changes is generally way higher than the number of mobs pathfinding, the update code would
  * need to be triggered by the mobs pathfinding.
  */
-@Mixin(ServerWorld.class)
-public abstract class ServerWorldMixin extends World implements ServerWorldExtended {
+@Mixin(ServerLevel.class)
+public abstract class ServerWorldMixin extends Level implements ServerWorldExtended {
     @Mutable
     @Shadow
     @Final
-    Set<MobEntity> loadedMobs;
+    Set<Mob> navigatingMobs;
 
-    private ReferenceOpenHashSet<EntityNavigation> activeNavigations;
+    private ReferenceOpenHashSet<PathNavigation> activeNavigations;
 
-    protected ServerWorldMixin(MutableWorldProperties properties, RegistryKey<World> registryRef, RegistryEntry<DimensionType> dimension, Supplier<Profiler> supplier, boolean isClient, boolean debugWorld, long seed, int maxChainedNeighborUpdates) {
+    protected ServerWorldMixin(WritableLevelData properties, ResourceKey<Level> registryRef, Holder<DimensionType> dimension, Supplier<ProfilerFiller> supplier, boolean isClient, boolean debugWorld, long seed, int maxChainedNeighborUpdates) {
         super(properties, registryRef, dimension, supplier, isClient, debugWorld, seed, maxChainedNeighborUpdates);
     }
 
@@ -72,44 +72,44 @@ public abstract class ServerWorldMixin extends World implements ServerWorldExten
      * With thousands of non-pathfinding mobs in the world, this can be a relevant difference.
      */
     @Redirect(
-            method = "updateListeners(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/block/BlockState;I)V",
+            method = "sendBlockUpdated(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;I)V",
             at = @At(
                     value = "INVOKE",
                     target = "Ljava/util/Set;iterator()Ljava/util/Iterator;"
             )
     )
-    private Iterator<MobEntity> getActiveListeners(Set<MobEntity> set) {
+    private Iterator<Mob> getActiveListeners(Set<Mob> set) {
         return Collections.emptyIterator();
     }
 
     @SuppressWarnings("rawtypes")
     @Inject(method = "<init>", at = @At("TAIL"))
-    private void init(MinecraftServer server, Executor workerExecutor, LevelStorage.Session session, ServerWorldProperties properties, RegistryKey worldKey, DimensionOptions dimensionOptions, WorldGenerationProgressListener worldGenerationProgressListener, boolean debugWorld, long seed, List spawners, boolean shouldTickTime, CallbackInfo ci) {
-        this.loadedMobs = new ReferenceOpenHashSet<>(this.loadedMobs);
+    private void init(MinecraftServer server, Executor workerExecutor, LevelStorageSource.LevelStorageAccess session, ServerLevelData properties, ResourceKey<Level> worldKey, LevelStem dimensionOptions, ChunkProgressListener worldGenerationProgressListener, boolean debugWorld, long seed, List spawners, boolean shouldTickTime, CallbackInfo ci) {
+        this.navigatingMobs = new ReferenceOpenHashSet<>(this.navigatingMobs);
         this.activeNavigations = new ReferenceOpenHashSet<>();
     }
 
     @Override
-    public void setNavigationActive(MobEntity mobEntity) {
+    public void setNavigationActive(Mob mobEntity) {
         this.activeNavigations.add(((NavigatingEntity) mobEntity).getRegisteredNavigation());
     }
 
     @Override
-    public void setNavigationInactive(MobEntity mobEntity) {
+    public void setNavigationInactive(Mob mobEntity) {
         this.activeNavigations.remove(((NavigatingEntity) mobEntity).getRegisteredNavigation());
     }
 
     @Inject(
-            method = "updateListeners(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/block/BlockState;I)V",
+            method = "sendBlockUpdated(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;I)V",
             at = @At(
                     value = "INVOKE",
                     target = "Ljava/util/Set;iterator()Ljava/util/Iterator;"
             ),
             locals = LocalCapture.CAPTURE_FAILHARD
     )
-    private void updateActiveListeners(BlockPos pos, BlockState oldState, BlockState newState, int arg3, CallbackInfo ci, VoxelShape string, VoxelShape voxelShape, List<EntityNavigation> list) {
-        for (EntityNavigation entityNavigation : this.activeNavigations) {
-            if (entityNavigation.shouldRecalculatePath(pos)) {
+    private void updateActiveListeners(BlockPos pos, BlockState oldState, BlockState newState, int arg3, CallbackInfo ci, VoxelShape string, VoxelShape voxelShape, List<PathNavigation> list) {
+        for (PathNavigation entityNavigation : this.activeNavigations) {
+            if (entityNavigation.shouldRecomputePath(pos)) {
                 list.add(entityNavigation);
             }
         }
@@ -123,12 +123,12 @@ public abstract class ServerWorldMixin extends World implements ServerWorldExten
     @SuppressWarnings("unused")
     public boolean isConsistent() {
         int i = 0;
-        for (MobEntity mobEntity : this.loadedMobs) {
-            EntityNavigation entityNavigation = mobEntity.getNavigation();
-            if ((entityNavigation.getCurrentPath() != null && ((NavigatingEntity) mobEntity).isRegisteredToWorld()) != this.activeNavigations.contains(entityNavigation)) {
+        for (Mob mobEntity : this.navigatingMobs) {
+            PathNavigation entityNavigation = mobEntity.getNavigation();
+            if ((entityNavigation.getPath() != null && ((NavigatingEntity) mobEntity).isRegisteredToWorld()) != this.activeNavigations.contains(entityNavigation)) {
                 return false;
             }
-            if (entityNavigation.getCurrentPath() != null) {
+            if (entityNavigation.getPath() != null) {
                 i++;
             }
         }

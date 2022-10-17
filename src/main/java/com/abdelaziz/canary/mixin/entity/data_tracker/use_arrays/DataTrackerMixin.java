@@ -1,11 +1,11 @@
 package com.abdelaziz.canary.mixin.entity.data_tracker.use_arrays;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import net.minecraft.entity.data.DataTracker;
-import net.minecraft.entity.data.TrackedData;
-import net.minecraft.util.crash.CrashException;
-import net.minecraft.util.crash.CrashReport;
-import net.minecraft.util.crash.CrashReportSection;
+import net.minecraft.CrashReport;
+import net.minecraft.CrashReportCategory;
+import net.minecraft.ReportedException;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.SynchedEntityData;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -17,7 +17,7 @@ import java.util.concurrent.locks.ReadWriteLock;
  * Optimizes the DataTracker to use a simple array-based storage for entries and avoids integer boxing. This reduces
  * a lot of the overhead associated with retrieving tracked data about an entity.
  */
-@Mixin(DataTracker.class)
+@Mixin(SynchedEntityData.class)
 public abstract class DataTrackerMixin {
     private static final int DEFAULT_ENTRY_COUNT = 10, GROW_FACTOR = 8;
 
@@ -28,11 +28,11 @@ public abstract class DataTrackerMixin {
     @Mutable
     @Shadow
     @Final
-    private Int2ObjectMap<DataTracker.Entry<?>> entries;
+    private Int2ObjectMap<SynchedEntityData.DataItem<?>> itemsById;
     /**
-     * Mirrors the vanilla backing entries map. Each DataTracker.Entry can be accessed in this array through its ID.
+     * Mirrors the vanilla backing entries map. Each SynchedEntityData.DataItem can be accessed in this array through its ID.
      **/
-    private DataTracker.Entry<?>[] entriesArray = new DataTracker.Entry<?>[DEFAULT_ENTRY_COUNT];
+    private SynchedEntityData.DataItem<?>[] entriesArray = new SynchedEntityData.DataItem<?>[DEFAULT_ENTRY_COUNT];
 
     /**
      * We redirect the call to add a tracked data to the internal map so we can add it to our new storage structure. This
@@ -40,7 +40,7 @@ public abstract class DataTrackerMixin {
      * a calls to the generic Map interface.
      */
     @Redirect(
-            method = "addTrackedData(Lnet/minecraft/entity/data/TrackedData;Ljava/lang/Object;)V",
+            method = "createDataItem(Lnet/minecraft/network/syncher/EntityDataAccessor;Ljava/lang/Object;)V",
             at = @At(
                     value = "INVOKE",
                     target = "Lit/unimi/dsi/fastutil/ints/Int2ObjectMap;put(ILjava/lang/Object;)Ljava/lang/Object;",
@@ -48,9 +48,9 @@ public abstract class DataTrackerMixin {
             )
     )
     private Object onAddTrackedDataInsertMap(Int2ObjectMap<?> int2ObjectMap, int k, Object valueRaw) {
-        DataTracker.Entry<?> v = (DataTracker.Entry<?>) valueRaw;
+        SynchedEntityData.DataItem<?> v = (SynchedEntityData.DataItem<?>) valueRaw;
 
-        DataTracker.Entry<?>[] storage = this.entriesArray;
+        SynchedEntityData.DataItem<?>[] storage = this.entriesArray;
 
         // Check if we need to grow the backing array to accommodate the new key range
         if (storage.length <= k) {
@@ -65,7 +65,7 @@ public abstract class DataTrackerMixin {
         storage[k] = v;
 
         // Ensure that the vanilla backing storage is still updated appropriately
-        return this.entries.put(k, v);
+        return this.itemsById.put(k, v);
     }
 
     /**
@@ -73,11 +73,11 @@ public abstract class DataTrackerMixin {
      * @author JellySquid
      */
     @Overwrite
-    public <T> DataTracker.Entry<T> getEntry(TrackedData<T> data) {
+    public <T> SynchedEntityData.DataItem<T> getItem(EntityDataAccessor<T> data) {
         this.lock.readLock().lock();
 
         try {
-            DataTracker.Entry<?>[] array = this.entriesArray;
+            SynchedEntityData.DataItem<?>[] array = this.entriesArray;
 
             int id = data.getId();
 
@@ -92,7 +92,7 @@ public abstract class DataTrackerMixin {
             // This cast can fail if trying to access a entry which doesn't belong to this tracker, as the ID could
             // instead point to an entry of a different type. However, that is also vanilla behaviour.
             // noinspection unchecked
-            return (DataTracker.Entry<T>) array[id];
+            return (SynchedEntityData.DataItem<T>) array[id];
         } catch (Throwable cause) {
             // Move to another method so this function can be in-lined better
             throw onGetException(cause, data);
@@ -101,12 +101,12 @@ public abstract class DataTrackerMixin {
         }
     }
 
-    private static <T> CrashException onGetException(Throwable cause, TrackedData<T> data) {
-        CrashReport report = CrashReport.create(cause, "Getting synced entity data");
+    private static <T> ReportedException onGetException(Throwable cause, EntityDataAccessor<T> data) {
+        CrashReport report = CrashReport.forThrowable(cause, "Getting synced entity data");
 
-        CrashReportSection section = report.addElement("Synced entity data");
-        section.add("Data ID", data);
+        CrashReportCategory section = report.addCategory("Synced entity data");
+        section.setDetail("Data ID", data);
 
-        return new CrashException(report);
+        return new ReportedException(report);
     }
 }

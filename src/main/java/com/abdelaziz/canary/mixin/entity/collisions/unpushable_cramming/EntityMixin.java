@@ -1,8 +1,8 @@
 package com.abdelaziz.canary.mixin.entity.collisions.unpushable_cramming;
 
 import com.abdelaziz.canary.common.entity.pushable.BlockCachingEntity;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -14,48 +14,48 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(Entity.class)
 public class EntityMixin implements BlockCachingEntity {
     @Shadow
-    private @Nullable BlockState blockStateAtPos;
+    private @Nullable BlockState feetBlockState;
 
     @Inject(
-            method = "setPos(DDD)V",
+            method = "setPosRaw(DDD)V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/util/math/ChunkSectionPos;getSectionCoord(I)I",
+                    target = "Lnet/minecraft/core/SectionPos;blockToSectionCoord(I)I",
                     ordinal = 0,
                     shift = At.Shift.BEFORE
             )
     )
     private void onPositionChanged(double x, double y, double z, CallbackInfo ci) {
-        this.lithiumOnBlockCacheDeleted();
+        this.canaryOnBlockCacheDeleted();
     }
 
     @Inject(
             method = "baseTick()V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/Entity;hasVehicle()Z",
+                    target = "Lnet/minecraft/world/entity/Entity;isPassenger()Z",
                     ordinal = 0,
                     shift = At.Shift.BEFORE
             )
     )
     private void onBaseTick(CallbackInfo ci) {
-        this.lithiumOnBlockCacheDeleted();
+        this.canaryOnBlockCacheDeleted();
     }
 
     @Inject(
-            method = "getBlockStateAtPos()Lnet/minecraft/block/BlockState;",
+            method = "getFeetBlockState()Lnet/minecraft/world/level/block/state/BlockState;",
             at = @At(
                     value = "INVOKE_ASSIGN",
-                    target = "Lnet/minecraft/world/World;getBlockState(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/BlockState;",
+                    target = "Lnet/minecraft/world/level/Level;getBlockState(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;",
                     shift = At.Shift.AFTER
             )
     )
     private void onBlockCached(CallbackInfoReturnable<BlockState> cir) {
-        this.lithiumOnBlockCacheSet(this.blockStateAtPos);
+        this.canaryOnBlockCacheSet(this.feetBlockState);
     }
 
     @Override
     public BlockState getCachedFeetBlockState() {
-        return this.blockStateAtPos;
+        return this.feetBlockState;
     }
 }

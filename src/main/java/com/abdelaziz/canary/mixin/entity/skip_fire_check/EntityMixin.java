@@ -1,9 +1,9 @@
 package com.abdelaziz.canary.mixin.entity.skip_fire_check;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.Box;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -15,38 +15,38 @@ import java.util.stream.Stream;
 @Mixin(Entity.class)
 public abstract class EntityMixin {
     @Shadow
-    private int fireTicks;
+    private int remainingFireTicks;
 
     @Shadow
-    protected abstract int getBurningDuration();
+    protected abstract int getFireImmuneTicks();
 
     @Shadow
     public boolean wasOnFire;
 
     @Shadow
-    public boolean inPowderSnow;
+    public boolean isInPowderSnow;
 
     @Shadow
-    public abstract boolean isWet();
+    public abstract boolean isInWaterRainOrBubble();
 
     @Redirect(
-            method = "move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V",
+            method = "move(Lnet/minecraft/world/entity/MoverType;Lnet/minecraft/world/phys/Vec3;)V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/world/World;getStatesInBoxIfLoaded(Lnet/minecraft/util/math/Box;)Ljava/util/stream/Stream;"
+                    target = "Lnet/minecraft/world/level/Level;getBlockStatesIfLoaded(Lnet/minecraft/world/phys/AABB;)Ljava/util/stream/Stream;"
             )
     )
-    private Stream<BlockState> skipFireTestIfResultDoesNotMatter(World world, Box box) {
+    private Stream<BlockState> skipFireTestIfResultDoesNotMatter(Level world, AABB box) {
         // Skip scanning the blocks around the entity touches by returning an empty stream when the result does not matter
-        if ((this.fireTicks > 0 || this.fireTicks == -this.getBurningDuration()) && (!this.wasOnFire || !this.inPowderSnow && !this.isWet())) {
+        if ((this.remainingFireTicks > 0 || this.remainingFireTicks == -this.getFireImmuneTicks()) && (!this.wasOnFire || !this.isInPowderSnow && !this.isInWaterRainOrBubble())) {
             return null;
         }
 
-        return world.getStatesInBoxIfLoaded(box);
+        return world.getBlockStatesIfLoaded(box);
     }
 
     @Redirect(
-            method = "move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V",
+            method = "move(Lnet/minecraft/world/entity/MoverType;Lnet/minecraft/world/phys/Vec3;)V",
             at = @At(
                     value = "INVOKE",
                     target = "Ljava/util/stream/Stream;noneMatch(Ljava/util/function/Predicate;)Z"

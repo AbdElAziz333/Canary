@@ -1,10 +1,10 @@
 package com.abdelaziz.canary.mixin.entity.collisions.intersection;
 
 import com.abdelaziz.canary.common.entity.CanaryEntityCollisions;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.Box;
-import net.minecraft.world.CollisionView;
-import net.minecraft.world.EntityView;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.CollisionGetter;
+import net.minecraft.world.level.EntityGetter;
+import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.Overwrite;
 /**
  * Replaces collision testing methods with jumps to our own (faster) entity collision testing code.
  */
-@Mixin(CollisionView.class)
+@Mixin(CollisionGetter.class)
 public interface CollisionViewMixin {
 
     /**
@@ -22,19 +22,18 @@ public interface CollisionViewMixin {
      * @author 2No2Name
      */
     @Overwrite
-    default boolean isSpaceEmpty(@Nullable Entity entity, Box box) {
-        boolean ret = !CanaryEntityCollisions.doesBoxCollideWithBlocks((CollisionView) this, entity, box);
+    default boolean noCollision(@Nullable Entity entity, AABB box) {
+        boolean ret = !CanaryEntityCollisions.doesBoxCollideWithBlocks((CollisionGetter) this, entity, box);
 
         // If no blocks were collided with, try to check for entity collisions if we can read entities
-        if (ret && this instanceof EntityView) {
+        if (ret && this instanceof EntityGetter) {
             //needs to include world border collision
-            ret = !CanaryEntityCollisions.doesBoxCollideWithHardEntities((EntityView) this, entity, box);
+            ret = !CanaryEntityCollisions.doesBoxCollideWithHardEntities((EntityGetter) this, entity, box);
         }
 
         if (ret && entity != null) {
-            ret = !CanaryEntityCollisions.doesEntityCollideWithWorldBorder((CollisionView) this, entity);
+            ret = !CanaryEntityCollisions.doesEntityCollideWithWorldBorder((CollisionGetter) this, entity);
         }
-
         return ret;
     }
 }

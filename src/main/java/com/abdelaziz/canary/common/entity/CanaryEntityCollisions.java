@@ -3,15 +3,15 @@ package com.abdelaziz.canary.common.entity;
 import com.abdelaziz.canary.common.entity.movement.ChunkAwareBlockCollisionSweeper;
 import com.abdelaziz.canary.common.world.WorldHelper;
 import com.google.common.collect.AbstractIterator;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.function.BooleanBiFunction;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.CollisionView;
-import net.minecraft.world.EntityView;
-import net.minecraft.world.World;
-import net.minecraft.world.border.WorldBorder;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.CollisionGetter;
+import net.minecraft.world.level.EntityGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.border.WorldBorder;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.BooleanOp;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -23,12 +23,12 @@ public class CanaryEntityCollisions {
     public static final double EPSILON = 1.0E-7D;
 
     /**
-     * [VanillaCopy] CollisionView#getBlockCollisions(Entity, Box)
+     * [VanillaCopy] CollisionGetter#getBlockCollisions(Entity, AABB)
      * This is a much, much faster implementation which uses simple collision testing against full-cube block shapes.
      * Checks against the world border are replaced with our own optimized functions which do not go through the
      * VoxelShape system.
      */
-    public static List<VoxelShape> getBlockCollisions(CollisionView world, Entity entity, Box box) {
+    public static List<VoxelShape> getBlockCollisions(CollisionGetter world, Entity entity, AABB box) {
         ArrayList<VoxelShape> shapes = new ArrayList<>();
         ChunkAwareBlockCollisionSweeper sweeper = new ChunkAwareBlockCollisionSweeper(world, entity, box);
         while (sweeper.hasNext()) {
@@ -40,7 +40,7 @@ public class CanaryEntityCollisions {
     /***
      * @return True if the box (possibly that of an entity's) collided with any blocks
      */
-    public static boolean doesBoxCollideWithBlocks(CollisionView world, Entity entity, Box box) {
+    public static boolean doesBoxCollideWithBlocks(CollisionGetter world, Entity entity, AABB box) {
         final ChunkAwareBlockCollisionSweeper sweeper = new ChunkAwareBlockCollisionSweeper(world, entity, box);
 
         final VoxelShape shape = sweeper.computeNext();
@@ -51,23 +51,23 @@ public class CanaryEntityCollisions {
     /**
      * @return True if the box (possibly that of an entity's) collided with any other hard entities
      */
-    public static boolean doesBoxCollideWithHardEntities(EntityView view, Entity entity, Box box) {
+    public static boolean doesBoxCollideWithHardEntities(EntityGetter view, Entity entity, AABB box) {
         if (isBoxEmpty(box)) {
             return false;
         }
 
-        return getEntityWorldBorderCollisionIterable(view, entity, box.expand(EPSILON), false).iterator().hasNext();
+        return getEntityWorldBorderCollisionIterable(view, entity, box.inflate(EPSILON), false).iterator().hasNext();
     }
 
     /**
      * Iterates entity and world border collision boxes.
      */
-    public static List<VoxelShape> getEntityWorldBorderCollisions(World world, Entity entity, Box box, boolean includeWorldBorder) {
+    public static List<VoxelShape> getEntityWorldBorderCollisions(Level world, Entity entity, AABB box, boolean includeWorldBorder) {
         if (isBoxEmpty(box)) {
             return Collections.emptyList();
         }
         ArrayList<VoxelShape> shapes = new ArrayList<>();
-        Iterable<VoxelShape> collisions = getEntityWorldBorderCollisionIterable(world, entity, box.expand(EPSILON), includeWorldBorder);
+        Iterable<VoxelShape> collisions = getEntityWorldBorderCollisionIterable(world, entity, box.inflate(EPSILON), includeWorldBorder);
         for (VoxelShape shape : collisions) {
             shapes.add(shape);
         }
@@ -79,7 +79,7 @@ public class CanaryEntityCollisions {
      * Re-implements the function named above without stream code or unnecessary allocations. This can provide a small
      * boost in some situations (such as heavy entity crowding) and reduces the allocation rate significantly.
      */
-    public static Iterable<VoxelShape> getEntityWorldBorderCollisionIterable(EntityView view, Entity entity, Box box, boolean includeWorldBorder) {
+    public static Iterable<VoxelShape> getEntityWorldBorderCollisionIterable(EntityGetter view, Entity entity, AABB box, boolean includeWorldBorder) {
         assert !includeWorldBorder || entity != null;
         return new Iterable<>() {
             private List<Entity> entityList;
@@ -110,9 +110,9 @@ public class CanaryEntityCollisions {
                                 //get the world border at the end
                                 if (includeWorldBorder && !this.consumedWorldBorder) {
                                     this.consumedWorldBorder = true;
-                                    WorldBorder worldBorder = entity.world.getWorldBorder();
+                                    WorldBorder worldBorder = entity.level.getWorldBorder();
                                     if (!isWithinWorldBorder(worldBorder, box) && isWithinWorldBorder(worldBorder, entity.getBoundingBox())) {
-                                        return worldBorder.asVoxelShape();
+                                        return worldBorder.getCollisionShape();
                                     }
                                 }
                                 return this.endOfData();
@@ -128,10 +128,10 @@ public class CanaryEntityCollisions {
                                  * otherEntity as a vehicle.
                                  */
                                 if (entity == null) {
-                                    if (!otherEntity.isCollidable()) {
+                                    if (!otherEntity.canBeCollidedWith()) {
                                         otherEntity = null;
                                     }
-                                } else if (!entity.collidesWith(otherEntity)) {
+                                } else if (!entity.canCollideWith(otherEntity)) {
                                     otherEntity = null;
                                 }
                                 nextFilterIndex++;
@@ -139,7 +139,7 @@ public class CanaryEntityCollisions {
                             this.index++;
                         } while (otherEntity == null);
 
-                        return VoxelShapes.cuboid(otherEntity.getBoundingBox());
+                        return Shapes.create(otherEntity.getBoundingBox());
                     }
                 };
             }
@@ -152,34 +152,34 @@ public class CanaryEntityCollisions {
      *
      * @return True if the {@param box} is fully within the {@param border}, otherwise false.
      */
-    public static boolean isWithinWorldBorder(WorldBorder border, Box box) {
-        double wboxMinX = Math.floor(border.getBoundWest());
-        double wboxMinZ = Math.floor(border.getBoundNorth());
+    public static boolean isWithinWorldBorder(WorldBorder border, AABB box) {
+        double wboxMinX = Math.floor(border.getMinX());
+        double wboxMinZ = Math.floor(border.getMinZ());
 
-        double wboxMaxX = Math.ceil(border.getBoundEast());
-        double wboxMaxZ = Math.ceil(border.getBoundSouth());
+        double wboxMaxX = Math.ceil(border.getMaxX());
+        double wboxMaxZ = Math.ceil(border.getMaxZ());
 
         return box.minX >= wboxMinX && box.minX <= wboxMaxX && box.minZ >= wboxMinZ && box.minZ <= wboxMaxZ &&
                 box.maxX >= wboxMinX && box.maxX <= wboxMaxX && box.maxZ >= wboxMinZ && box.maxZ <= wboxMaxZ;
     }
 
 
-    private static boolean isBoxEmpty(Box box) {
-        return box.getAverageSideLength() <= EPSILON;
+    private static boolean isBoxEmpty(AABB box) {
+        return box.getSize() <= EPSILON;
     }
 
-    public static boolean doesEntityCollideWithWorldBorder(CollisionView collisionView, Entity entity) {
+    public static boolean doesEntityCollideWithWorldBorder(CollisionGetter collisionView, Entity entity) {
         if (isWithinWorldBorder(collisionView.getWorldBorder(), entity.getBoundingBox())) {
             return false;
         } else {
             VoxelShape worldBorderShape = getWorldBorderCollision(collisionView, entity);
-            return worldBorderShape != null && VoxelShapes.matchesAnywhere(worldBorderShape, VoxelShapes.cuboid(entity.getBoundingBox()), BooleanBiFunction.AND);
+            return worldBorderShape != null && Shapes.joinIsNotEmpty(worldBorderShape, Shapes.create(entity.getBoundingBox()), BooleanOp.AND);
         }
     }
 
-    public static VoxelShape getWorldBorderCollision(CollisionView collisionView, Entity entity) {
-        Box box = entity.getBoundingBox();
+    public static VoxelShape getWorldBorderCollision(CollisionGetter collisionView, Entity entity) {
+        AABB box = entity.getBoundingBox();
         WorldBorder worldBorder = collisionView.getWorldBorder();
-        return worldBorder.canCollide(entity, box) ? worldBorder.asVoxelShape() : null;
+        return worldBorder.isInsideCloseToBorder(entity, box) ? worldBorder.getCollisionShape() : null;
     }
 }

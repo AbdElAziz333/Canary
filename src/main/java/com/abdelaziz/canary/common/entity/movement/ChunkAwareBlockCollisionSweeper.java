@@ -6,20 +6,20 @@ import com.abdelaziz.canary.common.entity.CanaryEntityCollisions;
 import com.abdelaziz.canary.common.shapes.VoxelShapeCaster;
 import com.abdelaziz.canary.common.util.Pos;
 import com.google.common.collect.AbstractIterator;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.function.BooleanBiFunction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.CollisionView;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.ChunkSection;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.CollisionGetter;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.LevelChunkSection;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.BooleanOp;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
  * ChunkAwareBlockCollisionSweeper iterates over blocks in one chunk section at a time. Together with the chunk
@@ -27,21 +27,21 @@ import net.minecraft.world.chunk.ChunkSection;
  */
 public class ChunkAwareBlockCollisionSweeper extends AbstractIterator<VoxelShape> {
 
-    private final BlockPos.Mutable pos = new BlockPos.Mutable();
+    private final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 
     /**
      * The collision box being swept through the world.
      */
-    private final Box box;
+    private final AABB box;
 
     /**
      * The VoxelShape of the collision box being swept through the world.
      */
     private final VoxelShape shape;
 
-    private final CollisionView view;
+    private final CollisionGetter view;
 
-    private final ShapeContext context;
+    private final CollisionContext context;
 
     //limits of the area without extension for oversized blocks
     private final int minX, minY, minZ, maxX, maxY, maxZ;
@@ -56,21 +56,21 @@ public class ChunkAwareBlockCollisionSweeper extends AbstractIterator<VoxelShape
     private int cIterated;
 
     private boolean sectionOversizedBlocks;
-    private Chunk cachedChunk;
-    private ChunkSection cachedChunkSection;
+    private ChunkAccess cachedChunk;
+    private LevelChunkSection cachedChunkSection;
 
-    public ChunkAwareBlockCollisionSweeper(CollisionView view, Entity entity, Box box) {
+    public ChunkAwareBlockCollisionSweeper(CollisionGetter view, Entity entity, AABB box) {
         this.box = box;
-        this.shape = VoxelShapes.cuboid(box);
-        this.context = entity == null ? ShapeContext.absent() : ShapeContext.of(entity);
+        this.shape = Shapes.create(box);
+        this.context = entity == null ? CollisionContext.empty() : CollisionContext.of(entity);
         this.view = view;
 
-        this.minX = MathHelper.floor(box.minX - CanaryEntityCollisions.EPSILON);
-        this.maxX = MathHelper.floor(box.maxX + CanaryEntityCollisions.EPSILON);
-        this.minY = MathHelper.clamp(MathHelper.floor(box.minY - CanaryEntityCollisions.EPSILON), Pos.BlockCoord.getMinY(this.view), Pos.BlockCoord.getMaxYInclusive(this.view));
-        this.maxY = MathHelper.clamp(MathHelper.floor(box.maxY + CanaryEntityCollisions.EPSILON), Pos.BlockCoord.getMinY(this.view), Pos.BlockCoord.getMaxYInclusive(this.view));
-        this.minZ = MathHelper.floor(box.minZ - CanaryEntityCollisions.EPSILON);
-        this.maxZ = MathHelper.floor(box.maxZ + CanaryEntityCollisions.EPSILON);
+        this.minX = Mth.floor(box.minX - CanaryEntityCollisions.EPSILON);
+        this.maxX = Mth.floor(box.maxX + CanaryEntityCollisions.EPSILON);
+        this.minY = Mth.clamp(Mth.floor(box.minY - CanaryEntityCollisions.EPSILON), Pos.BlockCoord.getMinY(this.view), Pos.BlockCoord.getMaxYInclusive(this.view));
+        this.maxY = Mth.clamp(Mth.floor(box.maxY + CanaryEntityCollisions.EPSILON), Pos.BlockCoord.getMinY(this.view), Pos.BlockCoord.getMaxYInclusive(this.view));
+        this.minZ = Mth.floor(box.minZ - CanaryEntityCollisions.EPSILON);
+        this.maxZ = Mth.floor(box.maxZ + CanaryEntityCollisions.EPSILON);
 
         this.chunkX = Pos.ChunkCoord.fromBlockCoord(expandMin(this.minX));
         this.chunkZ = Pos.ChunkCoord.fromBlockCoord(expandMin(this.minZ));
@@ -89,7 +89,7 @@ public class ChunkAwareBlockCollisionSweeper extends AbstractIterator<VoxelShape
      * @return True if the shape can be interacted with at the given edge boundary
      */
     private static boolean canInteractWithBlock(BlockState state, int edgesHit) {
-        return (edgesHit != 1 || state.exceedsCube()) && (edgesHit != 2 || state.getBlock() == Blocks.MOVING_PISTON);
+        return (edgesHit != 1 || state.hasLargeCollisionShape()) && (edgesHit != 2 || state.getBlock() == Blocks.MOVING_PISTON);
     }
 
     /**
@@ -99,21 +99,21 @@ public class ChunkAwareBlockCollisionSweeper extends AbstractIterator<VoxelShape
      *
      * @return A {@link VoxelShape} which contains the shape representing that which was collided with, otherwise null
      */
-    private static VoxelShape getCollidedShape(Box entityBox, VoxelShape entityShape, VoxelShape shape, int x, int y, int z) {
-        if (shape == VoxelShapes.fullCube()) {
-            return entityBox.intersects(x, y, z, x + 1.0, y + 1.0, z + 1.0) ? shape.offset(x, y, z) : null;
+    private static VoxelShape getCollidedShape(AABB entityBox, VoxelShape entityShape, VoxelShape shape, int x, int y, int z) {
+        if (shape == Shapes.block()) {
+            return entityBox.intersects(x, y, z, x + 1.0, y + 1.0, z + 1.0) ? shape.move(x, y, z) : null;
         }
         if (shape instanceof VoxelShapeCaster) {
             if (((VoxelShapeCaster) shape).intersects(entityBox, x, y, z)) {
-                return shape.offset(x, y, z);
+                return shape.move(x, y, z);
             } else {
                 return null;
             }
         }
 
-        shape = shape.offset(x, y, z);
+        shape = shape.move(x, y, z);
 
-        if (VoxelShapes.matchesAnywhere(shape, entityShape, BooleanBiFunction.AND)) {
+        if (Shapes.joinIsNotEmpty(shape, entityShape, BooleanOp.AND)) {
             return shape;
         }
 
@@ -125,9 +125,9 @@ public class ChunkAwareBlockCollisionSweeper extends AbstractIterator<VoxelShape
      *
      * @return Whether there are any oversized blocks in the chunk section.
      */
-    private static boolean hasChunkSectionOversizedBlocks(Chunk chunk, int chunkY) {
+    private static boolean hasChunkSectionOversizedBlocks(ChunkAccess chunk, int chunkY) {
         if (BlockStateFlags.ENABLED) {
-            ChunkSection section = chunk.getSectionArray()[chunkY];
+            LevelChunkSection section = chunk.getSections()[chunkY];
             return section != null && ((BlockCountingSection) section).anyMatch(BlockStateFlags.OVERSIZED_SHAPE, true);
         }
         return true; //like vanilla, assume that a chunk section has oversized blocks, when the section mixin isn't loaded
@@ -152,9 +152,9 @@ public class ChunkAwareBlockCollisionSweeper extends AbstractIterator<VoxelShape
                                 this.chunkYIndex < Pos.SectionYIndex.fromBlockCoord(this.view, expandMax(this.maxY))
                 ) {
                     this.chunkYIndex++;
-                    this.cachedChunkSection = this.cachedChunk.getSectionArray()[this.chunkYIndex];
+                    this.cachedChunkSection = this.cachedChunk.getSections()[this.chunkYIndex];
                 } else {
-                    this.chunkYIndex = MathHelper.clamp(
+                    this.chunkYIndex = Mth.clamp(
                             Pos.SectionYIndex.fromBlockCoord(this.view, expandMin(this.minY)),
                             Pos.SectionYIndex.getMinYSectionIndex(this.view),
                             Pos.SectionYIndex.getMaxYSectionIndexInclusive(this.view)
@@ -173,16 +173,16 @@ public class ChunkAwareBlockCollisionSweeper extends AbstractIterator<VoxelShape
                         }
                     }
                     //Casting to Chunk is not checked, together with other mods this could cause a ClassCastException
-                    BlockView view = this.view.getChunkAsView(this.chunkX, chunkZ);
-                    if (view instanceof Chunk) {
-                        this.cachedChunk = (Chunk) this.view.getChunkAsView(this.chunkX, this.chunkZ);
+                    BlockGetter view = this.view.getChunkForCollisions(this.chunkX, chunkZ);
+                    if (view instanceof ChunkAccess) {
+                        this.cachedChunk = (ChunkAccess) this.view.getChunkForCollisions(this.chunkX, this.chunkZ);
                         if (this.cachedChunk != null) {
-                            this.cachedChunkSection = this.cachedChunk.getSectionArray()[this.chunkYIndex];
+                            this.cachedChunkSection = this.cachedChunk.getSections()[this.chunkYIndex];
                         }
                     }
                 }
                 //skip empty chunks and empty chunk sections
-            } while (this.cachedChunk == null || this.cachedChunkSection == null || this.cachedChunkSection.isEmpty());
+            } while (this.cachedChunk == null || this.cachedChunkSection == null || this.cachedChunkSection.hasOnlyAir());
 
             this.sectionOversizedBlocks = hasChunkSectionOversizedBlocks(this.cachedChunk, this.chunkYIndex);
 
@@ -264,7 +264,7 @@ public class ChunkAwareBlockCollisionSweeper extends AbstractIterator<VoxelShape
 
             VoxelShape collisionShape = state.getCollisionShape(this.view, this.pos, this.context);
 
-            if (collisionShape != VoxelShapes.empty()) {
+            if (collisionShape != Shapes.empty()) {
                 VoxelShape collidedShape = getCollidedShape(this.box, this.shape, collisionShape, x, y, z);
                 if (collidedShape != null) {
                     return collidedShape;

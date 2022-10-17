@@ -2,12 +2,12 @@ package com.abdelaziz.canary.mixin.entity.hopper_minecart;
 
 import com.abdelaziz.canary.common.hopper.HopperHelper;
 import com.abdelaziz.canary.common.util.collections.BucketedList;
-import net.minecraft.block.entity.Hopper;
-import net.minecraft.block.entity.HopperBlockEntity;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.predicate.entity.EntityPredicates;
-import net.minecraft.util.math.Box;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.EntitySelector;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.Hopper;
+import net.minecraft.world.level.block.entity.HopperBlockEntity;
+import net.minecraft.world.phys.AABB;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 
@@ -24,28 +24,28 @@ public class HopperBlockEntityMixin {
      * This code is run by hopper minecarts. Hopper blocks use a different optimization unless it is disabled.
      */
     @Overwrite
-    public static List<ItemEntity> getInputItemEntities(World world, Hopper hopper) {
-        Box encompassingBox = hopper.getInputAreaShape().getBoundingBox();
-        double xOffset = hopper.getHopperX() - 0.5;
-        double yOffset = hopper.getHopperY() - 0.5;
-        double zOffset = hopper.getHopperZ() - 0.5;
-        List<ItemEntity> nearbyEntities = world.getEntitiesByClass(ItemEntity.class, encompassingBox.offset(xOffset, yOffset, zOffset), EntityPredicates.VALID_ENTITY);
+    public static List<ItemEntity> getItemsAtAndAbove(Level world, Hopper hopper) {
+        AABB encompassingBox = hopper.getSuckShape().bounds();
+        double xOffset = hopper.getLevelX() - 0.5;
+        double yOffset = hopper.getLevelY() - 0.5;
+        double zOffset = hopper.getLevelZ() - 0.5;
+        List<ItemEntity> nearbyEntities = world.getEntitiesOfClass(ItemEntity.class, encompassingBox.move(xOffset, yOffset, zOffset), EntitySelector.ENTITY_STILL_ALIVE);
 
         if (nearbyEntities.isEmpty()) {
             return Collections.emptyList();
         }
 
-        Box[] boundingBoxes = HopperHelper.getHopperPickupVolumeBoxes(hopper);
+        AABB[] boundingBoxes = HopperHelper.getHopperPickupVolumeBoxes(hopper);
         int numBoxes = boundingBoxes.length;
-        Box[] offsetBoundingBoxes = new Box[numBoxes];
+        AABB[] offsetBoundingBoxes = new AABB[numBoxes];
         for (int i = 0; i < numBoxes; i++) {
-            offsetBoundingBoxes[i] = boundingBoxes[i].offset(xOffset, yOffset, zOffset);
+            offsetBoundingBoxes[i] = boundingBoxes[i].move(xOffset, yOffset, zOffset);
         }
 
         BucketedList<ItemEntity> entities = new BucketedList<>(numBoxes);
 
         for (ItemEntity itemEntity : nearbyEntities) {
-            Box entityBoundingBox = itemEntity.getBoundingBox();
+            AABB entityBoundingBox = itemEntity.getBoundingBox();
             for (int j = 0; j < numBoxes; j++) {
                 if (entityBoundingBox.intersects(offsetBoundingBoxes[j])) {
                     entities.addToBucket(j, itemEntity);

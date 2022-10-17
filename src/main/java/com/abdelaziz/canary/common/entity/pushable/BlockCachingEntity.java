@@ -1,18 +1,14 @@
 package com.abdelaziz.canary.common.entity.pushable;
 
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.state.BlockState;
 
 public interface BlockCachingEntity {
 
-    default void lithiumOnBlockCacheDeleted() {
+    default void canaryOnBlockCacheDeleted() {}
 
-    }
+    default void canaryOnBlockCacheSet(BlockState newState) {}
 
-    default void lithiumOnBlockCacheSet(BlockState newState) {
-
-    }
-
-    default void lithiumSetClimbingMobCachingSectionUpdateBehavior(boolean listening) {
+    default void canarySetClimbingMobCachingSectionUpdateBehavior(boolean listening) {
         throw new UnsupportedOperationException();
     }
 

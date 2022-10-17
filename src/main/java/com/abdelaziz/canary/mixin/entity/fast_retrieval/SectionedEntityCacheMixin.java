@@ -1,10 +1,10 @@
 package com.abdelaziz.canary.mixin.entity.fast_retrieval;
 
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.ChunkSectionPos;
-import net.minecraft.world.entity.EntityLike;
-import net.minecraft.world.entity.EntityTrackingSection;
-import net.minecraft.world.entity.SectionedEntityCache;
+import net.minecraft.core.SectionPos;
+import net.minecraft.world.level.entity.EntityAccess;
+import net.minecraft.world.level.entity.EntitySection;
+import net.minecraft.world.level.entity.EntitySectionStorage;
+import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -15,11 +15,11 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.function.Consumer;
 
-@Mixin(SectionedEntityCache.class)
-public abstract class SectionedEntityCacheMixin<T extends EntityLike> {
+@Mixin(EntitySectionStorage.class)
+public abstract class SectionedEntityCacheMixin<T extends EntityAccess> {
     @Shadow
     @Nullable
-    public abstract EntityTrackingSection<T> findTrackingSection(long sectionPos);
+    public abstract EntitySection<T> getSection(long sectionPos);
 
     /**
      * @author 2No2Name
@@ -27,17 +27,17 @@ public abstract class SectionedEntityCacheMixin<T extends EntityLike> {
      */
     @SuppressWarnings("InvalidInjectorMethodSignature")
     @Inject(
-            method = "forEachInBox",
+            method = "forEachAccessibleNonEmptySection",
             at = @At(
                     value = "INVOKE_ASSIGN",
                     shift = At.Shift.AFTER,
-                    target = "Lnet/minecraft/util/math/ChunkSectionPos;getSectionCoord(D)I",
+                    target = "Lnet/minecraft/core/SectionPos;posToSectionCoord(D)I",
                     ordinal = 5
             ),
             locals = LocalCapture.CAPTURE_FAILHARD,
             cancellable = true
     )
-    public void forEachInBox(Box box, Consumer<EntityTrackingSection<T>> action, CallbackInfo ci, int i, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+    public void forEachInBox(AABB box, Consumer<EntitySection<T>> action, CallbackInfo ci, int i, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
         if (maxX >= minX + 4 || maxZ >= minZ + 4) {
             return; // Vanilla is likely more optimized when shooting entities with TNT cannons over huge distances.
             // Choosing a cutoff of 4 chunk size, as it becomes more likely that these entity sections do not exist when
@@ -64,20 +64,20 @@ public abstract class SectionedEntityCacheMixin<T extends EntityLike> {
         }
     }
 
-    private void forEachInColumn(int x, int minY, int maxY, int z, Consumer<EntityTrackingSection<T>> action) {
+    private void forEachInColumn(int x, int minY, int maxY, int z, Consumer<EntitySection<T>> action) {
         //y from negative to positive, but y is treated as unsigned
         for (int y = Math.max(minY, 0); y <= maxY; y++) {
-            this.consumeSection(ChunkSectionPos.asLong(x, y, z), action);
+            this.consumeSection(SectionPos.asLong(x, y, z), action);
         }
         int bound = Math.min(-1, maxY);
         for (int y = minY; y <= bound; y++) {
-            this.consumeSection(ChunkSectionPos.asLong(x, y, z), action);
+            this.consumeSection(SectionPos.asLong(x, y, z), action);
         }
     }
 
-    private void consumeSection(long pos, Consumer<EntityTrackingSection<T>> action) {
-        EntityTrackingSection<T> section = this.findTrackingSection(pos);
-        if (section != null && 0 != section.size() && section.getStatus().shouldTrack()) {
+    private void consumeSection(long pos, Consumer<EntitySection<T>> action) {
+        EntitySection<T> section = this.getSection(pos);
+        if (section != null && 0 != section.size() && section.getStatus().isAccessible()) {
             action.accept(section);
         }
     }
