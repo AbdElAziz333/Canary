@@ -1,36 +1,36 @@
 package com.abdelaziz.canary.mixin.block.hopper;
 
 import com.abdelaziz.canary.common.entity.tracker.nearby.ToggleableMovementTracker;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.vehicle.ChestBoatEntity;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
-import net.minecraft.world.entity.EntityChangeListener;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.vehicle.ChestBoat;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.entity.EntityInLevelCallback;
+import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 
-@Mixin(ChestBoatEntity.class)
+@Mixin(ChestBoat.class)
 public abstract class ChestBoatEntityMixin extends Entity {
-    public ChestBoatEntityMixin(EntityType<?> type, World world) {
+    public ChestBoatEntityMixin(EntityType<?> type, Level world) {
         super(type, world);
     }
 
     @Override
-    public void tickRiding() {
-        EntityChangeListener changeListener = ((EntityAccessor) this).getChangeListener();
+    public void rideTick() {
+        EntityInLevelCallback changeListener = ((EntityAccessor) this).getLevelCallback();
         if (changeListener instanceof ToggleableMovementTracker toggleableMovementTracker) {
-            Vec3d beforeTickPos = this.getPos();
+            Vec3 beforeTickPos = this.position();
             int beforeMovementNotificationMask = toggleableMovementTracker.setNotificationMask(0);
 
-            super.tickRiding();
+            super.rideTick();
 
             toggleableMovementTracker.setNotificationMask(beforeMovementNotificationMask);
 
-            if (!beforeTickPos.equals(this.getPos())) {
-                changeListener.updateEntityPosition();
+            if (!beforeTickPos.equals(this.position())) {
+                changeListener.onMove();
             }
         } else {
-            super.tickRiding();
+            super.rideTick();
         }
 
     }

@@ -1,65 +1,65 @@
 package com.abdelaziz.canary.mixin.block.hopper;
 
 import com.abdelaziz.canary.api.inventory.CanaryInventory;
-import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
-import net.minecraft.block.entity.BrewingStandBlockEntity;
-import net.minecraft.block.entity.LootableContainerBlockEntity;
-import net.minecraft.entity.vehicle.StorageMinecartEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.entity.vehicle.AbstractMinecartContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
+import net.minecraft.world.level.block.entity.BrewingStandBlockEntity;
+import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 public class InventoryAccessors {
-    @Mixin(LootableContainerBlockEntity.class)
+    @Mixin(RandomizableContainerBlockEntity.class)
     public abstract static class InventoryAccessorLootableContainerBlockEntity implements CanaryInventory {
         @Shadow
-        protected abstract DefaultedList<ItemStack> getInvStackList();
+        protected abstract NonNullList<ItemStack> getItems();
 
         @Shadow
-        protected abstract void setInvStackList(DefaultedList<ItemStack> list);
+        protected abstract void setItems(NonNullList<ItemStack> list);
 
         @Override
-        public DefaultedList<ItemStack> getInventoryCanary() {
-            return this.getInvStackList();
+        public NonNullList<ItemStack> getInventoryCanary() {
+            return this.getItems();
         }
 
         @Override
-        public void setInventoryCanary(DefaultedList<ItemStack> inventory) {
-            this.setInvStackList(inventory);
+        public void setInventoryCanary(NonNullList<ItemStack> inventory) {
+            this.setItems(inventory);
         }
     }
 
     @Mixin(AbstractFurnaceBlockEntity.class)
     public abstract static class InventoryAccessorAbstractFurnaceBlockEntity implements CanaryInventory {
-        @Accessor("inventory")
-        public abstract DefaultedList<ItemStack> getInventoryCanary();
+        @Accessor("items")
+        public abstract NonNullList<ItemStack> getInventoryCanary();
 
-        @Accessor("inventory")
-        public abstract void setInventoryCanary(DefaultedList<ItemStack> inventory);
+        @Accessor("items")
+        public abstract void setInventoryCanary(NonNullList<ItemStack> inventory);
     }
 
     @Mixin(BrewingStandBlockEntity.class)
     public abstract static class InventoryAccessorBrewingStandBlockEntity implements CanaryInventory {
         @Override
-        @Accessor("inventory")
-        public abstract DefaultedList<ItemStack> getInventoryCanary();
+        @Accessor("items")
+        public abstract NonNullList<ItemStack> getInventoryCanary();
 
         @Override
-        @Accessor("inventory")
-        public abstract void setInventoryCanary(DefaultedList<ItemStack> inventory);
+        @Accessor("items")
+        public abstract void setInventoryCanary(NonNullList<ItemStack> inventory);
     }
 
-    @Mixin(StorageMinecartEntity.class)
+    @Mixin(AbstractMinecartContainer.class)
     public abstract static class InventoryAccessorStorageMinecartEntity implements CanaryInventory {
         @Override
-        @Accessor("inventory")
-        public abstract DefaultedList<ItemStack> getInventoryCanary();
+        @Accessor("itemStacks")
+        public abstract NonNullList<ItemStack> getInventoryCanary();
 
         @Override
-        @Accessor("inventory")
-        public abstract void setInventoryCanary(DefaultedList<ItemStack> inventory);
+        @Accessor("itemStacks")
+        public abstract void setInventoryCanary(NonNullList<ItemStack> inventory);
     }
 
 }

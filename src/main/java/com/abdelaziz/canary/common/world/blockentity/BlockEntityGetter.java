@@ -1,7 +1,7 @@
 package com.abdelaziz.canary.common.world.blockentity;
 
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 public interface BlockEntityGetter {
     BlockEntity getLoadedExistingBlockEntity(BlockPos pos);

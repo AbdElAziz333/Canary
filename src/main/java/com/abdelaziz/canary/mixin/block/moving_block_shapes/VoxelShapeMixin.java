@@ -1,8 +1,8 @@
 package com.abdelaziz.canary.mixin.block.moving_block_shapes;
 
 import com.abdelaziz.canary.common.shapes.OffsetVoxelShapeCache;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.spongepowered.asm.mixin.Mixin;
 
 
@@ -41,6 +41,6 @@ public class VoxelShapeMixin implements OffsetVoxelShapeCache {
         if (offset == 0f) {
             return 0; //can treat offsetting by 0 in all directions the same
         }
-        return (int) (2 * offset) + 2 * direction.getId();
+        return (int) (2 * offset) + 2 * direction.get3DDataValue();
     }
 }
