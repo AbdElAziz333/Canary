@@ -1,7 +1,7 @@
 package com.abdelaziz.canary.common.util.collections;
 
 import it.unimi.dsi.fastutil.HashCommon;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
 
 import java.util.function.Predicate;
 
@@ -22,7 +22,7 @@ public final class Object2BooleanCacheTable<T> {
 
     @SuppressWarnings("unchecked")
     public Object2BooleanCacheTable(int capacity, Predicate<T> operator) {
-        int capacity1 = MathHelper.smallestEncompassingPowerOfTwo(capacity);
+        int capacity1 = Mth.smallestEncompassingPowerOfTwo(capacity);
         this.mask = capacity1 - 1;
 
         this.nodes = (Node<T>[]) new Node[capacity1];

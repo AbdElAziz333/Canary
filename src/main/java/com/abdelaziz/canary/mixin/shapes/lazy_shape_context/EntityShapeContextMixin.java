@@ -1,11 +1,11 @@
 package com.abdelaziz.canary.mixin.shapes.lazy_shape_context;
 
-import net.minecraft.block.EntityShapeContext;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.function.Predicate;
 
-@Mixin(EntityShapeContext.class)
+@Mixin(EntityCollisionContext.class)
 public class EntityShapeContextMixin {
     @Mutable
     @Shadow
@@ -29,7 +29,7 @@ public class EntityShapeContextMixin {
     @Mutable
     @Shadow
     @Final
-    private Predicate<FluidState> walkOnFluidPredicate;
+    private Predicate<FluidState> canStandOnFluid;
 
     @Shadow
     @Final
@@ -41,7 +41,7 @@ public class EntityShapeContextMixin {
      * No need to use Opcodes.INSTANCEOF or similar.
      */
     @ModifyConstant(
-            method = "<init>(Lnet/minecraft/entity/Entity;)V",
+            method = "<init>(Lnet/minecraft/world/entity/Entity;)V",
             constant = @Constant(classValue = LivingEntity.class, ordinal = 0)
     )
     private static boolean redirectInstanceOf(Object obj, Class<?> clazz) {
@@ -49,7 +49,7 @@ public class EntityShapeContextMixin {
     }
 
     @ModifyConstant(
-            method = "<init>(Lnet/minecraft/entity/Entity;)V",
+            method = "<init>(Lnet/minecraft/world/entity/Entity;)V",
             constant = @Constant(classValue = LivingEntity.class, ordinal = 2)
     )
     private static boolean redirectInstanceOf2(Object obj, Class<?> clazz) {
@@ -71,25 +71,25 @@ public class EntityShapeContextMixin {
         }
     */
     @Inject(
-            method = "isHolding(Lnet/minecraft/item/Item;)Z",
+            method = "isHolding(Lnet/minecraft/world/item/Item;)Z",
             at = @At("HEAD")
     )
     public void isHolding(Item item, CallbackInfoReturnable<Boolean> cir) {
         if (this.heldItem == null) {
-            this.heldItem = this.entity instanceof LivingEntity ? ((LivingEntity) this.entity).getMainHandStack() : ItemStack.EMPTY;
+            this.heldItem = this.entity instanceof LivingEntity ? ((LivingEntity) this.entity).getMainHandItem() : ItemStack.EMPTY;
         }
     }
 
     @Inject(
-            method = "canWalkOnFluid(Lnet/minecraft/fluid/FluidState;Lnet/minecraft/fluid/FluidState;)Z",
+            method = "canStandOnFluid(Lnet/minecraft/world/level/material/FluidState;Lnet/minecraft/world/level/material/FluidState;)Z",
             at = @At("HEAD")
     )
     public void canWalkOnFluid(FluidState state, FluidState fluidState, CallbackInfoReturnable<Boolean> cir) {
-        if (this.walkOnFluidPredicate == null) {
+        if (this.canStandOnFluid == null) {
             if (this.entity instanceof LivingEntity livingEntity) {
-                this.walkOnFluidPredicate = livingEntity::canWalkOnFluid;
+                this.canStandOnFluid = livingEntity::canStandOnFluid;
             } else {
-                this.walkOnFluidPredicate = (liquid) -> false;
+                this.canStandOnFluid = (liquid) -> false;
             }
         }
     }
