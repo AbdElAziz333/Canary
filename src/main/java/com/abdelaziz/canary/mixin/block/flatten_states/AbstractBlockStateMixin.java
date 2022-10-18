@@ -1,9 +1,9 @@
 package com.abdelaziz.canary.mixin.block.flatten_states;
 
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.fluid.FluidState;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FluidState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
@@ -15,10 +15,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * This patch safely avoids excessive overhead in some hot methods by caching some constant values in the BlockState
  * itself, excluding dynamic dispatch and the pointer dereferences.
  */
-@Mixin(AbstractBlock.AbstractBlockState.class)
+@Mixin(BlockBehaviour.BlockStateBase.class)
 public abstract class AbstractBlockStateMixin {
     @Shadow
-    protected abstract BlockState asBlockState();
+    protected abstract BlockState asState();
 
     @Shadow
     public abstract Block getBlock();
@@ -38,11 +38,11 @@ public abstract class AbstractBlockStateMixin {
     /**
      * We can't use the ctor as a BlockState will be constructed *before* a Block has fully initialized.
      */
-    @Inject(method = "initShapeCache()V", at = @At("HEAD"))
+    @Inject(method = "initCache()V", at = @At("HEAD"))
     private void init(CallbackInfo ci) {
         //noinspection deprecation
-        this.fluidStateCache = this.getBlock().getFluidState(this.asBlockState());
-        this.isTickable = this.getBlock().hasRandomTicks(this.asBlockState());
+        this.fluidStateCache = this.getBlock().getFluidState(this.asState());
+        this.isTickable = this.getBlock().isRandomlyTicking(this.asState());
     }
 
     /**
@@ -53,7 +53,7 @@ public abstract class AbstractBlockStateMixin {
     public FluidState getFluidState() {
         if (this.fluidStateCache == null) {
             //noinspection deprecation
-            this.fluidStateCache = this.getBlock().getFluidState(this.asBlockState());
+            this.fluidStateCache = this.getBlock().getFluidState(this.asState());
         }
 
         return this.fluidStateCache;
@@ -64,7 +64,7 @@ public abstract class AbstractBlockStateMixin {
      * @author Maity
      */
     @Overwrite
-    public boolean hasRandomTicks() {
+    public boolean isRandomlyTicking() {
         return this.isTickable;
     }
 }

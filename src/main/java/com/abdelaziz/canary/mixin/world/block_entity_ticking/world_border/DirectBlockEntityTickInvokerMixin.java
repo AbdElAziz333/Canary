@@ -6,6 +6,7 @@ import net.minecraft.server.level.ChunkHolder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.border.BorderStatus;
 import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.chunk.LevelChunk;
 import org.spongepowered.asm.mixin.Final;
@@ -19,7 +20,7 @@ public abstract class DirectBlockEntityTickInvokerMixin implements WorldBorderLi
 
     @Shadow
     @Final
-    LevelChunk worldChunk;
+    LevelChunk this$0;
 
     @Shadow
     public abstract BlockPos getPos();
@@ -30,14 +31,14 @@ public abstract class DirectBlockEntityTickInvokerMixin implements WorldBorderLi
             method = "tick",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/world/chunk/WorldChunk;canTickBlockEntity(Lnet/minecraft/util/math/BlockPos;)Z"
+                    target = "Lnet/minecraft/world/level/chunk/LevelChunk;isTicking(Lnet/minecraft/core/BlockPos;)Z"
             )
     )
     private boolean cachedCanTickBlockEntity(LevelChunk instance, BlockPos pos) {
         if (this.isInsideWorldBorder()) {
-            Level world = this.worldChunk.getLevel();
+            Level world = this.this$0.getLevel();
             if (world instanceof ServerLevel serverWorld) {
-                return this.worldChunk.getLevelType().isAfter(ChunkHolder.LevelType.TICKING) && serverWorld.isChunkLoaded(ChunkPos.toLong(pos));
+                return this.this$0.getFullStatus().isOrAfter(ChunkHolder.FullChunkStatus.TICKING) && serverWorld.areEntitiesLoaded(ChunkPos.asLong(pos));
             }
             return true;
         } else {
@@ -54,20 +55,20 @@ public abstract class DirectBlockEntityTickInvokerMixin implements WorldBorderLi
         if ((worldBorderState & 3) == 3) {
             return (worldBorderState & 4) != 0;
         }
-        return this.worldChunk.getLevel().getWorldBorder().contains(this.getPos());
+        return this.this$0.getLevel().getWorldBorder().isWithinBounds(this.getPos());
     }
 
     private void startWorldBorderCaching() {
         this.worldBorderState = (byte) 1;
-        WorldBorder worldBorder = this.worldChunk.getLevel().getWorldBorder();
+        WorldBorder worldBorder = this.this$0.getLevel().getWorldBorder();
         worldBorder.addListener(this);
-        boolean isStationary = worldBorder.getStage() == WorldBorderStage.STATIONARY;
-        if (worldBorder.contains(this.getPos())) {
-            if (isStationary || worldBorder.getStage() == WorldBorderStage.GROWING) {
+        boolean isStationary = worldBorder.getStatus() == BorderStatus.STATIONARY;
+        if (worldBorder.isWithinBounds(this.getPos())) {
+            if (isStationary || worldBorder.getStatus() == BorderStatus.GROWING) {
                 this.worldBorderState |= (byte) 6;
             }
         } else {
-            if (isStationary || worldBorder.getStage() == WorldBorderStage.SHRINKING) {
+            if (isStationary || worldBorder.getStatus() == BorderStatus.SHRINKING) {
                 this.worldBorderState |= (byte) 2;
             }
         }

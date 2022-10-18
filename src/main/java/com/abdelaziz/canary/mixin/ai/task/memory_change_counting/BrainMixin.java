@@ -17,7 +17,7 @@ public class BrainMixin implements MemoryModificationCounter {
     private long memoryModCount = 1;
 
     @Redirect(
-            method = "setMemory(Lnet/minecraft/entity/ai/brain/MemoryModuleType;Ljava/util/Optional;)V",
+            method = "setMemoryInternal(Lnet/minecraft/world/entity/ai/memory/MemoryModuleType;Ljava/util/Optional;)V",
             at = @At(
                     value = "INVOKE",
                     target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"
@@ -42,7 +42,7 @@ public class BrainMixin implements MemoryModificationCounter {
      * Mod count being reset can lead to tasks not running even though they should be!
      */
     @Inject(
-            method = "copy()Lnet/minecraft/entity/ai/brain/Brain;",
+            method = "copyWithoutBehaviors()Lnet/minecraft/world/entity/ai/Brain;",
             at = @At("RETURN")
     )
     private void copyModCount(CallbackInfoReturnable<Brain<?>> cir) {

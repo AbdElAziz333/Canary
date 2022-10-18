@@ -38,7 +38,7 @@ public class EntityMixin {
      * @reason Replace with optimized implementation
      */
     @Overwrite
-    public static Vec3 collide(@Nullable Entity entity, Vec3 movement, AABB entityBoundingBox, Level world, List<VoxelShape> collisions) {
+    public static Vec3 collideBoundingBox(@Nullable Entity entity, Vec3 movement, AABB entityBoundingBox, Level world, List<VoxelShape> collisions) {
         return canaryCollideMultiAxisMovement(entity, movement, entityBoundingBox, world, collisions == GET_ENTITIES_LATER);
     }
 

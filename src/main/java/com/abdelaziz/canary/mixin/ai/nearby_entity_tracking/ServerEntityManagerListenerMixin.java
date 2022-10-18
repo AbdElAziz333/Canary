@@ -25,7 +25,7 @@ public class ServerEntityManagerListenerMixin<T extends EntityAccess> implements
     @Final
     @SuppressWarnings("ShadowTarget")
     @Shadow
-    PersistentEntitySectionManager<T> manager;
+    PersistentEntitySectionManager<T> this$0;
     @Shadow
     @Final
     private T entity;
@@ -63,7 +63,7 @@ public class ServerEntityManagerListenerMixin<T extends EntityAccess> implements
         if (listener != null) {
             //noinspection unchecked
             listener.forEachChunkInRangeChange(
-                    ((ServerEntityManagerAccessor<T>) this.manager).getSectionStorage(),
+                    ((ServerEntityManagerAccessor<T>) this.this$0).getSectionStorage(),
                     SectionPos.of(this.currentSectionKey),
                     SectionPos.of(newPos)
             );
@@ -82,7 +82,7 @@ public class ServerEntityManagerListenerMixin<T extends EntityAccess> implements
         if (listener != null) {
             //noinspection unchecked
             listener.forEachChunkInRangeChange(
-                    ((ServerEntityManagerAccessor<T>) this.manager).getSectionStorage(),
+                    ((ServerEntityManagerAccessor<T>) this.this$0).getSectionStorage(),
                     SectionPos.of(this.currentSectionKey),
                     null
             );

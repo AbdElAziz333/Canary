@@ -20,10 +20,10 @@ public class RaiderEntityMixin {
     @Mutable
     @Shadow
     @Final
-    static Predicate<ItemEntity> ALLOWED_ITEMS;
+    public static Predicate<ItemEntity> ALLOWED_ITEMS;
 
     static {
-        Raider.ALLOWED_ITEMS = (itemEntity) -> !itemEntity.hasPickUpDelay() && itemEntity.isAlive() && ItemStack.matches(itemEntity.getItem(), CACHED_OMINOUS_BANNER);
+        ALLOWED_ITEMS = (itemEntity) -> !itemEntity.hasPickUpDelay() && itemEntity.isAlive() && ItemStack.matches(itemEntity.getItem(), CACHED_OMINOUS_BANNER);
     }
 
     @Redirect(

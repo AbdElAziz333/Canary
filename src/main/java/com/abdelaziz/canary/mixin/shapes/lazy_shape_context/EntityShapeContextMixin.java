@@ -71,7 +71,7 @@ public class EntityShapeContextMixin {
         }
     */
     @Inject(
-            method = "isHolding(Lnet/minecraft/world/item/Item;)Z",
+            method = "isHoldingItem(Lnet/minecraft/world/item/Item;)Z",
             at = @At("HEAD")
     )
     public void isHolding(Item item, CallbackInfoReturnable<Boolean> cir) {
