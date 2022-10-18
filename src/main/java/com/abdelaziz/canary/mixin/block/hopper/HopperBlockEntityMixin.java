@@ -17,6 +17,7 @@ import net.minecraft.world.Container;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.HopperBlock;
@@ -32,6 +33,7 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -145,21 +147,34 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
      * @reason Adding the inventory caching into the static method using mixins seems to be unfeasible without temporarily storing state in static fields.
      */
     @SuppressWarnings("JavadocReference")
-    @Redirect(method = "tryMoveItems(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/entity/HopperBlockEntity;Ljava/util/function/BooleanSupplier;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/entity/HopperBlockEntity;ejectItems(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/entity/HopperBlockEntity;)Z"))
+    /* @Redirect(method = "tryMoveItems(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/entity/HopperBlockEntity;Ljava/util/function/BooleanSupplier;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/entity/HopperBlockEntity;ejectItems(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/entity/HopperBlockEntity;)Z"))
     private static boolean canaryInsert(Level world, BlockPos pos, BlockState hopperState, HopperBlockEntity hopper) {
         HopperBlockEntityMixin hopperBlockEntity = (HopperBlockEntityMixin) hopper.getContainerAt(world, pos);
         Container insertInventory = hopperBlockEntity.getInsertInventory(world, hopperState);
         if (insertInventory == null) {
-            //call the vanilla code, but with target inventory nullify (mixin above) to allow other mods inject features
-            //e.g. carpet mod allows hoppers to insert items into wool blocks
-            return ejectItems(world, pos, hopperState, hopper);
+            //call the vanilla code, but with target inventory nullify (mixin above) to allow other mods inject features */
+    @Inject(
+            cancellable = true,
+            method = "ejectItems(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/entity/HopperBlockEntity;)Z",
+            at = @At(
+                    value = "INVOKE", shift = At.Shift.BEFORE,
+                    target = "Lnet/minecraft/world/level/block/entity/HopperBlockEntity;isFullContainer(Lnet/minecraft/world/Container;Lnet/minecraft/core/Direction;)Z"
+            ), locals = LocalCapture.CAPTURE_FAILHARD
+    )
+    private static void canaryInsert(Level world, BlockPos pos, BlockState hopperState, HopperBlockEntity hopper, CallbackInfoReturnable<Boolean> cir, Container insertInventory, Direction direction) {
+        if (insertInventory == null || !(hopper instanceof HopperBlockEntity)) {
+            //call the vanilla code to allow other mods inject features
+            // e.g. carpet mod allows hoppers to insert items into wool blocks
+            return;
         }
+        HopperBlockEntityMixin hopperBlockEntity = (HopperBlockEntityMixin) hopper.getContainerAt(world, pos);
 
         CanaryStackList hopperStackList = InventoryHelper.getCanaryStackList(hopperBlockEntity);
         if (hopperBlockEntity.insertInventory == insertInventory && hopperStackList.getModCount() == hopperBlockEntity.myModCountAtLastInsert) {
             if (hopperBlockEntity.insertStackList != null && hopperBlockEntity.insertStackList.getModCount() == hopperBlockEntity.insertStackListModCount) {
 //                ComparatorUpdatePattern.NO_UPDATE.apply(hopperBlockEntity, hopperStackList); //commented because it's a noop, Hoppers do not send useless comparator updates
-                return false;
+                cir.setReturnValue(false);
+                return;
             }
         }
 
@@ -183,7 +198,8 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
                             receivingHopper.setCooldown(k);
                         }
                         insertInventory.setChanged();
-                        return true;
+                        cir.setReturnValue(true);
+                        return;
                     }
                 }
             }
@@ -192,7 +208,7 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
         if (hopperBlockEntity.insertStackList != null) {
             hopperBlockEntity.insertStackListModCount = hopperBlockEntity.insertStackList.getModCount();
         }
-        return false;
+        cir.setReturnValue(false);
     }
 
     /**
@@ -200,7 +216,6 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
      * Uses the vanilla method as fallback for non-optimized Inventories.
      *
      * @param to   Hopper or Hopper Minecart that is extracting
-     * @param from Inventory the hopper is extracting from
      */
     @Inject(method = "suckInItems(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/block/entity/Hopper;)Z", at = @At(value = "FIELD", target = "Lnet/minecraft/core/Direction;DOWN:Lnet/minecraft/core/Direction;", shift = At.Shift.AFTER), cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD)
     private static void canaryExtract(Level world, Hopper to, CallbackInfoReturnable<Boolean> cir) {
