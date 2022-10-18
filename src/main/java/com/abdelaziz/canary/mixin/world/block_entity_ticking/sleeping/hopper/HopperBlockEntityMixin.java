@@ -4,17 +4,16 @@ import com.abdelaziz.canary.common.block.entity.SleepingBlockEntity;
 import com.abdelaziz.canary.mixin.world.block_entity_ticking.sleeping.WrappedBlockEntityTickInvokerAccessor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.HopperBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import net.minecraft.world.level.block.entity.TickingBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -57,23 +56,14 @@ public class HopperBlockEntityMixin extends BlockEntity implements SleepingBlock
         super(type, pos, state);
     }
 
-    @SuppressWarnings("InvalidInjectorMethodSignature" )
-    @ModifyVariable(
-            method = "tryMoveItems",
-            at = @At(value = "JUMP", opcode = Opcodes.IFEQ, ordinal = 2),
-            argsOnly = true
-    )
-    private static BooleanSupplier rememberBranch(BooleanSupplier booleanSupplier) {
-        return null;
-    }
-
     @Inject(
             method = "tryMoveItems",
             at = @At(value = "RETURN", ordinal = 2)
     )
-    private static void sleepIfBranchNotRemembered(Level world, BlockPos pos, BlockState state, HopperBlockEntity blockEntity, BooleanSupplier booleanSupplier, CallbackInfoReturnable<Boolean> cir) {
-        if (booleanSupplier != null && !((HopperBlockEntityMixin) (Object) blockEntity).isOnCooldown()) {
-            //When this code is reached, rememberBranch(BooleanSupplier) wasn't reached. Therefore the hopper is locked and not on cooldown.
+    private static void sleepIfNoCooldownAndLocked(Level world, BlockPos pos, BlockState state, HopperBlockEntity blockEntity, BooleanSupplier booleanSupplier, CallbackInfoReturnable<Boolean> cir) {
+        if (!((HopperBlockEntityMixin) (Object) blockEntity).isOnCooldown() &&
+                !((HopperBlockEntityMixin) (Object) blockEntity).isSleeping() &&
+                !state.getValue(HopperBlock.ENABLED)) {
             ((HopperBlockEntityMixin) (Object) blockEntity).startSleeping();
         }
     }
