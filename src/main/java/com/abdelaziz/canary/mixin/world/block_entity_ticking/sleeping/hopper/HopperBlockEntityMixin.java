@@ -2,13 +2,13 @@ package com.abdelaziz.canary.mixin.world.block_entity_ticking.sleeping.hopper;
 
 import com.abdelaziz.canary.common.block.entity.SleepingBlockEntity;
 import com.abdelaziz.canary.mixin.world.block_entity_ticking.sleeping.WrappedBlockEntityTickInvokerAccessor;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.block.entity.HopperBlockEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.BlockEntityTickInvoker;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.HopperBlockEntity;
+import net.minecraft.world.level.block.entity.TickingBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -24,13 +24,13 @@ import java.util.function.BooleanSupplier;
 public class HopperBlockEntityMixin extends BlockEntity implements SleepingBlockEntity {
 
     @Shadow
-    private long lastTickTime;
+    private long tickedGameTime;
 
     @Shadow
-    private native boolean needsCooldown();
+    private native boolean isOnCooldown();
 
     private WrappedBlockEntityTickInvokerAccessor tickWrapper = null;
-    private BlockEntityTickInvoker sleepingTicker = null;
+    private TickingBlockEntity sleepingTicker = null;
 
     @Override
     public WrappedBlockEntityTickInvokerAccessor getTickWrapper() {
@@ -44,12 +44,12 @@ public class HopperBlockEntityMixin extends BlockEntity implements SleepingBlock
     }
 
     @Override
-    public BlockEntityTickInvoker getSleepingTicker() {
+    public TickingBlockEntity getSleepingTicker() {
         return sleepingTicker;
     }
 
     @Override
-    public void setSleepingTicker(BlockEntityTickInvoker sleepingTicker) {
+    public void setSleepingTicker(TickingBlockEntity sleepingTicker) {
         this.sleepingTicker = sleepingTicker;
     }
 
@@ -59,7 +59,7 @@ public class HopperBlockEntityMixin extends BlockEntity implements SleepingBlock
 
     @SuppressWarnings("InvalidInjectorMethodSignature" )
     @ModifyVariable(
-            method = "insertAndExtract",
+            method = "tryMoveItems",
             at = @At(value = "JUMP", opcode = Opcodes.IFEQ, ordinal = 2),
             argsOnly = true
     )
@@ -68,11 +68,11 @@ public class HopperBlockEntityMixin extends BlockEntity implements SleepingBlock
     }
 
     @Inject(
-            method = "insertAndExtract",
+            method = "tryMoveItems",
             at = @At(value = "RETURN", ordinal = 2)
     )
-    private static void sleepIfBranchNotRemembered(World world, BlockPos pos, BlockState state, HopperBlockEntity blockEntity, BooleanSupplier booleanSupplier, CallbackInfoReturnable<Boolean> cir) {
-        if (booleanSupplier != null && !((HopperBlockEntityMixin) (Object) blockEntity).needsCooldown()) {
+    private static void sleepIfBranchNotRemembered(Level world, BlockPos pos, BlockState state, HopperBlockEntity blockEntity, BooleanSupplier booleanSupplier, CallbackInfoReturnable<Boolean> cir) {
+        if (booleanSupplier != null && !((HopperBlockEntityMixin) (Object) blockEntity).isOnCooldown()) {
             //When this code is reached, rememberBranch(BooleanSupplier) wasn't reached. Therefore the hopper is locked and not on cooldown.
             ((HopperBlockEntityMixin) (Object) blockEntity).startSleeping();
         }
@@ -86,25 +86,25 @@ public class HopperBlockEntityMixin extends BlockEntity implements SleepingBlock
 
         WrappedBlockEntityTickInvokerAccessor tickWrapper = this.getTickWrapper();
         if (tickWrapper != null) {
-            this.setSleepingTicker(tickWrapper.getWrapped());
-            tickWrapper.callSetWrapped(SleepingBlockEntity.SLEEPING_BLOCK_ENTITY_TICKER);
+            this.setSleepingTicker(tickWrapper.getTicker());
+            tickWrapper.callRebind(SleepingBlockEntity.SLEEPING_BLOCK_ENTITY_TICKER);
 
             // Set the last tick time to max value, so other hoppers transferring into this hopper will set it to 7gt
             // cooldown. Then when waking up, we make sure to not tick this hopper in the same gametick.
             // This makes the observable hopper cooldown not be different from vanilla.
-            this.lastTickTime = Long.MAX_VALUE;
+            this.tickedGameTime = Long.MAX_VALUE;
             return true;
         }
         return false;
     }
 
     @Inject(
-            method = "setTransferCooldown",
+            method = "setCooldown",
             at = @At("HEAD" )
     )
     private void wakeUpOnCooldownSet(int transferCooldown, CallbackInfo ci) {
         if (transferCooldown == 7) {
-            if (this.lastTickTime == Long.MAX_VALUE) {
+            if (this.tickedGameTime == Long.MAX_VALUE) {
                 this.sleepOnlyCurrentTick();
             } else {
                 this.wakeUpNow();

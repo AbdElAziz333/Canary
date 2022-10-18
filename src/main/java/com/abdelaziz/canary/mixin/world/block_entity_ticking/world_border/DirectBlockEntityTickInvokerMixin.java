@@ -1,26 +1,25 @@
 package com.abdelaziz.canary.mixin.world.block_entity_ticking.world_border;
 
 import com.abdelaziz.canary.common.world.listeners.WorldBorderListenerOnce;
-import net.minecraft.server.world.ChunkHolder;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
-import net.minecraft.world.border.WorldBorder;
-import net.minecraft.world.border.WorldBorderStage;
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ChunkHolder;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.border.WorldBorder;
+import net.minecraft.world.level.chunk.LevelChunk;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(targets = "net.minecraft.world.chunk.WorldChunk$DirectBlockEntityTickInvoker")
+@Mixin(targets = "net.minecraft.world.level.chunk.LevelChunk.BoundTickingBlockEntity")
 public abstract class DirectBlockEntityTickInvokerMixin implements WorldBorderListenerOnce {
 
     @Shadow
     @Final
-    WorldChunk worldChunk;
+    LevelChunk worldChunk;
 
     @Shadow
     public abstract BlockPos getPos();
@@ -34,10 +33,10 @@ public abstract class DirectBlockEntityTickInvokerMixin implements WorldBorderLi
                     target = "Lnet/minecraft/world/chunk/WorldChunk;canTickBlockEntity(Lnet/minecraft/util/math/BlockPos;)Z"
             )
     )
-    private boolean cachedCanTickBlockEntity(WorldChunk instance, BlockPos pos) {
+    private boolean cachedCanTickBlockEntity(LevelChunk instance, BlockPos pos) {
         if (this.isInsideWorldBorder()) {
-            World world = this.worldChunk.getWorld();
-            if (world instanceof ServerWorld serverWorld) {
+            Level world = this.worldChunk.getLevel();
+            if (world instanceof ServerLevel serverWorld) {
                 return this.worldChunk.getLevelType().isAfter(ChunkHolder.LevelType.TICKING) && serverWorld.isChunkLoaded(ChunkPos.toLong(pos));
             }
             return true;
@@ -55,12 +54,12 @@ public abstract class DirectBlockEntityTickInvokerMixin implements WorldBorderLi
         if ((worldBorderState & 3) == 3) {
             return (worldBorderState & 4) != 0;
         }
-        return this.worldChunk.getWorld().getWorldBorder().contains(this.getPos());
+        return this.worldChunk.getLevel().getWorldBorder().contains(this.getPos());
     }
 
     private void startWorldBorderCaching() {
         this.worldBorderState = (byte) 1;
-        WorldBorder worldBorder = this.worldChunk.getWorld().getWorldBorder();
+        WorldBorder worldBorder = this.worldChunk.getLevel().getWorldBorder();
         worldBorder.addListener(this);
         boolean isStationary = worldBorder.getStage() == WorldBorderStage.STATIONARY;
         if (worldBorder.contains(this.getPos())) {

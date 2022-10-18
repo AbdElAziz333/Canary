@@ -1,15 +1,15 @@
 package com.abdelaziz.canary.mixin.world.block_entity_ticking.sleeping;
 
-import net.minecraft.world.chunk.BlockEntityTickInvoker;
+import net.minecraft.world.level.block.entity.TickingBlockEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
-@Mixin(targets = "net/minecraft/world/chunk/WorldChunk$WrappedBlockEntityTickInvoker" )
+@Mixin(targets = "net/minecraft/world/level/chunk/LevelChunk$RebindableTickingBlockEntityWrapper" )
 public interface WrappedBlockEntityTickInvokerAccessor {
     @Invoker
-    void callSetWrapped(BlockEntityTickInvoker wrapped);
+    void callRebind(TickingBlockEntity wrapped);
 
     @Accessor
-    BlockEntityTickInvoker getWrapped();
+    TickingBlockEntity getTicker();
 }

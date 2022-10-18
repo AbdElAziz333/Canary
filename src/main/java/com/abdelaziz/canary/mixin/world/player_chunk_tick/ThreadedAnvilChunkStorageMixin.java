@@ -2,77 +2,73 @@ package com.abdelaziz.canary.mixin.world.player_chunk_tick;
 
 import com.abdelaziz.canary.common.util.Pos;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import net.minecraft.network.packet.s2c.play.ChunkDataS2CPacket;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ChunkHolder;
-import net.minecraft.server.world.PlayerChunkWatchingManager;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.server.world.ThreadedAnvilChunkStorage;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.ChunkSectionPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.core.SectionPos;
+import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
+import net.minecraft.server.level.*;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.chunk.LevelChunk;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
-import static net.minecraft.server.world.ThreadedAnvilChunkStorage.isWithinDistance;
+import static net.minecraft.server.level.ChunkMap.isChunkInRange;
 
-@Mixin(ThreadedAnvilChunkStorage.class)
+@Mixin(ChunkMap.class)
 public abstract class ThreadedAnvilChunkStorageMixin {
     @Shadow
-    protected abstract void sendChunkDataPackets(ServerPlayerEntity player, MutableObject<ChunkDataS2CPacket> cachedDataPacket, WorldChunk chunk);
+    protected abstract void playerLoadedChunk(ServerPlayer player, MutableObject<ClientboundLevelChunkWithLightPacket> cachedDataPacket, LevelChunk chunk);
 
     @Shadow
-    protected abstract ChunkSectionPos updateWatchedSection(ServerPlayerEntity player);
+    protected abstract SectionPos updatePlayerPos(ServerPlayer player);
 
     /**
      * @author JellySquid
      * @reason Defer sending chunks to the player so that we can batch them together
      */
     @Overwrite
-    public void updatePosition(ServerPlayerEntity player) {
-        for (ThreadedAnvilChunkStorage.EntityTracker tracker : this.entityTrackers.values()) {
+    public void move(ServerPlayer player) {
+        for (ChunkMap.TrackedEntity tracker : this.entityMap.values()) {
             if (tracker.entity == player) {
-                tracker.updateTrackedStatus(this.world.getPlayers());
+                tracker.updatePlayers(this.level.players());
             } else {
-                tracker.updateTrackedStatus(player);
+                tracker.updatePlayer(player);
             }
         }
 
-        ChunkSectionPos oldPos = player.getWatchedSection();
-        ChunkSectionPos newPos = ChunkSectionPos.from(player);
+        SectionPos oldPos = player.getLastSectionPos();
+        SectionPos newPos = SectionPos.of(player);
 
-        boolean isWatchingWorld = this.playerChunkWatchingManager.isWatchDisabled(player);
-        boolean doesNotGenerateChunks = this.doesNotGenerateChunks(player);
+        boolean isWatchingWorld = this.playerMap.ignored(player);
+        boolean doesNotGenerateChunks = this.skipPlayer(player);
         boolean movedSections = !newPos.equals(oldPos);
 
         if (movedSections || isWatchingWorld != doesNotGenerateChunks) {
             // Notify the client that the chunk map origin has changed. This must happen before any chunk payloads are sent.
-            this.updateWatchedSection(player);
+            this.updatePlayerPos(player);
 
             if (!isWatchingWorld) {
-                this.ticketManager.handleChunkLeave(oldPos, player);
+                this.distanceManager.removePlayer(oldPos, player);
             }
 
             if (!doesNotGenerateChunks) {
-                this.ticketManager.handleChunkEnter(newPos, player);
+                this.distanceManager.addPlayer(newPos, player);
             }
 
             if (!isWatchingWorld && doesNotGenerateChunks) {
-                this.playerChunkWatchingManager.disableWatch(player);
+                this.playerMap.ignorePlayer(player);
             }
 
             if (isWatchingWorld && !doesNotGenerateChunks) {
-                this.playerChunkWatchingManager.enableWatch(player);
+                this.playerMap.unIgnorePlayer(player);
             }
 
-            long oldChunkPos = ChunkPos.toLong(oldPos.getX(), oldPos.getZ());
-            long newChunkPos = ChunkPos.toLong(newPos.getX(), newPos.getZ());
+            long oldChunkPos = ChunkPos.asLong(oldPos.getX(), oldPos.getZ());
+            long newChunkPos = ChunkPos.asLong(newPos.getX(), newPos.getZ());
 
-            this.playerChunkWatchingManager.movePlayer(oldChunkPos, newChunkPos, player);
+            this.playerMap.updatePlayer(oldChunkPos, newChunkPos, player);
         } else {
             // The player hasn't changed locations and isn't changing dimensions
             return;
@@ -80,19 +76,19 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 
         // We can only send chunks if the world matches. This hoists a check that
         // would otherwise be performed every time we try to send a chunk over.
-        if (player.world == this.world) {
+        if (player.level == this.level) {
             this.sendChunks(oldPos, player);
         }
     }
 
-    private void sendChunks(ChunkSectionPos oldPos, ServerPlayerEntity player) {
-        int newCenterX = Pos.ChunkCoord.fromBlockCoord(MathHelper.floor(player.getX()));
-        int newCenterZ = Pos.ChunkCoord.fromBlockCoord(MathHelper.floor(player.getZ()));
+    private void sendChunks(SectionPos oldPos, ServerPlayer player) {
+        int newCenterX = Pos.ChunkCoord.fromBlockCoord(Mth.floor(player.getX()));
+        int newCenterZ = Pos.ChunkCoord.fromBlockCoord(Mth.floor(player.getZ()));
 
-        int oldCenterX = oldPos.getSectionX();
-        int oldCenterZ = oldPos.getSectionZ();
+        int oldCenterX = oldPos.x();
+        int oldCenterZ = oldPos.z();
 
-        int watchRadius = this.watchDistance;
+        int watchRadius = this.viewDistance;
         int watchRadiusIncr = watchRadius + 1;
         int watchDiameter = watchRadius * 2;
 
@@ -104,8 +100,8 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 
             for (int x = minX; x <= maxX; x++) {
                 for (int z = minZ; z <= maxZ; z++) {
-                    boolean isWithinOldRadius = isWithinDistance(x, z, oldCenterX, oldCenterZ, watchRadius);
-                    boolean isWithinNewRadius = isWithinDistance(x, z, newCenterX, newCenterZ, watchRadius);
+                    boolean isWithinOldRadius = isChunkInRange(x, z, oldCenterX, oldCenterZ, watchRadius);
+                    boolean isWithinNewRadius = isChunkInRange(x, z, newCenterX, newCenterZ, watchRadius);
 
                     if (isWithinNewRadius && !isWithinOldRadius) {
                         this.startWatchingChunk(player, x, z);
@@ -119,7 +115,7 @@ public abstract class ThreadedAnvilChunkStorageMixin {
         } else {
             for (int x = oldCenterX - watchRadiusIncr; x <= oldCenterX + watchRadiusIncr; ++x) {
                 for (int z = oldCenterZ - watchRadiusIncr; z <= oldCenterZ + watchRadiusIncr; ++z) {
-                    if (isWithinDistance(x, z, oldCenterX, oldCenterZ, watchRadius)) {
+                    if (isChunkInRange(x, z, oldCenterX, oldCenterZ, watchRadius)) {
                         this.stopWatchingChunk(player, x, z);
                     }
                 }
@@ -127,7 +123,7 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 
             for (int x = newCenterX - watchRadiusIncr; x <= newCenterX + watchRadiusIncr; ++x) {
                 for (int z = newCenterZ - watchRadiusIncr; z <= newCenterZ + watchRadiusIncr; ++z) {
-                    if (isWithinDistance(x, z, newCenterX, newCenterZ, watchRadius)) {
+                    if (isChunkInRange(x, z, newCenterX, newCenterZ, watchRadius)) {
                         this.startWatchingChunk(player, x, z);
                     }
                 }
@@ -135,44 +131,44 @@ public abstract class ThreadedAnvilChunkStorageMixin {
         }
     }
 
-    protected void startWatchingChunk(ServerPlayerEntity player, int x, int z) {
-        ChunkHolder holder = this.getChunkHolder(ChunkPos.toLong(x, z));
+    protected void startWatchingChunk(ServerPlayer player, int x, int z) {
+        ChunkHolder holder = this.getVisibleChunkIfPresent(ChunkPos.asLong(x, z));
 
         if (holder != null) {
-            WorldChunk chunk = holder.getWorldChunk();
+            LevelChunk chunk = holder.getTickingChunk();
 
             if (chunk != null) {
-                this.sendChunkDataPackets(player, new MutableObject<>(), chunk);
+                this.playerLoadedChunk(player, new MutableObject<>(), chunk);
             }
         }
     }
 
-    protected void stopWatchingChunk(ServerPlayerEntity player, int x, int z) {
-        player.sendUnloadChunkPacket(new ChunkPos(x, z));
+    protected void stopWatchingChunk(ServerPlayer player, int x, int z) {
+        player.untrackChunk(new ChunkPos(x, z));
     }
 
     @Shadow
     @Final
-    private Int2ObjectMap<ThreadedAnvilChunkStorage.EntityTracker> entityTrackers;
+    private Int2ObjectMap<ChunkMap.TrackedEntity> entityMap;
 
     @Shadow
     @Final
-    ServerWorld world;
+    ServerLevel level;
 
     @Shadow
     @Final
-    private PlayerChunkWatchingManager playerChunkWatchingManager;
+    private PlayerMap playerMap;
 
     @Shadow
     @Final
-    private ThreadedAnvilChunkStorage.TicketManager ticketManager;
+    private ChunkMap.DistanceManager distanceManager;
 
     @Shadow
-    int watchDistance;
+    int viewDistance;
 
     @Shadow
-    protected abstract boolean doesNotGenerateChunks(ServerPlayerEntity player);
+    protected abstract boolean skipPlayer(ServerPlayer player);
 
     @Shadow
-    protected abstract ChunkHolder getChunkHolder(long pos);
+    protected abstract ChunkHolder getVisibleChunkIfPresent(long pos);
 }

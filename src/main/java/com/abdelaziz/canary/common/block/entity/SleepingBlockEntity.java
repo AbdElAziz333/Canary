@@ -1,13 +1,13 @@
 package com.abdelaziz.canary.common.block.entity;
 
 import com.abdelaziz.canary.mixin.world.block_entity_ticking.sleeping.WrappedBlockEntityTickInvokerAccessor;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.BlockEntityTickInvoker;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.TickingBlockEntity;
 
 public interface SleepingBlockEntity {
-    BlockEntityTickInvoker SLEEPING_BLOCK_ENTITY_TICKER = new BlockEntityTickInvoker() {
+    TickingBlockEntity SLEEPING_BLOCK_ENTITY_TICKER = new TickingBlockEntity() {
         public void tick() {
         }
 
@@ -19,8 +19,8 @@ public interface SleepingBlockEntity {
             return null;
         }
 
-        public String getName() {
-            return "<lithium_sleeping>";
+        public String getType() {
+            return "<canary_sleeping>";
         }
     };
 
@@ -28,9 +28,9 @@ public interface SleepingBlockEntity {
 
     void setTickWrapper(WrappedBlockEntityTickInvokerAccessor tickWrapper);
 
-    BlockEntityTickInvoker getSleepingTicker();
+    TickingBlockEntity getSleepingTicker();
 
-    void setSleepingTicker(BlockEntityTickInvoker sleepingTicker);
+    void setSleepingTicker(TickingBlockEntity sleepingTicker);
 
     default boolean startSleeping() {
         if (this.isSleeping()) {
@@ -41,24 +41,24 @@ public interface SleepingBlockEntity {
         if (tickWrapper == null) {
             return false;
         }
-        this.setSleepingTicker(tickWrapper.getWrapped());
-        tickWrapper.callSetWrapped(SleepingBlockEntity.SLEEPING_BLOCK_ENTITY_TICKER);
+        this.setSleepingTicker(tickWrapper.getTicker());
+        tickWrapper.callRebind(SleepingBlockEntity.SLEEPING_BLOCK_ENTITY_TICKER);
         return true;
     }
 
     default void sleepOnlyCurrentTick() {
-        BlockEntityTickInvoker sleepingTicker = this.getSleepingTicker();
+        TickingBlockEntity sleepingTicker = this.getSleepingTicker();
         WrappedBlockEntityTickInvokerAccessor tickWrapper = this.getTickWrapper();
         if (sleepingTicker == null) {
-            sleepingTicker = tickWrapper.getWrapped();
+            sleepingTicker = tickWrapper.getTicker();
         }
-        World world = ((BlockEntity) this).getWorld();
-        tickWrapper.callSetWrapped(new SleepUntilTimeBlockEntityTickInvoker((BlockEntity) this, world.getTime() + 1, sleepingTicker));
+        Level world = ((BlockEntity) this).getLevel();
+        tickWrapper.callRebind(new SleepUntilTimeBlockEntityTickInvoker((BlockEntity) this, world.getGameTime() + 1, sleepingTicker));
         this.setSleepingTicker(null);
     }
 
     default void wakeUpNow() {
-        BlockEntityTickInvoker sleepingTicker = this.getSleepingTicker();
+        TickingBlockEntity sleepingTicker = this.getSleepingTicker();
         if (sleepingTicker == null) {
             return;
         }
@@ -66,12 +66,12 @@ public interface SleepingBlockEntity {
         this.setSleepingTicker(null);
     }
 
-    default void setTicker(BlockEntityTickInvoker delegate) {
+    default void setTicker(TickingBlockEntity delegate) {
         WrappedBlockEntityTickInvokerAccessor tickWrapper = this.getTickWrapper();
         if (tickWrapper == null) {
             return;
         }
-        tickWrapper.callSetWrapped(delegate);
+        tickWrapper.callRebind(delegate);
     }
 
     default boolean isSleeping() {
