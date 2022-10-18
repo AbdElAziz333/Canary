@@ -27,7 +27,7 @@ public abstract class AbstractBlockStateMixin implements BlockStatePathingCache 
         SingleBlockBlockView blockView = SingleBlockBlockView.of(state, BlockPos.ZERO);
         try {
             this.pathNodeType = Validate.notNull(WalkNodeEvaluator.getBlockPathTypeRaw(blockView, BlockPos.ZERO));
-        } catch (SingleBlockBlockView.SingleBlockViewException e) {
+        } catch (SingleBlockBlockView.SingleBlockViewException | ClassCastException e) {
             //This is usually hit by shulker boxes, as their hitbox depends on the block entity, and the node type depends on the hitbox
             this.pathNodeType = null;
         }
@@ -37,7 +37,7 @@ public abstract class AbstractBlockStateMixin implements BlockStatePathingCache 
             if (this.pathNodeTypeNeighbor == null) {
                 this.pathNodeTypeNeighbor = BlockPathTypes.OPEN;
             }
-        } catch (SingleBlockBlockView.SingleBlockViewException e) {
+        } catch (SingleBlockBlockView.SingleBlockViewException | ClassCastException e) {
             this.pathNodeTypeNeighbor = null;
         }
     }
