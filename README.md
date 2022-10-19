@@ -5,7 +5,6 @@
 ![Github License](https://img.shields.io/github/license/AbdElAziz333/Canary)
 ![Github Issues](https://img.shields.io/github/issues/AbdElAziz333/Canary)
 ![Curseforge Downloads](https://cf.way2muchnoise.eu/665658.svg)
-[![Architectury Forge Loom](https://img.shields.io/badge/Built%20With-Architectury%20Forge%20Loom-aqua)](https://github.com/architectury/architectury-loom)
 [![This is a Fork](https://img.shields.io/badge/This%20is%20port-Support%20the%20original!-darkmagenta)](https://github.com/CaffeineMC/lithium-fabric)
 
 Canary is a general-purpose optimization mod and unofficial fork of the Fabric mod [Lithium](https://github.com/CaffeineMC/lithium-fabric) for Minecraft, this mod aims to optimize many areas of the game in order to provide better overall performance. It works on both the **client and server**, and **doesn't require the mod to be installed on both sides**.
@@ -38,4 +37,4 @@ Canary is licensed under GNU LGPLv3, a free and open-source license. For more in
 [license file](LICENSE.txt).
 
 ### Issues and Feature Requests
-If you'd like to get help with the mod, feel free to open an issue here on GitHub, and if you want to propose new features or otherwise contribute to the mod, we will gladly accept pull requests, as well!
+If you'd like to get help with the mod, feel free to open an issue here on GitHub, and if you want to propose new features or otherwise contribute to the mod, i will gladly accept pull requests, as well!
