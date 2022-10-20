@@ -15,7 +15,7 @@ plugins {
 apply plugin: 'org.spongepowered.mixin'
 
 group = 'com.abdelaziz.canary'
-version = '0.0.5'
+version = '0.0.6'
 
 java {
     archivesBaseName = 'canary-mc1.19.2'
