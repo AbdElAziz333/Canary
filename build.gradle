@@ -102,7 +102,14 @@ mixin {
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
-repositories {}
+repositories {
+    maven {
+        url "https://cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
+    }
+}
 
 dependencies {
     minecraft 'net.minecraftforge:forge:1.19.2-43.1.39'
