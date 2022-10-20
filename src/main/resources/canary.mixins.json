@@ -18,7 +18,6 @@
     "ai.nearby_entity_tracking.goals.FleeEntityGoalMixin",
     "ai.nearby_entity_tracking.goals.LookAtEntityGoalMixin",
     "ai.pathing.AbstractBlockStateMixin",
-    "ai.pathing.BirdPathNodeMakerMixin",
     "ai.pathing.ChunkCacheMixin",
     "ai.pathing.LandPathNodeMakerMixin",
     "ai.poi.PointOfInterestSetMixin",
