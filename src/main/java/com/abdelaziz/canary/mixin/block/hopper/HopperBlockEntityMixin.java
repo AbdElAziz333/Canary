@@ -92,9 +92,6 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
     private long extractInventoryEntityFailedSearchTime;
 
     @Shadow
-    private static native boolean ejectItems(World world, BlockPos pos, BlockState state, HopperBlockEntity inventory);
-
-    @Shadow
     private static native boolean canExtract(Inventory inv, ItemStack stack, int slot, Direction facing);
 
     private long insertInventoryEntityFailedSearchTime;
