@@ -1,21 +1,17 @@
 package com.abdelaziz.canary.mixin.ai.pathing;
 
 import com.abdelaziz.canary.common.ai.pathing.PathNodeCache;
-import com.abdelaziz.canary.common.util.Pos;
-import com.abdelaziz.canary.common.world.WorldHelper;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.ai.pathing.LandPathNodeMaker;
-import net.minecraft.entity.ai.pathing.NavigationType;
 import net.minecraft.entity.ai.pathing.PathNodeType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
-import net.minecraft.world.CollisionView;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.ChunkSection;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 /**
  * Determining the type of node offered by a block state is a very slow operation due to the nasty chain of tag,
@@ -26,113 +22,62 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(LandPathNodeMaker.class)
 public abstract class LandPathNodeMakerMixin {
     /**
+     * This mixin requires a priority < 1000 due to fabric api using 1000 and we need to inject before them.
+     *
      * @reason Use optimized implementation
-     * @author JellySquid
+     * @author JellySquid, 2No2Name
      */
-    @Inject(method = "getCommonNodeType", at = @At("HEAD"), cancellable = true)
-    private static void getCommonNodeType(BlockView blockView, BlockPos blockPos, CallbackInfoReturnable<PathNodeType> cir) {
-        BlockState blockState = blockView.getBlockState(blockPos);
+    @SuppressWarnings("InvalidInjectorMethodSignature")
+    @Inject(method = "getCommonNodeType",
+            at = @At(
+                    value = "INVOKE_ASSIGN",
+                    target = "Lnet/minecraft/world/BlockView;getBlockState(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/BlockState;",
+                    shift = At.Shift.AFTER
+            ),
+            cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD
+    )
+    private static void getLithiumCachedCommonNodeType(BlockView world, BlockPos pos, CallbackInfoReturnable<PathNodeType> cir, BlockState blockState) {
         PathNodeType type = PathNodeCache.getPathNodeType(blockState);
-
-        // If the node type is open, it means that we were unable to determine a more specific type, so we need
-        // to check the fallback path.
-        if (type == PathNodeType.OPEN || type == PathNodeType.WATER) {
-            // This is only ever called in vanilla after all other possibilities are exhausted, but before fluid checks
-            // It should be safe to perform it last in actuality and take advantage of the cache for fluid types as well
-            // since fluids will always pass this check.
-            if (!blockState.canPathfindThrough(blockView, blockPos, NavigationType.LAND)) {
-                cir.setReturnValue(PathNodeType.BLOCKED);
-                return;
-            }
-
-            // All checks succeed, this path node really is open!
+        if (type != null) {
             cir.setReturnValue(type);
-            return;
         }
+    }
 
-        // Return the cached value since we found an obstacle earlier
-        cir.setReturnValue(type);
+    /**
+     * Modify the method to allow it to just return the behavior of a single block instead of scanning its neighbors.
+     * This technique might seem odd, but it allows us to be very mod and fabric-api compatible.
+     * If the function is called with usual inputs (nodeType != null), it behaves normally.
+     * If the function is called with nodeType == null, only the passed position is checked for its neighbor behavior.
+     * <p>
+     * This allows Lithium to call this function to initialize its caches. It also allows using this function as fallback
+     * for dynamic blocks (shulker boxes and fabric-api dynamic definitions)
+     *
+     * @author 2No2Name
+     */
+    @Inject(
+            method = "getNodeTypeFromNeighbors", locals = LocalCapture.CAPTURE_FAILHARD,
+            at = @At(
+                    value = "INVOKE", shift = At.Shift.AFTER,
+                    target = "Lnet/minecraft/util/math/BlockPos$Mutable;set(III)Lnet/minecraft/util/math/BlockPos$Mutable;"
+            ),
+            cancellable = true
+    )
+    private static void doNotChangePositionIfLithiumSinglePosCall(BlockView world, BlockPos.Mutable pos, PathNodeType nodeType, CallbackInfoReturnable<PathNodeType> cir, int posX, int posY, int posZ, int dX, int dY, int dZ) {
+        if (nodeType == null) {
+            if (dX == -1 && dY == -1 && dZ == -1) {
+                pos.set(posX, posY, posZ);
+            } else {
+                cir.setReturnValue(null);
+            }
+        }
     }
 
     /**
      * @reason Use optimized implementation which avoids scanning blocks for dangers where possible
-     * @author JellySquid
+     * @author JellySquid, 2No2Name
      */
-    @Inject(method = "getNodeTypeFromNeighbors", at = @At("HEAD"), cancellable = true)
-    private static void getNodeTypeFromNeighbors(BlockView world, BlockPos.Mutable pos, PathNodeType type, CallbackInfoReturnable<PathNodeType> cir) {
-        int x = pos.getX();
-        int y = pos.getY();
-        int z = pos.getZ();
-
-        ChunkSection section = null;
-
-        // Check that all the block's neighbors are within the same chunk column. If so, we can isolate all our block
-        // reads to just one chunk and avoid hits against the server chunk manager.
-        if (world instanceof CollisionView && WorldHelper.areNeighborsWithinSameChunk(pos)) {
-            // If the y-coordinate is within bounds, we can cache the chunk section. Otherwise, the if statement to check
-            // if the cached chunk section was initialized will early-exit.
-            if (!world.isOutOfHeightLimit(y)) {
-                // This cast is always safe and is necessary to obtain direct references to chunk sections.
-                Chunk chunk = (Chunk) ((CollisionView) world).getChunkAsView(Pos.ChunkCoord.fromBlockCoord(x), Pos.ChunkCoord.fromBlockCoord(z));
-
-                // If the chunk is absent, the cached section above will remain null, as there is no chunk section anyways.
-                // An empty chunk or section will never pose any danger sources, which will be caught later.
-                if (chunk != null) {
-                    section = chunk.getSectionArray()[Pos.SectionYIndex.fromBlockCoord(world, y)];
-                }
-            }
-
-            // If we can guarantee that blocks won't be modified while the cache is active, try to see if the chunk
-            // section is empty or contains any dangerous blocks within the palette. If not, we can assume any checks
-            // against this chunk section will always fail, allowing us to fast-exit.
-            if (section == null || PathNodeCache.isSectionSafeAsNeighbor(section)) {
-                cir.setReturnValue(type);
-                return;
-            }
-        }
-
-        int xStart = x - 1;
-        int yStart = y - 1;
-        int zStart = z - 1;
-
-        int xEnd = x + 1;
-        int yEnd = y + 1;
-        int zEnd = z + 1;
-
-        // Vanilla iteration order is XYZ
-        for (int adjX = xStart; adjX <= xEnd; adjX++) {
-            for (int adjY = yStart; adjY <= yEnd; adjY++) {
-                for (int adjZ = zStart; adjZ <= zEnd; adjZ++) {
-                    // Skip the vertical column of the origin block
-                    if (adjX == x && adjZ == z) {
-                        continue;
-                    }
-
-                    BlockState state;
-
-                    // If we're not accessing blocks outside a given section, we can greatly accelerate block state
-                    // retrieval by calling upon the cached chunk directly.
-                    if (section != null) {
-                        state = section.getBlockState(adjX & 15, adjY & 15, adjZ & 15);
-                    } else {
-                        state = world.getBlockState(pos.set(adjX, adjY, adjZ));
-                    }
-
-                    // Ensure that the block isn't air first to avoid expensive hash table accesses
-                    if (state.isAir()) {
-                        continue;
-                    }
-
-                    PathNodeType neighborType = PathNodeCache.getNeighborPathNodeType(state);
-
-                    if (neighborType != PathNodeType.OPEN) {
-                        cir.setReturnValue(neighborType);
-                        return;
-                    }
-                }
-            }
-        }
-
-        cir.setReturnValue(type);
+    @Redirect(method = "getLandNodeType", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/ai/pathing/LandPathNodeMaker;getNodeTypeFromNeighbors(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos$Mutable;Lnet/minecraft/entity/ai/pathing/PathNodeType;)Lnet/minecraft/entity/ai/pathing/PathNodeType;"))
+    private static PathNodeType getNodeTypeFromNeighbors(BlockView world, BlockPos.Mutable pos, PathNodeType type) {
+        return PathNodeCache.getNodeTypeFromNeighbors(world, pos, type);
     }
 }
