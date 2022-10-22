@@ -342,7 +342,7 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
             ),
             ordinal = 1
     )
-    private static Inventory getLithiumOutputInventory(Inventory inventory, World world, BlockPos pos, BlockState hopperState, Inventory hopper) {
+    private static Inventory getCanaryOutputInventory(Inventory inventory, World world, BlockPos pos, BlockState hopperState, Inventory hopper) {
         HopperBlockEntityMixin hopperBlockEntity = (HopperBlockEntityMixin) hopper;
         return hopperBlockEntity.getInsertInventory(world, hopperState);
     }
