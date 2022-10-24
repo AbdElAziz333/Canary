@@ -1,7 +1,7 @@
 package com.abdelaziz.canary.mixin.chunk.serialization;
 
 import com.abdelaziz.canary.common.world.chunk.CompactingPackedIntegerArray;
-import com.abdelaziz.canary.common.world.chunk.LithiumHashPalette;
+import com.abdelaziz.canary.common.world.chunk.CanaryHashPalette;
 import net.minecraft.util.collection.EmptyPaletteStorage;
 import net.minecraft.util.collection.IndexedIterable;
 import net.minecraft.util.collection.PackedIntegerArray;
@@ -63,7 +63,7 @@ public abstract class PalettedContainerMixin<T> {
         this.lock();
 
         // The palette that will be serialized
-        LithiumHashPalette<T> hashPalette = null;
+        CanaryHashPalette<T> hashPalette = null;
         Optional<LongStream> data = Optional.empty();
         List<T> elements = null;
 
@@ -72,12 +72,12 @@ public abstract class PalettedContainerMixin<T> {
         if (storage instanceof EmptyPaletteStorage || palette.getSize() == 1) {
             // If the palette only contains one entry, don't attempt to repack it.
             elements = List.of(palette.get(0));
-        } else if (palette instanceof LithiumHashPalette<T> lithiumHashPalette) {
-            hashPalette = lithiumHashPalette;
+        } else if (palette instanceof CanaryHashPalette<T> canaryHashPalette) {
+            hashPalette = canaryHashPalette;
         }
 
         if (elements == null) {
-            LithiumHashPalette<T> compactedPalette = new LithiumHashPalette<>(idList, storage.getElementBits(), this.dummyListener);
+            CanaryHashPalette<T> compactedPalette = new CanaryHashPalette<>(idList, storage.getElementBits(), this.dummyListener);
             short[] array = this.getOrCreate(provider.getContainerSize());
 
             ((CompactingPackedIntegerArray) storage).compact(this.data.palette(), compactedPalette, array);

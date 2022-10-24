@@ -17,9 +17,9 @@ import static it.unimi.dsi.fastutil.Hash.FAST_LOAD_FACTOR;
 
 /**
  * Generally provides better performance over the vanilla {@link net.minecraft.world.chunk.BiMapPalette} when calling
- * {@link LithiumHashPalette#index(Object)} through using a faster backing map and reducing pointer chasing.
+ * {@link CanaryHashPalette#index(Object)} through using a faster backing map and reducing pointer chasing.
  */
-public class LithiumHashPalette<T> implements Palette<T> {
+public class CanaryHashPalette<T> implements Palette<T> {
     private static final int ABSENT_VALUE = -1;
 
     private final IndexedIterable<T> idList;
@@ -30,7 +30,7 @@ public class LithiumHashPalette<T> implements Palette<T> {
     private T[] entries;
     private int size = 0;
 
-    public LithiumHashPalette(IndexedIterable<T> idList, PaletteResizeListener<T> resizeHandler, int indexBits, T[] entries, Reference2IntMap<T> table, int size) {
+    public CanaryHashPalette(IndexedIterable<T> idList, PaletteResizeListener<T> resizeHandler, int indexBits, T[] entries, Reference2IntMap<T> table, int size) {
         this.idList = idList;
         this.resizeHandler = resizeHandler;
         this.indexBits = indexBits;
@@ -39,7 +39,7 @@ public class LithiumHashPalette<T> implements Palette<T> {
         this.size = size;
     }
 
-    public LithiumHashPalette(IndexedIterable<T> idList, int bits, PaletteResizeListener<T> resizeHandler, List<T> list) {
+    public CanaryHashPalette(IndexedIterable<T> idList, int bits, PaletteResizeListener<T> resizeHandler, List<T> list) {
         this(idList, bits, resizeHandler);
 
         for (T t : list) {
@@ -48,7 +48,7 @@ public class LithiumHashPalette<T> implements Palette<T> {
     }
 
     @SuppressWarnings("unchecked")
-    public LithiumHashPalette(IndexedIterable<T> idList, int bits, PaletteResizeListener<T> resizeHandler) {
+    public CanaryHashPalette(IndexedIterable<T> idList, int bits, PaletteResizeListener<T> resizeHandler) {
         this.idList = idList;
         this.indexBits = bits;
         this.resizeHandler = resizeHandler;
@@ -61,7 +61,7 @@ public class LithiumHashPalette<T> implements Palette<T> {
     }
 
     public static <A> Palette<A> create(int bits, IndexedIterable<A> idList, PaletteResizeListener<A> listener, List<A> list) {
-        return new LithiumHashPalette<>(idList, bits, listener, list);
+        return new CanaryHashPalette<>(idList, bits, listener, list);
     }
 
     @Override
@@ -158,7 +158,7 @@ public class LithiumHashPalette<T> implements Palette<T> {
 
     @Override
     public Palette<T> copy() {
-        return new LithiumHashPalette<>(this.idList, this.resizeHandler, this.indexBits, this.entries.clone(), new Reference2IntOpenHashMap<>(this.table), this.size);
+        return new CanaryHashPalette<>(this.idList, this.resizeHandler, this.indexBits, this.entries.clone(), new Reference2IntOpenHashMap<>(this.table), this.size);
     }
 
     private void clear() {
