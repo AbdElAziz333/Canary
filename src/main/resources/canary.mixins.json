@@ -14,6 +14,7 @@
     "ai.nearby_entity_tracking.EntitySectionStorageMixin",
     "ai.nearby_entity_tracking.PersistentEntitySectionManagerAccessor",
     "ai.nearby_entity_tracking.PersistentEntitySectionManagerCallbackMixin",
+    "ai.nearby_entity_tracking.PersistentEntitySectionManagerMixin",
     "ai.nearby_entity_tracking.ServerLevelAccessor",
     "ai.nearby_entity_tracking.goals.AvoidEntityGoalMixin",
     "ai.nearby_entity_tracking.goals.LookAtPlayerGoalMixin",
