@@ -38,7 +38,7 @@ public class BehaviorMixin<E extends LivingEntity> {
      * @author 2No2Name
      */
     @Overwrite
-    public boolean hasRequiredMemories(E entity) {
+    private boolean hasRequiredMemories(E entity) {
         Brain<?> brain = entity.getBrain();
         long modCount = ((MemoryModificationCounter) brain).getModCount();
         if (this.cachedMemoryModCount == modCount) {

@@ -1,9 +1,9 @@
 package com.abdelaziz.canary.common.entity.tracker.nearby;
 
 import com.abdelaziz.canary.common.util.tuples.WorldSectionBox;
-import com.abdelaziz.canary.mixin.ai.nearby_entity_tracking.ServerEntityManagerAccessor;
-import com.abdelaziz.canary.mixin.ai.nearby_entity_tracking.ServerWorldAccessor;
-import com.abdelaziz.canary.mixin.block.hopper.EntityTrackingSectionAccessor;
+import com.abdelaziz.canary.mixin.ai.nearby_entity_tracking.PersistentEntitySectionManagerAccessor;
+import com.abdelaziz.canary.mixin.ai.nearby_entity_tracking.ServerLevelAccessor;
+import com.abdelaziz.canary.mixin.block.hopper.EntitySectionAccessor;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.ClassInstanceMultiMap;
 import net.minecraft.world.entity.Entity;
@@ -19,7 +19,7 @@ public class SectionedInventoryEntityMovementTracker<S> extends SectionedEntityM
     }
 
     public static <S> SectionedInventoryEntityMovementTracker<S> registerAt(ServerLevel world, AABB interactionArea, Class<S> clazz) {
-        MovementTrackerCache cache = (MovementTrackerCache) ((ServerEntityManagerAccessor<?>) ((ServerWorldAccessor) world).getEntityManager()).getSectionStorage();
+        MovementTrackerCache cache = (MovementTrackerCache) ((PersistentEntitySectionManagerAccessor<?>) ((ServerLevelAccessor) world).getEntityManager()).getSectionStorage();
 
         WorldSectionBox worldSectionBox = WorldSectionBox.entityAccessBox(world, interactionArea);
         SectionedInventoryEntityMovementTracker<S> tracker = new SectionedInventoryEntityMovementTracker<>(worldSectionBox, clazz);
@@ -34,7 +34,7 @@ public class SectionedInventoryEntityMovementTracker<S> extends SectionedEntityM
         for (int i = 0; i < this.sortedSections.size(); i++) {
             if (this.sectionVisible[i]) {
                 //noinspection unchecked
-                ClassInstanceMultiMap<S> collection = ((EntityTrackingSectionAccessor<S>) this.sortedSections.get(i)).getStorage();
+                ClassInstanceMultiMap<S> collection = ((EntitySectionAccessor<S>) this.sortedSections.get(i)).getStorage();
 
                 for (S entity : collection.find(this.clazz)) {
                     Entity inventoryEntity = (Entity) entity;

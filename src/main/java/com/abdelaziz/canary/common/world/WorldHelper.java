@@ -4,10 +4,10 @@ import com.abdelaziz.canary.common.client.ClientWorldAccessor;
 import com.abdelaziz.canary.common.entity.EntityClassGroup;
 import com.abdelaziz.canary.common.entity.pushable.EntityPushablePredicate;
 import com.abdelaziz.canary.common.world.chunk.ClassGroupFilterableList;
-import com.abdelaziz.canary.mixin.chunk.entity_class_groups.ClientEntityManagerAccessor;
-import com.abdelaziz.canary.mixin.chunk.entity_class_groups.EntityTrackingSectionAccessor;
-import com.abdelaziz.canary.mixin.chunk.entity_class_groups.ServerEntityManagerAccessor;
-import com.abdelaziz.canary.mixin.chunk.entity_class_groups.ServerWorldAccessor;
+import com.abdelaziz.canary.mixin.chunk.entity_class_groups.PersistentEntitySectionManagerAccessor;
+import com.abdelaziz.canary.mixin.chunk.entity_class_groups.EntitySectionAccessor;
+import com.abdelaziz.canary.mixin.chunk.entity_class_groups.ServerLevelAccessor;
+import com.abdelaziz.canary.mixin.chunk.entity_class_groups.TransientEntitySectionManagerAccessor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.ClassInstanceMultiMap;
 import net.minecraft.world.entity.Entity;
@@ -53,10 +53,10 @@ public class WorldHelper {
     public static EntitySectionStorage<Entity> getEntityCacheOrNull(Level world) {
         if (world instanceof ClientWorldAccessor) {
             //noinspection unchecked
-            return ((ClientEntityManagerAccessor<Entity>) ((ClientWorldAccessor) world).getEntityManager()).getSectionStorage();
-        } else if (world instanceof ServerWorldAccessor) {
+            return ((TransientEntitySectionManagerAccessor<Entity>) ((ClientWorldAccessor) world).getEntityManager()).getSectionStorage();
+        } else if (world instanceof ServerLevelAccessor) {
             //noinspection unchecked
-            return ((ServerEntityManagerAccessor<Entity>) ((ServerWorldAccessor) world).getEntityManager()).getSectionStorage();
+            return ((PersistentEntitySectionManagerAccessor<Entity>) ((ServerLevelAccessor) world).getEntityManager()).getSectionStorage();
         }
         return null;
     }
@@ -65,7 +65,7 @@ public class WorldHelper {
         ArrayList<Entity> entities = new ArrayList<>();
         cache.forEachAccessibleNonEmptySection(box, section -> {
             //noinspection unchecked
-            ClassInstanceMultiMap<Entity> allEntities = ((EntityTrackingSectionAccessor<Entity>) section).getStorage();
+            ClassInstanceMultiMap<Entity> allEntities = ((EntitySectionAccessor<Entity>) section).getStorage();
             //noinspection unchecked
             Collection<Entity> entitiesOfType = ((ClassGroupFilterableList<Entity>) allEntities).getAllOfGroupType(entityClassGroup);
             if (!entitiesOfType.isEmpty()) {

@@ -2,7 +2,7 @@ package com.abdelaziz.canary.common.world.interests.types;
 
 import com.abdelaziz.canary.common.Canary;
 import com.abdelaziz.canary.common.util.collections.SetFactory;
-import com.abdelaziz.canary.mixin.ai.poi.PointOfInterestTypesMixin;
+import com.abdelaziz.canary.mixin.ai.poi.PoiTypesMixin;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 import net.minecraft.world.entity.ai.village.poi.PoiManager;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
@@ -34,9 +34,9 @@ public class PointOfInterestTypeHelper {
         if (TYPES != null) {
             throw new IllegalStateException("Already initialized");
         }
-        Map<BlockState, PoiType> blockstatePOIMap = PointOfInterestTypesMixin.getBlockStateToPointOfInterestType();
+        Map<BlockState, PoiType> blockstatePOIMap = PoiTypesMixin.getBlockStateToPointOfInterestType();
         blockstatePOIMap = new Reference2ReferenceOpenHashMap<>(blockstatePOIMap);
-        PointOfInterestTypesMixin.setBlockStateToPointOfInterestType(blockstatePOIMap);
+        PoiTypesMixin.setBlockStateToPointOfInterestType(blockstatePOIMap);
 
         TYPES = SetFactory.createFastRefBasedCopy(blockstatePOIMap.keySet());
     }

@@ -2,7 +2,7 @@ package com.abdelaziz.canary.common.hopper;
 
 import com.abdelaziz.canary.api.inventory.CanaryDefaultedList;
 import com.abdelaziz.canary.common.block.entity.inventory_change_tracking.InventoryChangeTracker;
-import com.abdelaziz.canary.mixin.block.hopper.DefaultedListAccessor;
+import com.abdelaziz.canary.mixin.block.hopper.NonNullListAccessor;
 import net.minecraft.core.NonNullList;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
@@ -27,7 +27,7 @@ public class CanaryStackList extends NonNullList<ItemStack> implements CanaryDef
 
     public CanaryStackList(NonNullList<ItemStack> original, int maxCountPerStack) {
         //noinspection unchecked
-        super(((DefaultedListAccessor<ItemStack>) original).getList(), ItemStack.EMPTY);
+        super(((NonNullListAccessor<ItemStack>) original).getList(), ItemStack.EMPTY);
         this.maxCountPerStack = maxCountPerStack;
 
         this.cachedSignalStrength = -1;

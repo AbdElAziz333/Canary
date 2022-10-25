@@ -1,8 +1,8 @@
 package com.abdelaziz.canary.common.entity.tracker.nearby;
 
 import com.abdelaziz.canary.common.util.tuples.WorldSectionBox;
-import com.abdelaziz.canary.mixin.ai.nearby_entity_tracking.ServerEntityManagerAccessor;
-import com.abdelaziz.canary.mixin.ai.nearby_entity_tracking.ServerWorldAccessor;
+import com.abdelaziz.canary.mixin.ai.nearby_entity_tracking.PersistentEntitySectionManagerAccessor;
+import com.abdelaziz.canary.mixin.ai.nearby_entity_tracking.ServerLevelAccessor;
 import it.unimi.dsi.fastutil.HashCommon;
 import com.abdelaziz.canary.common.entity.tracker.EntityTrackerEngine;
 import com.abdelaziz.canary.common.entity.tracker.EntityTrackerSection;
@@ -83,7 +83,7 @@ public abstract class SectionedEntityMovementTracker<E extends EntityAccess, S> 
 
         if (this.timesRegistered == 0) {
             //noinspection unchecked
-            EntitySectionStorage<E> cache = ((ServerEntityManagerAccessor<E>) ((ServerWorldAccessor) world).getEntityManager()).getSectionStorage();
+            EntitySectionStorage<E> cache = ((PersistentEntitySectionManagerAccessor<E>) ((ServerLevelAccessor) world).getEntityManager()).getSectionStorage();
 
             WorldSectionBox trackedSections = this.trackedWorldSections;
             int size = trackedSections.numSections();
@@ -116,7 +116,7 @@ public abstract class SectionedEntityMovementTracker<E extends EntityAccess, S> 
         }
         assert this.timesRegistered == 0;
         //noinspection unchecked
-        EntitySectionStorage<E> cache = ((ServerEntityManagerAccessor<E>) ((ServerWorldAccessor) world).getEntityManager()).getSectionStorage();
+        EntitySectionStorage<E> cache = ((PersistentEntitySectionManagerAccessor<E>) ((ServerLevelAccessor) world).getEntityManager()).getSectionStorage();
         MovementTrackerCache storage = (MovementTrackerCache) cache;
         storage.remove(this);
 
