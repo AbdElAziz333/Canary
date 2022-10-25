@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 
 public class InventoryAccessors {
     @Mixin(RandomizableContainerBlockEntity.class)
-    public abstract static class InventoryAccessorLootableContainerBlockEntity implements CanaryInventory {
+    public abstract static class InventoryAccessorRandomizableContainerBlockEntity implements CanaryInventory {
         @Shadow
         protected abstract NonNullList<ItemStack> getItems();
 

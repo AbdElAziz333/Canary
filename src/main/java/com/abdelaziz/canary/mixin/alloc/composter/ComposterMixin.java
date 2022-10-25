@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.Overwrite;
 public class ComposterMixin {
 
     @Mixin(targets = "net.minecraft.world.level.block.ComposterBlock$InputContainer")
-    static abstract class ComposterBlockComposterInventoryMixin implements WorldlyContainer {
+    static abstract class ComposterBlockInputContainerMixin implements WorldlyContainer {
         /**
          * @author 2No2Name
          * @reason avoid allocation
@@ -21,7 +21,7 @@ public class ComposterMixin {
     }
 
     @Mixin(targets = "net.minecraft.world.level.block.ComposterBlock$EmptyContainer")
-    static abstract class ComposterBlockDummyInventoryMixin implements WorldlyContainer {
+    static abstract class ComposterBlockEmptyContainerMixin implements WorldlyContainer {
         /**
          * @author 2No2Name
          * @reason avoid allocation
@@ -33,7 +33,7 @@ public class ComposterMixin {
     }
 
     @Mixin(targets = "net.minecraft.world.level.block.ComposterBlock$OutputContainer")
-    static abstract class ComposterBlockFullComposterInventoryMixin implements WorldlyContainer {
+    static abstract class ComposterBlockOutputContainerMixin implements WorldlyContainer {
         /**
          * @author 2No2Name
          * @reason avoid allocation

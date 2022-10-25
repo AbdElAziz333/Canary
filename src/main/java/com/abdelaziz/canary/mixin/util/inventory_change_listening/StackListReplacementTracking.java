@@ -23,7 +23,7 @@ public class StackListReplacementTracking {
     }
 
     @Mixin(BaseContainerBlockEntity.class)
-    public abstract static class StackListReplacementTrackingLockableContainerBlockEntity {
+    public abstract static class StackListReplacementTrackingBaseContainerBlockEntity {
         @Inject(method = "load", at = @At("RETURN"))
         public void readNbtStackListReplacement(CompoundTag nbt, CallbackInfo ci) {
             if (this instanceof InventoryChangeTracker inventoryChangeTracker) {

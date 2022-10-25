@@ -1,0 +1,38 @@
+package com.abdelaziz.canary.mixin.entity.data_tracker.no_locks;
+
+import com.abdelaziz.canary.common.util.lock.NullReadWriteLock;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.world.entity.Entity;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Mutable;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.concurrent.locks.ReadWriteLock;
+
+/**
+ * The vanilla implementation of {@link SynchedEntityData} performs locking when fetching or updating data due to a legacy
+ * quirk in older versions of the game where updates would occur on a network thread for (de)serialization while entities
+ * were ticking and accessing values from it on the main thread. In newer versions (1.14+) this no longer happens.
+ * <p>
+ * The DataTracker is expected to only ever updated on the main-thread (or the thread owning it in recent versions when
+ * baking entities) during entity initialization and main-thread network updates, and as such the locking mechanism
+ * is unnecessary since the job is to only protect against simultaneous reading and writing.
+ */
+@Mixin(value = SynchedEntityData.class, priority = 1001)
+public abstract class SynchedEntityDataMixin {
+    private static final NullReadWriteLock NULL_READ_WRITE_LOCK = new NullReadWriteLock();
+
+    @Mutable
+    @Shadow
+    @Final
+    private ReadWriteLock lock;
+
+    @Inject(method = "<init>(Lnet/minecraft/world/entity/Entity;)V", at = @At("RETURN"))
+    private void init(Entity entity, CallbackInfo ci) {
+        this.lock = NULL_READ_WRITE_LOCK;
+    }
+}

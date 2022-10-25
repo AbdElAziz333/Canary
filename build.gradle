@@ -14,16 +14,16 @@ plugins {
 
 apply plugin: 'org.spongepowered.mixin'
 
-group = 'com.abdelaziz.canary'
-version = '0.0.6'
+group = project.maven_group
+version = project.mod_version
 
 java {
-    archivesBaseName = 'canary-mc1.19.2'
+    archivesBaseName = project.archives_base_name
     toolchain.languageVersion = JavaLanguageVersion.of(17)
 }
 
 minecraft {
-    mappings channel: 'official', version: '1.19.2'
+    mappings channel: 'official', version: project.minecraft_version
 
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
@@ -59,38 +59,6 @@ minecraft {
                 }
             }
         }
-
-        gameTestServer {
-            workingDirectory project.file('run')
-
-            property 'forge.logging.markers', 'REGISTRIES'
-
-            property 'forge.logging.console.level', 'debug'
-
-            property 'forge.enabledGameTestNamespaces', 'canary'
-
-            mods {
-                canary {
-                    source sourceSets.main
-                }
-            }
-        }
-
-        data {
-            workingDirectory project.file('run')
-
-            property 'forge.logging.markers', 'REGISTRIES'
-
-            property 'forge.logging.console.level', 'debug'
-
-            args '--mod', 'canary', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
-
-            mods {
-                canary {
-                    source sourceSets.main
-                }
-            }
-        }
     }
 }
 
@@ -112,7 +80,7 @@ repositories {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.19.2-43.1.39'
+    minecraft "net.minecraftforge:forge:${project.forge_version}"
 
     runtimeOnly fg.deobf("curse.maven:pluto-682881:4029607")
     runtimeOnly fg.deobf("curse.maven:saturn-670986:3981973")
@@ -140,12 +108,12 @@ dependencies {
 jar {
     manifest {
         attributes([
-                "Specification-Title"     : "canary",
-                "Specification-Vendor"    : "AbdElAziz",
+                "Specification-Title"     : project.mod_id,
+                "Specification-Vendor"    : project.mod_author,
                 "Specification-Version"   : "1",
                 "Implementation-Title"    : project.name,
                 "Implementation-Version"  : project.jar.archiveVersion,
-                "Implementation-Vendor"   : "AbdElAziz",
+                "Implementation-Vendor"   : project.mod_author,
                 "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }
