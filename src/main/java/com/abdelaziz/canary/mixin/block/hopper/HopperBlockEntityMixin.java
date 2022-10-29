@@ -32,7 +32,6 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -787,22 +786,6 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
                 thisTracker.listenForContentChangesOnce(thisStackList, this);
                 thisSleepingBlockEntity.startSleeping();
             }
-        }
-    }
-
-    @Override
-    public void handleStackListReplaced(Inventory inventory) {
-        if (this instanceof SleepingBlockEntity) {
-            ((SleepingBlockEntity) this).wakeUpNow();
-        }
-        if (inventory == this.insertBlockInventory) {
-            this.invalidateBlockInsertionData();
-        }
-        if (inventory == this.extractBlockInventory) {
-            this.invalidateBlockExtractionData();
-        }
-        if (inventory == this) {
-            this.invalidateCachedData();
         }
     }
 

@@ -1,13 +1,10 @@
-package com.abdelaziz.canary.mixin.block.hopper;
+package com.abdelaziz.canary.common.hopper;
 
 import com.abdelaziz.canary.api.inventory.CanaryInventory;
 import com.abdelaziz.canary.common.block.entity.inventory_change_tracking.InventoryChangeEmitter;
 import com.abdelaziz.canary.common.block.entity.inventory_change_tracking.InventoryChangeListener;
 import com.abdelaziz.canary.common.block.entity.inventory_change_tracking.InventoryChangeTracker;
 import com.abdelaziz.canary.common.block.entity.inventory_comparator_tracking.ComparatorTracker;
-import com.abdelaziz.canary.common.hopper.CanaryDoubleStackList;
-import com.abdelaziz.canary.common.hopper.CanaryStackList;
-import com.abdelaziz.canary.common.hopper.InventoryHelper;
 import com.abdelaziz.canary.mixin.block.hopper.DoubleInventoryAccessor;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import net.minecraft.inventory.DoubleInventory;
@@ -135,12 +132,6 @@ public class CanaryDoubleInventory extends DoubleInventory implements CanaryInve
     @Override
     public void setInventoryCanary(DefaultedList<ItemStack> inventory) {
         throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void handleStackListReplaced(Inventory inventory) {
-        //This inventory object becomes invalid if any of the children stacklists are replaced!
-        this.emitRemoved();
     }
 
     @Override

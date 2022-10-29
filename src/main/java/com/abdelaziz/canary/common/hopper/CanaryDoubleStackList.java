@@ -1,7 +1,6 @@
 package com.abdelaziz.canary.common.hopper;
 
 import com.abdelaziz.canary.common.block.entity.inventory_change_tracking.InventoryChangeTracker;
-import com.abdelaziz.canary.mixin.block.hopper.CanaryDoubleInventory;
 import com.abdelaziz.canary.mixin.block.hopper.DoubleInventoryAccessor;
 import net.minecraft.inventory.DoubleInventory;
 import net.minecraft.inventory.Inventory;
@@ -16,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 public class CanaryDoubleStackList extends CanaryStackList {
     private final CanaryStackList first;
     private final CanaryStackList second;
-    public final CanaryDoubleInventory doubleInventory;
+    final CanaryDoubleInventory doubleInventory;
 
     private long signalStrengthChangeCount;
 

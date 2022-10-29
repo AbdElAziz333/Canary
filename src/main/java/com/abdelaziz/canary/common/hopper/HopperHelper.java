@@ -1,6 +1,5 @@
 package com.abdelaziz.canary.common.hopper;
 
-import com.abdelaziz.canary.mixin.block.hopper.CanaryDoubleInventory;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ChestBlock;
