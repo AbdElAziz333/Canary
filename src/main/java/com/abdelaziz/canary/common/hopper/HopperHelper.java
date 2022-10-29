@@ -1,10 +1,12 @@
 package com.abdelaziz.canary.common.hopper;
 
+import com.abdelaziz.canary.mixin.block.hopper.CanaryDoubleInventory;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ChestBlock;
 import net.minecraft.block.InventoryProvider;
 import net.minecraft.block.entity.*;
+import net.minecraft.inventory.DoubleInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
@@ -147,5 +149,15 @@ public class HopperHelper {
             }
         }
         return updatePattern;
+    }
+
+    public static Inventory replaceDoubleInventory(Inventory blockInventory) {
+        if (blockInventory instanceof DoubleInventory doubleInventory) {
+            doubleInventory = CanaryDoubleInventory.getCanaryInventory(doubleInventory);
+            if (doubleInventory != null) {
+                return doubleInventory;
+            }
+        }
+        return blockInventory;
     }
 }
