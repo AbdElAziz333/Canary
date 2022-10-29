@@ -13,6 +13,14 @@ public class InventoryHelper {
         return upgradeToCanaryStackList(inventory);
     }
 
+    public static CanaryStackList getCanaryStackListOrNull(CanaryInventory inventory) {
+        DefaultedList<ItemStack> stackList = inventory.getInventoryCanary();
+        if (stackList instanceof CanaryStackList canaryStackList) {
+            return canaryStackList;
+        }
+        return null;
+    }
+
     private static CanaryStackList upgradeToCanaryStackList(CanaryInventory inventory) {
         //generate loot to avoid any problems with directly accessing the inventory slots
         //the loot that is generated here is not generated earlier than in vanilla, because vanilla generates loot

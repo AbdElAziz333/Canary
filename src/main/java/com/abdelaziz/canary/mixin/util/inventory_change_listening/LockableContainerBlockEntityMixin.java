@@ -1,17 +1,16 @@
 package com.abdelaziz.canary.mixin.util.inventory_change_listening;
 
 
+import com.abdelaziz.canary.api.inventory.CanaryInventory;
 import com.abdelaziz.canary.common.block.entity.inventory_change_tracking.InventoryChangeEmitter;
 import com.abdelaziz.canary.common.block.entity.inventory_change_tracking.InventoryChangeListener;
 import com.abdelaziz.canary.common.block.entity.inventory_change_tracking.InventoryChangeTracker;
 import com.abdelaziz.canary.common.hopper.CanaryStackList;
+import com.abdelaziz.canary.common.hopper.InventoryHelper;
 import it.unimi.dsi.fastutil.objects.ReferenceArraySet;
-import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import net.minecraft.block.entity.LockableContainerBlockEntity;
 import net.minecraft.inventory.Inventory;
 import org.spongepowered.asm.mixin.Mixin;
-
-import java.util.ArrayList;
 
 @Mixin(LockableContainerBlockEntity.class)
 public abstract class LockableContainerBlockEntityMixin implements InventoryChangeEmitter, Inventory {
@@ -39,6 +38,7 @@ public abstract class LockableContainerBlockEntityMixin implements InventoryChan
         if (this instanceof InventoryChangeListener listener) {
             listener.handleStackListReplaced(this);
         }
+        this.invalidateChangeListening();
     }
 
     @Override
@@ -50,6 +50,16 @@ public abstract class LockableContainerBlockEntityMixin implements InventoryChan
 
         if (this instanceof InventoryChangeListener listener) {
             listener.handleInventoryRemoved(this);
+        }
+        this.invalidateChangeListening();
+    }
+
+    private void invalidateChangeListening() {
+        this.inventoryChangeListeners.clear();
+
+        CanaryStackList canaryStackList = InventoryHelper.getCanaryStackListOrNull((CanaryInventory) this);
+        if (canaryStackList != null && this instanceof InventoryChangeTracker inventoryChangeTracker) {
+            canaryStackList.removeInventoryModificationCallback(inventoryChangeTracker);
         }
     }
 

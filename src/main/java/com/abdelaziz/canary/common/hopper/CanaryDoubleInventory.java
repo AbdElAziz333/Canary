@@ -71,6 +71,7 @@ public class CanaryDoubleInventory extends DoubleInventory implements CanaryInve
         if (listeners != null && !listeners.isEmpty()) {
             listeners.forEach(inventoryChangeListener -> inventoryChangeListener.handleStackListReplaced(this));
         }
+        this.invalidateChangeListening();
     }
 
     @Override
@@ -78,6 +79,16 @@ public class CanaryDoubleInventory extends DoubleInventory implements CanaryInve
         ReferenceOpenHashSet<InventoryChangeListener> listeners = this.inventoryHandlingTypeListeners;
         if (listeners != null && !listeners.isEmpty()) {
             listeners.forEach(listener -> listener.handleInventoryRemoved(this));
+        }
+        this.invalidateChangeListening();
+    }
+
+    private void invalidateChangeListening() {
+        this.inventoryChangeListeners.clear();
+
+        CanaryStackList canaryStackList = InventoryHelper.getCanaryStackListOrNull(this);
+        if (canaryStackList != null) {
+            canaryStackList.removeInventoryModificationCallback(this);
         }
     }
 
