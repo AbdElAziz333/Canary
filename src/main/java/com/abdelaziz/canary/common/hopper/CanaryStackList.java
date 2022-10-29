@@ -262,7 +262,6 @@ public class CanaryStackList extends DefaultedList<ItemStack> implements CanaryD
 
     public void removeInventoryModificationCallback(@NotNull InventoryChangeTracker inventoryModificationCallback) {
         if (this.inventoryModificationCallback != null && this.inventoryModificationCallback == inventoryModificationCallback) {
-            this.inventoryModificationCallback.emitCallbackReplaced();
             this.inventoryModificationCallback = null;
         }
     }
