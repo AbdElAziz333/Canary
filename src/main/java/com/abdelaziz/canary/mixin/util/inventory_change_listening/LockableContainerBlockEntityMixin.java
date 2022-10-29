@@ -55,7 +55,9 @@ public abstract class LockableContainerBlockEntityMixin implements InventoryChan
     }
 
     private void invalidateChangeListening() {
-        this.inventoryChangeListeners.clear();
+        if (this.inventoryChangeListeners != null) {
+            this.inventoryChangeListeners.clear();
+        }
 
         CanaryStackList canaryStackList = InventoryHelper.getCanaryStackListOrNull((CanaryInventory) this);
         if (canaryStackList != null && this instanceof InventoryChangeTracker inventoryChangeTracker) {

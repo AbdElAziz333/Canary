@@ -84,7 +84,9 @@ public class CanaryDoubleInventory extends DoubleInventory implements CanaryInve
     }
 
     private void invalidateChangeListening() {
-        this.inventoryChangeListeners.clear();
+        if (this.inventoryChangeListeners != null) {
+            this.inventoryChangeListeners.clear();
+        }
 
         CanaryStackList canaryStackList = InventoryHelper.getCanaryStackListOrNull(this);
         if (canaryStackList != null) {
