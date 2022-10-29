@@ -132,9 +132,8 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
             if (inventory != hopperBlockEntity.extractInventory || hopperBlockEntity.extractStackList != extractInventoryStackList) {
                 //not caching the inventory (NO_BLOCK_INVENTORY prevents it)
                 //make change counting on the entity inventory possible, without caching it as block inventory
-                hopperBlockEntity.extractInventory = optimizedInventory;
-                hopperBlockEntity.extractStackList = extractInventoryStackList;
-                hopperBlockEntity.extractStackListModCount = hopperBlockEntity.extractStackList.getModCount() - 1;
+                hopperBlockEntity.cacheExtractCanaryInventory(optimizedInventory);
+
             }
         }
         return inventory;
@@ -381,10 +380,17 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
     }
 
     private void cacheInsertCanaryInventory(CanaryInventory optimizedInventory) {
-        this.insertInventory = optimizedInventory;
         CanaryStackList insertInventoryStackList = InventoryHelper.getCanaryStackList(optimizedInventory);
+        this.insertInventory = optimizedInventory;
         this.insertStackList = insertInventoryStackList;
         this.insertStackListModCount = insertInventoryStackList.getModCount() - 1;
+    }
+
+    private void cacheExtractCanaryInventory(CanaryInventory optimizedInventory) {
+        CanaryStackList extractInventoryStackList = InventoryHelper.getCanaryStackList(optimizedInventory);
+        this.extractInventory = optimizedInventory;
+        this.extractStackList = extractInventoryStackList;
+        this.extractStackListModCount = extractInventoryStackList.getModCount() - 1;
     }
 
     /**
@@ -394,6 +400,15 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
      */
     private void cacheInsertBlockInventory(Inventory insertInventory) {
         assert !(insertInventory instanceof Entity);
+
+        if (insertInventory instanceof CanaryInventory optimizedInventory) {
+            this.cacheInsertCanaryInventory(optimizedInventory);
+        } else {
+            this.insertInventory = null;
+            this.insertStackList = null;
+            this.insertStackListModCount = 0;
+        }
+
         if (insertInventory instanceof BlockEntity || insertInventory instanceof DoubleInventory) {
             this.insertBlockInventory = insertInventory;
             if (insertInventory instanceof InventoryChangeTracker) {
@@ -444,17 +459,6 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
                 this.extractBlockInventory = extractInventory;
                 this.extractionMode = HopperCachingState.BlockInventory.BLOCK_STATE;
             }
-        }
-
-        if (extractInventory instanceof CanaryInventory optimizedInventory) {
-            this.extractInventory = optimizedInventory;
-            CanaryStackList extractInventoryStackList = InventoryHelper.getCanaryStackList(optimizedInventory);
-            this.extractStackList = extractInventoryStackList;
-            this.extractStackListModCount = extractInventoryStackList.getModCount() - 1;
-        } else {
-            this.extractInventory = null;
-            this.extractStackList = null;
-            this.extractStackListModCount = 0;
         }
     }
 
