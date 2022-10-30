@@ -32,7 +32,6 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -152,13 +151,13 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
                     target = "Lnet/minecraft/block/entity/HopperBlockEntity;isInventoryFull(Lnet/minecraft/inventory/Inventory;Lnet/minecraft/util/math/Direction;)Z"
             ), locals = LocalCapture.CAPTURE_FAILHARD
     )
-    private static void canaryInsert(World world, BlockPos pos, BlockState hopperState, Inventory hopper, CallbackInfoReturnable<Boolean> cir, Inventory insertInventory, Direction direction) {
+    private static void canaryInsert(World world, BlockPos pos, BlockState hopperState, HopperBlockEntity hopper, CallbackInfoReturnable<Boolean> cir, Inventory insertInventory, Direction direction) {
         if (insertInventory == null || !(hopper instanceof HopperBlockEntity)) {
             //call the vanilla code to allow other mods inject features
             //e.g. carpet mod allows hoppers to insert items into wool blocks
             return;
         }
-        HopperBlockEntityMixin hopperBlockEntity = (HopperBlockEntityMixin) hopper;
+        HopperBlockEntityMixin hopperBlockEntity = (HopperBlockEntityMixin) hopper.getInventoryAt(world, pos);
 
         CanaryStackList hopperStackList = InventoryHelper.getCanaryStackList(hopperBlockEntity);
         if (hopperBlockEntity.insertInventory == insertInventory && hopperStackList.getModCount() == hopperBlockEntity.myModCountAtLastInsert) {
@@ -206,11 +205,11 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
      * Inject to replace the extract method with an optimized but equivalent replacement.
      * Uses the vanilla method as fallback for non-optimized Inventories.
      *
-     * @param to   Hopper or Hopper Minecart that is extracting
-     * @param from Inventory the hopper is extracting from
+     * @param to Hopper or Hopper Minecart that is extracting
      */
     @Inject(method = "extract(Lnet/minecraft/world/World;Lnet/minecraft/block/entity/Hopper;)Z", at = @At(value = "FIELD", target = "Lnet/minecraft/util/math/Direction;DOWN:Lnet/minecraft/util/math/Direction;", shift = At.Shift.AFTER), cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD)
-    private static void canaryExtract(World world, Hopper to, CallbackInfoReturnable<Boolean> cir, Inventory from) {
+    private static void canaryExtract(World world, Hopper to, CallbackInfoReturnable<Boolean> cir) {
+        Inventory from = getInputInventory(world, to);
         if (!(to instanceof HopperBlockEntityMixin hopperBlockEntity)) {
             return; //optimizations not implemented for hopper minecarts
         }
@@ -312,23 +311,9 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
         }
     }
 
-
     @Redirect(method = "ejectItems(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/block/entity/HopperBlockEntity;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/entity/HopperBlockEntity;getOutputInventory(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;)Lnet/minecraft/inventory/Inventory;"))
     private static Inventory nullify(World world, BlockPos pos, BlockState state) {
         return null;
-    }
-
-    @ModifyVariable(
-            method = "ejectItems(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/block/entity/HopperBlockEntity;)Z",
-            at = @At(
-                    value = "INVOKE_ASSIGN",
-                    target = "Lnet/minecraft/block/entity/HopperBlockEntity;getOutputInventory(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;)Lnet/minecraft/inventory/Inventory;"
-            ),
-            ordinal = 1
-    )
-    private static Inventory getCanaryOutputInventory(Inventory inventory, World world, BlockPos pos, BlockState hopperState, Inventory hopper) {
-        HopperBlockEntityMixin hopperBlockEntity = (HopperBlockEntityMixin) hopper;
-        return hopperBlockEntity.getInsertInventory(world, hopperState);
     }
 
     @Redirect(method = "extract(Lnet/minecraft/world/World;Lnet/minecraft/block/entity/Hopper;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/entity/HopperBlockEntity;getInputItemEntities(Lnet/minecraft/world/World;Lnet/minecraft/block/entity/Hopper;)Ljava/util/List;"))
