@@ -7,11 +7,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(Level.class)
-public class WorldMixin {
+public class LevelMixin {
 
     @Redirect(
             method = "tickBlockEntities",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;shouldTickBlocksAt(Lnet/minecraft/core/BlockPos;)Z" )
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;shouldTickBlocksAt(Lnet/minecraft/core/BlockPos;)Z")
     )
     private boolean shouldTickBlockPosFilterNull(Level instance, BlockPos pos) {
         if (pos == null) {

@@ -15,19 +15,24 @@ import org.jetbrains.annotations.NotNull;
 public class CanaryDoubleStackList extends CanaryStackList {
     private final CanaryStackList first;
     private final CanaryStackList second;
+    public final CanaryDoubleInventory doubleInventory;
 
     private long signalStrengthChangeCount;
 
-    public CanaryDoubleStackList(CanaryStackList first, CanaryStackList second, int maxCountPerStack) {
+    public CanaryDoubleStackList(CanaryDoubleInventory doubleInventory, CanaryStackList first, CanaryStackList second, int maxCountPerStack) {
         super(maxCountPerStack);
         this.first = first;
         this.second = second;
+        this.doubleInventory = doubleInventory;
     }
 
-    public static CanaryStackList getOrCreate(CanaryStackList first, CanaryStackList second, int maxCountPerStack) {
+    public static CanaryDoubleStackList getOrCreate(CanaryDoubleInventory doubleInventory, CanaryStackList first, CanaryStackList second, int maxCountPerStack) {
         CanaryDoubleStackList parentStackList = first.parent;
-        if (parentStackList == null || parentStackList != second.parent) {
-            parentStackList = new CanaryDoubleStackList(first, second, maxCountPerStack);
+        if (parentStackList == null || parentStackList != second.parent || parentStackList.first != first || parentStackList.second != second) {
+            if (parentStackList != null) {
+                parentStackList.doubleInventory.emitRemoved();
+            }
+            parentStackList = new CanaryDoubleStackList(doubleInventory, first, second, maxCountPerStack);
             first.parent = parentStackList;
             second.parent = parentStackList;
         }
@@ -129,8 +134,13 @@ public class CanaryDoubleStackList extends CanaryStackList {
         return this.first.size() + this.second.size();
     }
 
-    public void setInventoryModificationCallback(InventoryChangeTracker inventoryModificationCallback) {
+    public void setInventoryModificationCallback(@NotNull InventoryChangeTracker inventoryModificationCallback) {
         this.first.setInventoryModificationCallback(inventoryModificationCallback);
         this.second.setInventoryModificationCallback(inventoryModificationCallback);
+    }
+
+    public void removeInventoryModificationCallback(@NotNull InventoryChangeTracker inventoryModificationCallback) {
+        this.first.removeInventoryModificationCallback(inventoryModificationCallback);
+        this.second.removeInventoryModificationCallback(inventoryModificationCallback);
     }
 }

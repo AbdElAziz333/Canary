@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(LevelChunk.class)
-public class WorldChunkMixin {
+public class LevelChunkMixin {
 
     @Inject(
             method = "lambda$updateBlockEntityTicker$7", //m_187960_
@@ -23,7 +23,7 @@ public class WorldChunkMixin {
     )
     private void setBlockEntityTickingOrder(BlockEntity blockEntity, BlockEntityTicker<?> blockEntityTicker, BlockPos pos, @Coerce Object wrappedBlockEntityTickInvoker, CallbackInfoReturnable<?> cir, TickingBlockEntity blockEntityTickInvoker, @Coerce Object wrappedBlockEntityTickInvoker2) {
         if (blockEntity instanceof SleepingBlockEntity sleepingBlockEntity) {
-            sleepingBlockEntity.setTickWrapper((WrappedBlockEntityTickInvokerAccessor) wrappedBlockEntityTickInvoker2);
+            sleepingBlockEntity.setTickWrapper((RebindableTickingBlockEntityWrapperAccessor) wrappedBlockEntityTickInvoker2);
         }
     }
 
@@ -34,7 +34,7 @@ public class WorldChunkMixin {
     )
     private void setBlockEntityTickingOrder(BlockEntity blockEntity, BlockEntityTicker<?> blockEntityTicker, BlockPos pos, @Coerce Object wrappedBlockEntityTickInvoker, CallbackInfoReturnable<?> cir, TickingBlockEntity blockEntityTickInvoker) {
         if (blockEntity instanceof SleepingBlockEntity sleepingBlockEntity) {
-            sleepingBlockEntity.setTickWrapper((WrappedBlockEntityTickInvokerAccessor) wrappedBlockEntityTickInvoker);
+            sleepingBlockEntity.setTickWrapper((RebindableTickingBlockEntityWrapperAccessor) wrappedBlockEntityTickInvoker);
         }
     }
 }

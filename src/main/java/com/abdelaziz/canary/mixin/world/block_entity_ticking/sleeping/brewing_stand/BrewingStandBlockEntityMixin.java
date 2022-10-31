@@ -1,7 +1,7 @@
 package com.abdelaziz.canary.mixin.world.block_entity_ticking.sleeping.brewing_stand;
 
 import com.abdelaziz.canary.common.block.entity.SleepingBlockEntity;
-import com.abdelaziz.canary.mixin.world.block_entity_ticking.sleeping.WrappedBlockEntityTickInvokerAccessor;
+import com.abdelaziz.canary.mixin.world.block_entity_ticking.sleeping.RebindableTickingBlockEntityWrapperAccessor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -21,7 +21,7 @@ public class BrewingStandBlockEntityMixin extends BlockEntity implements Sleepin
     @Shadow
     int brewTime;
 
-    private WrappedBlockEntityTickInvokerAccessor tickWrapper = null;
+    private RebindableTickingBlockEntityWrapperAccessor tickWrapper = null;
     private TickingBlockEntity sleepingTicker = null;
 
     public BrewingStandBlockEntityMixin(BlockEntityType<?> type, BlockPos pos, BlockState state) {
@@ -29,12 +29,12 @@ public class BrewingStandBlockEntityMixin extends BlockEntity implements Sleepin
     }
 
     @Override
-    public WrappedBlockEntityTickInvokerAccessor getTickWrapper() {
+    public RebindableTickingBlockEntityWrapperAccessor getTickWrapper() {
         return tickWrapper;
     }
 
     @Override
-    public void setTickWrapper(WrappedBlockEntityTickInvokerAccessor tickWrapper) {
+    public void setTickWrapper(RebindableTickingBlockEntityWrapperAccessor tickWrapper) {
         this.tickWrapper = tickWrapper;
         this.setSleepingTicker(null);
     }

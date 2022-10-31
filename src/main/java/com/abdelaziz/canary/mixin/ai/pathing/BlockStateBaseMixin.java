@@ -22,6 +22,10 @@ public abstract class BlockStateBaseMixin implements BlockStatePathingCache {
 
     @Inject(method = "initCache()V", at = @At("RETURN"))
     private void init(CallbackInfo ci) {
+        // Reset the cached path node types, to ensure they are re-calculated.
+        this.pathNodeType = null;
+        this.pathNodeTypeNeighbor = null;
+
         BlockState state = this.asState();
 
         SingleBlockBlockView blockView = SingleBlockBlockView.of(state, BlockPos.ZERO);

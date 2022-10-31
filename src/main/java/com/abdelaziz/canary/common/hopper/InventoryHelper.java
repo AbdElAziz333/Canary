@@ -7,10 +7,18 @@ import net.minecraft.world.item.ItemStack;
 public class InventoryHelper {
     public static CanaryStackList getCanaryStackList(CanaryInventory inventory) {
         NonNullList<ItemStack> stackList = inventory.getInventoryCanary();
-        if (stackList instanceof CanaryStackList lithiumStackList) {
-            return lithiumStackList;
+        if (stackList instanceof CanaryStackList canaryStackList) {
+            return canaryStackList;
         }
         return upgradeToCanaryStackList(inventory);
+    }
+
+    public static CanaryStackList getCanaryStackListOrNull(CanaryInventory inventory) {
+        NonNullList<ItemStack> stackList = inventory.getInventoryCanary();
+        if (stackList instanceof CanaryStackList canaryStackList) {
+            return canaryStackList;
+        }
+        return null;
     }
 
     private static CanaryStackList upgradeToCanaryStackList(CanaryInventory inventory) {
@@ -20,8 +28,8 @@ public class InventoryHelper {
         inventory.generateLootCanary();
         //get the stack list after generating loot, just in case generating loot creates a new stack list
         NonNullList<ItemStack> stackList = inventory.getInventoryCanary();
-        CanaryStackList lithiumStackList = new CanaryStackList(stackList, inventory.getMaxStackSize());
-        inventory.setInventoryCanary(lithiumStackList);
-        return lithiumStackList;
+        CanaryStackList canaryStackList = new CanaryStackList(stackList, inventory.getMaxStackSize());
+        inventory.setInventoryCanary(canaryStackList);
+        return canaryStackList;
     }
 }

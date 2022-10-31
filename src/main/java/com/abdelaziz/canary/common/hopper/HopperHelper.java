@@ -4,9 +4,11 @@ package com.abdelaziz.canary.common.hopper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
+import net.minecraft.world.CompoundContainer;
 import net.minecraft.world.Container;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.WorldlyContainerHolder;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -148,5 +150,15 @@ public class HopperHelper {
             }
         }
         return updatePattern;
+    }
+
+    public static Container replaceDoubleInventory(Container blockInventory) {
+        if (blockInventory instanceof CompoundContainer doubleInventory) {
+            doubleInventory = CanaryDoubleInventory.getCanaryInventory(doubleInventory);
+            if (doubleInventory != null) {
+                return doubleInventory;
+            }
+        }
+        return blockInventory;
     }
 }

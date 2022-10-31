@@ -12,16 +12,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 public class StackListReplacementTracking {
 
-    @Mixin(AbstractFurnaceBlockEntity.class)
-    public abstract static class InventoryChangeTrackingAbstractFurnaceBlockEntity implements InventoryChangeTracker {
-        //Handled in LockableConainerBlockEntity
-    }
-
-    @Mixin(BrewingStandBlockEntity.class)
-    public abstract static class InventoryChangeTrackingBrewingStandBlockEntity implements InventoryChangeTracker {
-        //Handled in LockableConainerBlockEntity
-    }
-
     @Mixin(BaseContainerBlockEntity.class)
     public abstract static class StackListReplacementTrackingBaseContainerBlockEntity {
         @Inject(method = "load", at = @At("RETURN"))

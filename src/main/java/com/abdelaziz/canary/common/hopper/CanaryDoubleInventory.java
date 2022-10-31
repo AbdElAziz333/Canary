@@ -1,40 +1,59 @@
-package com.abdelaziz.canary.mixin.block.hopper;
+package com.abdelaziz.canary.common.hopper;
 
 import com.abdelaziz.canary.api.inventory.CanaryInventory;
-import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import com.abdelaziz.canary.common.block.entity.inventory_change_tracking.InventoryChangeEmitter;
 import com.abdelaziz.canary.common.block.entity.inventory_change_tracking.InventoryChangeListener;
 import com.abdelaziz.canary.common.block.entity.inventory_change_tracking.InventoryChangeTracker;
 import com.abdelaziz.canary.common.block.entity.inventory_comparator_tracking.ComparatorTracker;
-import com.abdelaziz.canary.common.hopper.InventoryHelper;
-import com.abdelaziz.canary.common.hopper.CanaryDoubleStackList;
-import com.abdelaziz.canary.common.hopper.CanaryStackList;
+import com.abdelaziz.canary.mixin.block.hopper.CompoundContainerAccessor;
+import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.CompoundContainer;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 
-@Mixin(CompoundContainer.class)
-public abstract class CompoundContainerMixin implements CanaryInventory, InventoryChangeTracker, InventoryChangeEmitter, InventoryChangeListener, ComparatorTracker {
-    @Shadow
-    @Final
+public class CanaryDoubleInventory extends CompoundContainer implements CanaryInventory, InventoryChangeTracker, InventoryChangeEmitter, InventoryChangeListener, ComparatorTracker {
+
     private Container container1;
 
-    @Shadow
-    @Final
     private Container container2;
 
-    @Shadow
-    public abstract int getMaxStackSize();
-
-    private CanaryStackList cachedList;
+    private CanaryStackList doubleStackList;
 
     ReferenceOpenHashSet<InventoryChangeListener> inventoryChangeListeners = null;
     ReferenceOpenHashSet<InventoryChangeListener> inventoryHandlingTypeListeners = null;
+
+    private CanaryDoubleInventory(CanaryInventory container1, CanaryInventory container2) {
+        super(container1, container2);
+        this.container1 = container1;
+        this.container2 = container2;
+    }
+
+    /**
+     * This method returns the same CanaryDoubleInventory instance for equal (same children in same order)
+     * doubleInventory parameters until {@link #emitRemoved()} is called. After that a new CanaryDoubleInventory object
+     * may be in use.
+     *
+     * @param doubleInventory A double inventory
+     * @return The only non-removed CanaryDoubleInventory instance for the double inventory. Null if not compatible
+     */
+    public static CanaryDoubleInventory getCanaryInventory(CompoundContainer doubleInventory) {
+        Container vanillaFirst = ((CompoundContainerAccessor) doubleInventory).getFirst();
+        Container vanillaSecond = ((CompoundContainerAccessor) doubleInventory).getSecond();
+        if (vanillaFirst != vanillaSecond && vanillaFirst instanceof CanaryInventory container1 && vanillaSecond instanceof CanaryInventory container2) {
+            CanaryDoubleInventory newDoubleInventory = new CanaryDoubleInventory(container1, container2);
+            CanaryDoubleStackList doubleStackList = CanaryDoubleStackList.getOrCreate(
+                    newDoubleInventory,
+                    InventoryHelper.getCanaryStackList(container1),
+                    InventoryHelper.getCanaryStackList(container2),
+                    newDoubleInventory.getMaxStackSize()
+            );
+            newDoubleInventory.doubleStackList = doubleStackList;
+            return doubleStackList.doubleInventory;
+        }
+        return null;
+    }
 
     @Override
     public void emitContentModified() {
@@ -60,6 +79,18 @@ public abstract class CompoundContainerMixin implements CanaryInventory, Invento
         ReferenceOpenHashSet<InventoryChangeListener> listeners = this.inventoryHandlingTypeListeners;
         if (listeners != null && !listeners.isEmpty()) {
             listeners.forEach(listener -> listener.handleInventoryRemoved(this));
+        }
+        this.invalidateChangeListening();
+    }
+
+    private void invalidateChangeListening() {
+        if (this.inventoryChangeListeners != null) {
+            this.inventoryChangeListeners.clear();
+        }
+
+        CanaryStackList canaryStackList = InventoryHelper.getCanaryStackListOrNull(this);
+        if (canaryStackList != null) {
+            canaryStackList.removeInventoryModificationCallback(this);
         }
     }
 
@@ -108,14 +139,7 @@ public abstract class CompoundContainerMixin implements CanaryInventory, Invento
 
     @Override
     public NonNullList<ItemStack> getInventoryCanary() {
-        if (this.cachedList != null) {
-            return this.cachedList;
-        }
-        return this.cachedList = CanaryDoubleStackList.getOrCreate(
-                InventoryHelper.getCanaryStackList((CanaryInventory) this.container1),
-                InventoryHelper.getCanaryStackList((CanaryInventory) this.container2),
-                this.getMaxStackSize()
-        );
+        return this.doubleStackList;
     }
 
     @Override

@@ -8,6 +8,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.jetbrains.annotations.NotNull;
 
 public class CanaryStackList extends NonNullList<ItemStack> implements CanaryDefaultedList {
     final int maxCountPerStack;
@@ -59,6 +60,7 @@ public class CanaryStackList extends NonNullList<ItemStack> implements CanaryDef
         this.cachedSignalStrength = -1;
         this.inventoryModificationCallback = null;
     }
+
     public long getModCount() {
         return this.modCount;
     }
@@ -220,7 +222,6 @@ public class CanaryStackList extends NonNullList<ItemStack> implements CanaryDef
         this.signalStrengthOverride = false;
     }
 
-
     /**
      * @param masterStackList the stacklist of the inventory that comparators read from (double inventory for double chests)
      * @param inventory       the blockentity / inventory that this stacklist is inside
@@ -252,10 +253,16 @@ public class CanaryStackList extends NonNullList<ItemStack> implements CanaryDef
     }
 
 
-    public void setInventoryModificationCallback(InventoryChangeTracker inventoryModificationCallback) {
+    public void setInventoryModificationCallback(@NotNull InventoryChangeTracker inventoryModificationCallback) {
         if (this.inventoryModificationCallback != null && this.inventoryModificationCallback != inventoryModificationCallback) {
             this.inventoryModificationCallback.emitCallbackReplaced();
         }
         this.inventoryModificationCallback = inventoryModificationCallback;
+    }
+
+    public void removeInventoryModificationCallback(@NotNull InventoryChangeTracker inventoryModificationCallback) {
+        if (this.inventoryModificationCallback != null && this.inventoryModificationCallback == inventoryModificationCallback) {
+            this.inventoryModificationCallback = null;
+        }
     }
 }

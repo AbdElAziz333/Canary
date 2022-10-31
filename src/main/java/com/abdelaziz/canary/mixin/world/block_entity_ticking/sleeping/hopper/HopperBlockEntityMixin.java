@@ -1,7 +1,7 @@
 package com.abdelaziz.canary.mixin.world.block_entity_ticking.sleeping.hopper;
 
 import com.abdelaziz.canary.common.block.entity.SleepingBlockEntity;
-import com.abdelaziz.canary.mixin.world.block_entity_ticking.sleeping.WrappedBlockEntityTickInvokerAccessor;
+import com.abdelaziz.canary.mixin.world.block_entity_ticking.sleeping.RebindableTickingBlockEntityWrapperAccessor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.HopperBlock;
@@ -28,16 +28,16 @@ public class HopperBlockEntityMixin extends BlockEntity implements SleepingBlock
     @Shadow
     private native boolean isOnCooldown();
 
-    private WrappedBlockEntityTickInvokerAccessor tickWrapper = null;
+    private RebindableTickingBlockEntityWrapperAccessor tickWrapper = null;
     private TickingBlockEntity sleepingTicker = null;
 
     @Override
-    public WrappedBlockEntityTickInvokerAccessor getTickWrapper() {
+    public RebindableTickingBlockEntityWrapperAccessor getTickWrapper() {
         return tickWrapper;
     }
 
     @Override
-    public void setTickWrapper(WrappedBlockEntityTickInvokerAccessor tickWrapper) {
+    public void setTickWrapper(RebindableTickingBlockEntityWrapperAccessor tickWrapper) {
         this.tickWrapper = tickWrapper;
         this.setSleepingTicker(null);
     }
@@ -74,7 +74,7 @@ public class HopperBlockEntityMixin extends BlockEntity implements SleepingBlock
             return false;
         }
 
-        WrappedBlockEntityTickInvokerAccessor tickWrapper = this.getTickWrapper();
+        RebindableTickingBlockEntityWrapperAccessor tickWrapper = this.getTickWrapper();
         if (tickWrapper != null) {
             this.setSleepingTicker(tickWrapper.getTicker());
             tickWrapper.callRebind(SleepingBlockEntity.SLEEPING_BLOCK_ENTITY_TICKER);
