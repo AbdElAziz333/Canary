@@ -27,6 +27,8 @@ If you are using Curseforge Client, you can continue downloading Canary through 
 
 Github Actions builds will be available soon.
 
+#
+
 ### What makes Canary different?
 
 One of the most important design goals in Canary is *correctness*. Unlike other mods which apply optimizations to the
