@@ -59,7 +59,7 @@ public abstract class RandomizableContainerBlockEntityMixin implements Inventory
             this.inventoryChangeListeners.clear();
         }
 
-        CanaryStackList canaryStackList = InventoryHelper.getCanaryStackListOrNull((CanaryInventory) this);
+        CanaryStackList canaryStackList = this instanceof CanaryInventory ? InventoryHelper.getCanaryStackListOrNull((CanaryInventory) this) : null;
         if (canaryStackList != null && this instanceof InventoryChangeTracker inventoryChangeTracker) {
             canaryStackList.removeInventoryModificationCallback(inventoryChangeTracker);
         }
