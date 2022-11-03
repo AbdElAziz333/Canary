@@ -165,7 +165,7 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
             ), locals = LocalCapture.CAPTURE_FAILHARD
     )
     private static void canaryInsert(Level world, BlockPos pos, BlockState hopperState, HopperBlockEntity hopper, CallbackInfoReturnable<Boolean> cir, Container insertInventory, Direction direction) {
-        if (insertInventory == null || !(hopper instanceof HopperBlockEntity)) {
+        if (insertInventory == null || !(hopper instanceof HopperBlockEntity) || hopper instanceof WorldlyContainer) {
             //call the vanilla code to allow other mods inject features
             // e.g. carpet mod allows hoppers to insert items into wool blocks
             return;
