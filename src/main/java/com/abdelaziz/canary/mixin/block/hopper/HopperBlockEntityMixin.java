@@ -155,7 +155,7 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
      * @reason Adding the inventory caching into the static method using mixins seems to be unfeasible without temporarily storing state in static fields.
      */
     @SuppressWarnings("JavadocReference")
-            //call the vanilla code, but with target inventory nullify (mixin above) to allow other mods inject features */
+    //call the vanilla code, but with target inventory nullify (mixin above) to allow other mods inject features */
     @Inject(
             cancellable = true,
             method = "ejectItems(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/entity/HopperBlockEntity;)Z",
@@ -218,7 +218,7 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
      * Inject to replace the extract method with an optimized but equivalent replacement.
      * Uses the vanilla method as fallback for non-optimized Inventories.
      *
-     * @param to   Hopper or Hopper Minecart that is extracting
+     * @param to Hopper or Hopper Minecart that is extracting
      */
     @Inject(method = "suckInItems(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/block/entity/Hopper;)Z", at = @At(value = "FIELD", target = "Lnet/minecraft/core/Direction;DOWN:Lnet/minecraft/core/Direction;", shift = At.Shift.AFTER), cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD)
     private static void canaryExtract(Level world, Hopper to, CallbackInfoReturnable<Boolean> cir) {
@@ -305,6 +305,18 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
         return canaryStackList.getOccupiedSlots() == 0;
     }
 
+    @Inject(
+            method = "pushItemsTick",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/world/level/block/entity/HopperBlockEntity;tryMoveItems(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/entity/HopperBlockEntity;Ljava/util/function/BooleanSupplier;)Z",
+                    shift = At.Shift.AFTER
+            )
+    )
+    private static void checkSleepingConditions(Level world, BlockPos pos, BlockState state, HopperBlockEntity blockEntity, CallbackInfo ci) {
+        ((HopperBlockEntityMixin) (Object) blockEntity).checkSleepingConditions();
+    }
+
     @Redirect(method = "ejectItems(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/entity/HopperBlockEntity;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/entity/HopperBlockEntity;getAttachedContainer(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/world/Container;"))
     private static Container nullify(Level world, BlockPos pos, BlockState state) {
         return null;
@@ -351,18 +363,6 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
             }
         }
         return true;
-    }
-
-    @Inject(
-            method = "pushItemsTick",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/level/block/entity/HopperBlockEntity;tryMoveItems(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/entity/HopperBlockEntity;Ljava/util/function/BooleanSupplier;)Z",
-                    shift = At.Shift.AFTER
-            )
-    )
-    private static void checkSleepingConditions(Level world, BlockPos pos, BlockState state, HopperBlockEntity blockEntity, CallbackInfo ci) {
-        ((HopperBlockEntityMixin) (Object) blockEntity).checkSleepingConditions();
     }
 
     @Override
@@ -613,43 +613,23 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
         }
     }
 
-    @SuppressWarnings("deprecation")
-    @Override
-    public void setBlockState(BlockState state) {
-        BlockState cachedState = this.getBlockState();
-        super.setBlockState(state);
-        if (state.getValue(HopperBlock.FACING) != cachedState.getValue(HopperBlock.FACING)) {
-            this.invalidateCachedData();
-        }
-    }
-
     private void invalidateCachedData() {
         this.shouldCheckSleep = false;
         this.invalidateInsertionData();
         this.invalidateExtractionData();
     }
 
-    private void invalidateInsertionData() {
-        if (this.level instanceof ServerLevel serverWorld) {
-            if (this.insertInventoryEntityTracker != null) {
-                this.insertInventoryEntityTracker.unRegister(serverWorld);
-                this.insertInventoryEntityTracker = null;
-                this.insertInventoryEntityBox = null;
-                this.insertInventoryEntityFailedSearchTime = 0L;
-            }
+    @SuppressWarnings("deprecation")
+    @Override
+    public void setBlockState(BlockState state) {
+        BlockState cachedState = this.getBlockState();
+        super.setBlockState(state);
+        if (this.level != null && !this.level.isClientSide() && state.getValue(HopperBlock.FACING) != cachedState.getValue(HopperBlock.FACING)) {
+            this.invalidateCachedData();
         }
-        if (this.insertionMode == HopperCachingState.BlockInventory.REMOVAL_TRACKING_BLOCK_ENTITY) {
-            assert this.insertBlockInventory != null;
-            ((InventoryChangeTracker) this.insertBlockInventory).stopListenForMajorInventoryChanges(this);
-        }
-        this.invalidateBlockInsertionData();
     }
 
     private void invalidateBlockInsertionData() {
-        if (this.insertionMode == HopperCachingState.BlockInventory.REMOVAL_TRACKING_BLOCK_ENTITY) {
-            assert this.insertBlockInventory != null;
-            ((InventoryChangeTracker) this.insertBlockInventory).stopListenForMajorInventoryChanges(this);
-        }
         this.insertionMode = HopperCachingState.BlockInventory.UNKNOWN;
         this.insertBlockInventory = null;
         this.insertInventory = null;
@@ -699,18 +679,21 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
         }
     }
 
-    private void initInsertInventoryTracker(Level world, BlockState hopperState) {
-        assert world instanceof ServerLevel;
-        Direction direction = hopperState.getValue(HopperBlock.FACING);
-        BlockPos pos = this.getBlockPos().relative(direction);
-        this.insertInventoryEntityBox = new AABB(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1);
-        this.insertInventoryEntityTracker =
-                SectionedInventoryEntityMovementTracker.registerAt(
-                        (ServerLevel) this.level,
-                        this.insertInventoryEntityBox,
-                        Container.class
-                );
-        this.insertInventoryEntityFailedSearchTime = Long.MIN_VALUE;
+    private void invalidateInsertionData() {
+        if (this.level instanceof ServerLevel serverWorld) {
+            if (this.insertInventoryEntityTracker != null) {
+                this.insertInventoryEntityTracker.unRegister(serverWorld);
+                this.insertInventoryEntityTracker = null;
+                this.insertInventoryEntityBox = null;
+                this.insertInventoryEntityFailedSearchTime = 0L;
+            }
+        }
+
+        if (this.insertionMode == HopperCachingState.BlockInventory.REMOVAL_TRACKING_BLOCK_ENTITY) {
+            assert this.insertBlockInventory != null;
+            ((InventoryChangeTracker) this.insertBlockInventory).stopListenForMajorInventoryChanges(this);
+        }
+        this.invalidateBlockInsertionData();
     }
 
     private void checkSleepingConditions() {
@@ -798,22 +781,6 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
     }
 
     @Override
-    public void handleStackListReplaced(Container inventory) {
-        if (this instanceof SleepingBlockEntity) {
-            ((SleepingBlockEntity) this).wakeUpNow();
-        }
-        if (inventory == this.insertBlockInventory) {
-            this.invalidateBlockInsertionData();
-        }
-        if (inventory == this.extractBlockInventory) {
-            this.invalidateBlockExtractionData();
-        }
-        if (inventory == this) {
-            this.invalidateCachedData();
-        }
-    }
-
-    @Override
     public void handleInventoryContentModified(Container inventory) {
         if (this instanceof SleepingBlockEntity sleepingBlockEntity) {
             sleepingBlockEntity.wakeUpNow();
@@ -847,6 +814,36 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
     public void handleEntityMovement(Class<?> category) {
         if (this instanceof SleepingBlockEntity sleepingBlockEntity) {
             sleepingBlockEntity.wakeUpNow();
+        }
+    }
+
+    private void initInsertInventoryTracker(Level world, BlockState hopperState) {
+        assert world instanceof ServerLevel;
+        Direction direction = hopperState.getValue(HopperBlock.FACING);
+        BlockPos pos = this.getBlockPos().relative(direction);
+        this.insertInventoryEntityBox = new AABB(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1);
+        this.insertInventoryEntityTracker =
+                SectionedInventoryEntityMovementTracker.registerAt(
+                        (ServerLevel) this.level,
+                        this.insertInventoryEntityBox,
+                        Container.class
+                );
+        this.insertInventoryEntityFailedSearchTime = Long.MIN_VALUE;
+    }
+
+    @Override
+    public void handleStackListReplaced(Container inventory) {
+        if (this instanceof SleepingBlockEntity) {
+            ((SleepingBlockEntity) this).wakeUpNow();
+        }
+        if (inventory == this.insertBlockInventory) {
+            this.invalidateBlockInsertionData();
+        }
+        if (inventory == this.extractBlockInventory) {
+            this.invalidateBlockExtractionData();
+        }
+        if (inventory == this) {
+            this.invalidateCachedData();
         }
     }
 }
