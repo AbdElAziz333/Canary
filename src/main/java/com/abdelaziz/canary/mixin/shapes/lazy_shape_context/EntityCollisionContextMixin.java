@@ -15,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.function.Predicate;
@@ -56,20 +57,20 @@ public class EntityCollisionContextMixin {
         return false;
     }
 
-    /*
         @Inject(
-                method = "<init>(Lnet/minecraft/entity/Entity;)V",
-                at = @At(
+                method = "<init>(Lnet/minecraft/world/entity/Entity;)V",
+                at = @At("RETURN")
+                /* at = @At(
                         value = "INVOKE",
                         target = "Lnet/minecraft/block/EntityShapeContext;<init>(ZDLnet/minecraft/item/ItemStack;Ljava/util/function/Predicate;Lnet/minecraft/entity/Entity;)V",
                         shift = At.Shift.AFTER
-                )
+                ) */
         )
         private void initFields(Entity entity, CallbackInfo ci) {
             this.heldItem = null;
-            this.walkOnFluidPredicate = null;
+            this.canStandOnFluid = null;
         }
-    */
+
     @Inject(
             method = "isHoldingItem(Lnet/minecraft/world/item/Item;)Z",
             at = @At("HEAD")
