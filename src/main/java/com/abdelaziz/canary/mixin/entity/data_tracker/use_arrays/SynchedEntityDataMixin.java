@@ -73,7 +73,7 @@ public abstract class SynchedEntityDataMixin {
      * @author JellySquid
      */
     @Overwrite
-    private <T> SynchedEntityData.DataItem<T> getItem(EntityDataAccessor<T> data) {
+    public <T> SynchedEntityData.DataItem<T> getItem(EntityDataAccessor<T> data) {
         this.lock.readLock().lock();
 
         try {
