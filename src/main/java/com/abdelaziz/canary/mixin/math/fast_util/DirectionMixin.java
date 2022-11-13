@@ -1,11 +1,12 @@
 package com.abdelaziz.canary.mixin.math.fast_util;
 
 import net.minecraft.core.Direction;
-import net.minecraft.util.RandomSource;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+
+import java.util.Random;
 
 @Mixin(Direction.class)
 public class DirectionMixin {
@@ -31,7 +32,7 @@ public class DirectionMixin {
      * @author JellySquid
      */
     @Overwrite
-    public static Direction getRandom(RandomSource rand) {
+    public static Direction getRandom(Random rand) {
         return VALUES[rand.nextInt(VALUES.length)];
     }
 }

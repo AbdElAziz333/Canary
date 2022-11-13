@@ -3,6 +3,7 @@ package com.abdelaziz.canary.mixin.ai.poi;
 import com.abdelaziz.canary.common.world.interests.RegionBasedStorageColumn;
 import com.google.common.collect.AbstractIterator;
 import com.mojang.datafixers.DataFixer;
+import com.mojang.serialization.Codec;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import com.abdelaziz.canary.common.util.Pos;
@@ -52,9 +53,8 @@ public abstract class SectionStorageMixin<R> implements RegionBasedStorageSectio
     @Shadow
     protected abstract void readColumn(ChunkPos pos);
 
-    @SuppressWarnings("rawtypes")
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void init(Path path, Function codecFactory, Function factory, DataFixer dataFixer, DataFixTypes dataFixTypes, boolean dsync, RegistryAccess dynamicRegistryManager, LevelHeightAccessor world, CallbackInfo ci) {
+    private void init(Path path, Function<Runnable, Codec<R>> codecFactory, Function<Runnable, R> factory, DataFixer dataFixer, DataFixTypes dataFixTypes, boolean dsync, LevelHeightAccessor world, CallbackInfo ci) {
         this.columns = new Long2ObjectOpenHashMap<>();
         this.storage = new ListeningLong2ObjectOpenHashMap<>(this::onEntryAdded, this::onEntryRemoved);
     }

@@ -82,13 +82,7 @@ repositories {
 dependencies {
     minecraft "net.minecraftforge:forge:${project.forge_version}"
 
-    runtimeOnly fg.deobf("curse.maven:pluto-682881:4029607")
-    runtimeOnly fg.deobf("curse.maven:saturn-670986:3981973")
-    runtimeOnly fg.deobf("curse.maven:smooth-boot-reloaded-633412:4028205")
-    runtimeOnly fg.deobf("curse.maven:lazy-dfu-forge-460819:3831644")
-    runtimeOnly fg.deobf("curse.maven:ferritecore-429235:3875371")
-    runtimeOnly fg.deobf("curse.maven:fastload-630620:4026324")
-    runtimeOnly fg.deobf("curse.maven:starlight-forge-526854:3836016")
+    // Mowzie's Mobs - Cracker's Wither Storm - Quark (Hoppers) - Origin - Wooden Hoppers
 
     // Real mod deobf dependency examples - these get remapped to your current mappings
     // compileOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}:api") // Adds JEI API as a compile dependency

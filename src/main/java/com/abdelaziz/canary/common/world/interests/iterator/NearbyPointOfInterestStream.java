@@ -32,7 +32,7 @@ import java.util.function.Predicate;
 public class NearbyPointOfInterestStream extends Spliterators.AbstractSpliterator<PoiRecord> {
     private final RegionBasedStorageSectionExtended<PoiSection> storage;
 
-    private final Predicate<Holder<PoiType>> typeSelector;
+    private final Predicate<PoiType> typeSelector;
     private final PoiManager.Occupancy occupationStatus;
 
     private final LongArrayList chunksSortedByMinDistance;
@@ -46,7 +46,7 @@ public class NearbyPointOfInterestStream extends Spliterators.AbstractSpliterato
     private int pointIndex;
     private final Comparator<? super SortedPointOfInterest> pointComparator;
 
-    public NearbyPointOfInterestStream(Predicate<Holder<PoiType>> typeSelector,
+    public NearbyPointOfInterestStream(Predicate<PoiType> typeSelector,
                                        PoiManager.Occupancy status,
                                        boolean useSquareDistanceLimit,
                                        boolean preferNegativeY,

@@ -28,7 +28,7 @@ public abstract class LivingEntityMixin extends Entity {
             method = "tryAddFrost()V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/world/entity/LivingEntity;getBlockStateOnLegacy()Lnet/minecraft/world/level/block/state/BlockState;"
+                    target = "Lnet/minecraft/world/entity/LivingEntity;getBlockStateOn()Lnet/minecraft/world/level/block/state/BlockState;"
             )
     )
     private BlockState delayGetBlockState(LivingEntity instance) {
@@ -55,6 +55,6 @@ public abstract class LivingEntityMixin extends Entity {
     )
     private AttributeInstance doDelayedBlockStateAirTest(LivingEntity instance, Attribute attribute) {
         //noinspection deprecation
-        return this.getBlockStateOnLegacy().isAir() ? null : this.getAttribute(attribute);
+        return this.getBlockStateOn().isAir() ? null : this.getAttribute(attribute);
     }
 }

@@ -2,7 +2,7 @@ package com.abdelaziz.canary.api.inventory;
 
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.Container;
-import net.minecraft.world.entity.vehicle.ContainerEntity;
+import net.minecraft.world.entity.vehicle.AbstractMinecartContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 
@@ -45,6 +45,26 @@ public interface CanaryInventory extends Container {
     void setInventoryCanary(NonNullList<ItemStack> inventory);
 
     /**
+     * Controls the inventory caching of hoppers.
+     * Hoppers update their cache after the removedCounter of the cached inventory increases.
+     * <p>
+     * Modded inventories most likely do not need to override this method:
+     * <p>
+     * Entity inventories are never cached, so they do not need to implement this method.
+     * Inventories that are created using a block implementing {@link net.minecraft.world.WorldlyContainerHolder}
+     * must change their BlockState when they become invalid instead.
+     * {@link net.minecraft.world.level.block.entity.BlockEntity} inventories also do not need to implement this method.
+     * Inventories that never become invalid (e.g. by unloading, destroying, being replaced with a new object)
+     * do not need to implement this method.
+     *
+     * @return the removedCounter of the LithiumInventory
+     */
+    default int getRemovedCountCanary() {
+        //Already implemented for BlockEntity and DoubleInventory
+        return 0;
+    }
+
+    /**
      * Generates the loot like a hopper access would do in vanilla.
      * <p>
      * If a modded inventory has custom loot generation code, it will be required to override this
@@ -54,8 +74,8 @@ public interface CanaryInventory extends Container {
         if (this instanceof RandomizableContainerBlockEntity) {
             ((RandomizableContainerBlockEntity) this).unpackLootTable(null);
         }
-        if (this instanceof ContainerEntity) {
-            ((ContainerEntity) this).unpackChestVehicleLootTable(null);
+        if (this instanceof AbstractMinecartContainer) {
+            ((AbstractMinecartContainer) this).unpackLootTable(null);
         }
     }
 }

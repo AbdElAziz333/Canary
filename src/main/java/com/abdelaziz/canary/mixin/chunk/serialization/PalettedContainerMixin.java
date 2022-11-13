@@ -9,7 +9,6 @@ import net.minecraft.util.ZeroBitStorage;
 import net.minecraft.world.level.chunk.Palette;
 import net.minecraft.world.level.chunk.PaletteResize;
 import net.minecraft.world.level.chunk.PalettedContainer;
-import net.minecraft.world.level.chunk.PalettedContainerRO;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -60,7 +59,7 @@ public abstract class PalettedContainerMixin<T> {
      * @author JellySquid
      */
     @Overwrite
-    public PalettedContainerRO.PackedData<T> pack(IdMap<T> idList, PalettedContainer.Strategy provider) {
+    public PalettedContainer.DiscData<T> write(IdMap<T> idList, PalettedContainer.Strategy provider) {
         this.acquire();
 
         // The palette that will be serialized
@@ -105,7 +104,7 @@ public abstract class PalettedContainerMixin<T> {
         }
 
         this.release();
-        return new PalettedContainerRO.PackedData<>(elements, data);
+        return new PalettedContainer.DiscData<>(elements, data);
     }
 
     private Optional<LongStream> asOptional(long[] data) {

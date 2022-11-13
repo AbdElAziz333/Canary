@@ -55,7 +55,7 @@ public class CampfireBlockEntityMixin extends BlockEntity implements SleepingBlo
             method = "placeFood",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/core/NonNullList;set(ILjava/lang/Object;)Ljava/lang/Object;")
     )
-    private void wakeUpOnAddItem(Entity user, ItemStack stack, int cookTime, CallbackInfoReturnable<Boolean> cir) {
+    private void wakeUpOnAddItem(ItemStack stack, int cookTime, CallbackInfoReturnable<Boolean> cir) {
         this.wakeUpNow();
     }
 
