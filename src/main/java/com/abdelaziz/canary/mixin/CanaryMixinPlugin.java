@@ -4,6 +4,7 @@ import com.abdelaziz.canary.common.Canary;
 import com.abdelaziz.canary.common.config.CanaryConfig;
 import com.abdelaziz.canary.common.config.Option;
 import net.minecraftforge.fml.loading.FMLLoader;
+import net.minecraftforge.fml.loading.LoadingModList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.tree.ClassNode;
@@ -44,6 +45,24 @@ public class CanaryMixinPlugin implements IMixinConfigPlugin {
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
         //Ferritecore adds a better optimization for neighbor table, disable the StateMixin when ferritecore is installed
         if (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "alloc.blockstate") && (FMLLoader.getLoadingModList().getModFileById("ferritecore") != null)) {
+            return false;
+        }
+
+        //For now, disable entity.fast_retrieval optimization when Mowzie's Mobs is loaded, until i fix this issue
+        if (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "entity.fast_retrieval") && (FMLLoader.getLoadingModList().getModFileById("mowziesmobs") != null)) {
+            return false;
+        }
+
+        //Fix: if Forge errors is not empty then disable shapes, math.sine_lut and alloc.blockstate optimizations. (Thanks for malte!)
+        if (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "shapes") && !LoadingModList.get().getErrors().isEmpty()) {
+            return false;
+        }
+
+        if (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "math.sine_lut") && !LoadingModList.get().getErrors().isEmpty()) {
+            return false;
+        }
+
+        if (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "alloc.blockstate") && !LoadingModList.get().getErrors().isEmpty()) {
             return false;
         }
 
