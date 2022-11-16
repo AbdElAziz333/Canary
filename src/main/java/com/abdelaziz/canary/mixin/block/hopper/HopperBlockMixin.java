@@ -18,8 +18,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static net.minecraft.client.renderer.LevelRenderer.DIRECTIONS;
-
 @Mixin(HopperBlock.class)
 public abstract class HopperBlockMixin extends BaseEntityBlock {
 
@@ -60,7 +58,7 @@ public abstract class HopperBlockMixin extends BaseEntityBlock {
     private void workAroundVanillaUpdateSuppression(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean moved, CallbackInfo ci) {
         //invalidate caches of nearby hoppers when placing an update suppressed hopper
         if (world.getBlockState(pos) != state) {
-            for (Direction direction : DIRECTIONS) {
+            for (Direction direction : UPDATE_SHAPE_ORDER) {
                 BlockEntity hopper = ((BlockEntityGetter) world).getLoadedExistingBlockEntity(pos.relative(direction));
                 if (hopper instanceof UpdateReceiver updateReceiver) {
                     updateReceiver.onNeighborUpdate(direction == Direction.DOWN);
