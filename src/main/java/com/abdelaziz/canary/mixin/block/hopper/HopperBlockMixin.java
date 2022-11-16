@@ -35,7 +35,6 @@ public abstract class HopperBlockMixin extends BaseEntityBlock {
             this.updateHopper(world, myBlockState, myPos, posFrom);
         }
         return super.updateShape(myBlockState, direction, newState, world, myPos, posFrom);
-
     }
 
     @Inject(method = "neighborChanged(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/Block;Lnet/minecraft/core/BlockPos;Z)V", at = @At(value = "HEAD"))

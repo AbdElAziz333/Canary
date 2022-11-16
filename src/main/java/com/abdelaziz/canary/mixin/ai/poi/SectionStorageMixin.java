@@ -9,7 +9,6 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import com.abdelaziz.canary.common.util.Pos;
 import com.abdelaziz.canary.common.util.collections.ListeningLong2ObjectOpenHashMap;
 import com.abdelaziz.canary.common.world.interests.RegionBasedStorageSectionExtended;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.SectionPos;
 import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.level.ChunkPos;

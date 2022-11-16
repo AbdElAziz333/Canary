@@ -40,7 +40,7 @@ public class PortalForcerMixin {
         poiStorage.ensureLoadedAndValid(this.level, centerPos, searchRadius);
 
         Optional<PoiRecord> ret = ((PointOfInterestStorageExtended) poiStorage).findNearestForPortalLogic(centerPos, searchRadius,
-                PoiType.f_27350_, PoiManager.Occupancy.ANY,
+                PoiType.NETHER_PORTAL, PoiManager.Occupancy.ANY,
                 (poi) -> this.level.getBlockState(poi.getPos()).hasProperty(BlockStateProperties.HORIZONTAL_AXIS),
                 worldBorder
         );
