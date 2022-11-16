@@ -1,5 +1,5 @@
-modLoader="javafml"
-loaderVersion="[43,)"
+modLoader = "javafml"
+loaderVersion = "[40,)"
 license = "LGPL-3.0-only"
 issueTrackerURL = "https://github.com/AbdElAziz333/Canary/issues"
 [[mods]]
@@ -11,7 +11,6 @@ displayURL = "https://www.curseforge.com/minecraft/mc-mods/canary"
 logoFile = "logo.png"
 credits = "AbdElAziz, JellySquid, 2No2Name"
 authors = "AbdElAziz"
-displayTest = "MATCH_VERSION"
 
 description = '''
 Canary is a free and open-source optimization mod for Minecraft which makes a wide range of performance improvements to the game.
@@ -20,7 +19,7 @@ Canary is a free and open-source optimization mod for Minecraft which makes a wi
 [[dependencies.canary]]
 modId = "forge"
 mandatory = true
-versionRange = "[43,)"
+versionRange = "[40,)"
 ordering = "NONE"
 side = "BOTH"
 
