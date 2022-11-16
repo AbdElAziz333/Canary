@@ -53,6 +53,19 @@ public class CanaryMixinPlugin implements IMixinConfigPlugin {
             return false;
         }
 
+        //Fix: if Forge errors is not empty then disable shapes, math.sine_lut and alloc.blockstate optimizations. (Thanks for malte!)
+        if (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "shapes") && !LoadingModList.get().getErrors().isEmpty()) {
+            return false;
+        }
+
+        if (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "math.sine_lut") && !LoadingModList.get().getErrors().isEmpty()) {
+            return false;
+        }
+
+        if (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "alloc.blockstate") && !LoadingModList.get().getErrors().isEmpty()) {
+            return false;
+        }
+
         if (!mixinClassName.startsWith(MIXIN_PACKAGE_ROOT)) {
             this.logger.error("Expected mixin '{}' to start with package root '{}', treating as foreign and " +
                     "disabling!", mixinClassName, MIXIN_PACKAGE_ROOT);
