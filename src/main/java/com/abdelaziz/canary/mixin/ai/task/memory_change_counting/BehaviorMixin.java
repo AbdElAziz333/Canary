@@ -29,7 +29,7 @@ public class BehaviorMixin<E extends LivingEntity> {
     private boolean cachedHasRequiredMemoryState;
 
     @Inject(method = "<init>(Ljava/util/Map;II)V", at = @At("RETURN"))
-    private void init(Map<MemoryModuleType<?>, MemoryStatus> map, int int_1, int int_2, CallbackInfo ci) {
+    public void init(Map<MemoryModuleType<?>, MemoryStatus> map, int int_1, int int_2, CallbackInfo ci) {
         this.entryCondition = new Reference2ObjectOpenHashMap<>(map);
     }
 
