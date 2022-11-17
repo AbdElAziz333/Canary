@@ -17,7 +17,19 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 public class LevelChunkMixin {
 
     @Inject(
-            method = "lambda$updateBlockEntityTicker$7", //m_187960_
+            /**
+             * For Developers :
+             *
+             * - When you use the mod in the dev environment, you should use the regular names
+             * use lambda$updateBlockEntityTicker$7 instead of m_187960_
+             *
+             * - When you are want to build this project use the SRG method names
+             * use m_187960_ instead of lambda$updateBlockEntityTicker$7.
+             *
+             * you should also do that with
+             * You should also do that with EntityClassGroup
+             * */
+            method = "lambda$updateBlockEntityTicker$7", //m_187960_ - lambda$updateBlockEntityTicker$7
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addBlockEntityTicker(Lnet/minecraft/world/level/block/entity/TickingBlockEntity;)V"),
             locals = LocalCapture.CAPTURE_FAILHARD
     )
@@ -28,7 +40,18 @@ public class LevelChunkMixin {
     }
 
     @Inject(
-            method = "lambda$updateBlockEntityTicker$7",
+            /**
+             * For Developers :
+             *
+             * - When you use the mod in the dev environment, you should use the regular names
+             * use lambda$updateBlockEntityTicker$7 instead of m_187960_
+             *
+             * - When you are want to build this project use the SRG method names
+             * use m_187960_ instead of lambda$updateBlockEntityTicker$7.
+             *
+             * You should also do that with EntityClassGroup
+             * */
+            method = "lambda$updateBlockEntityTicker$7", //m_187960_ - lambda$updateBlockEntityTicker$7
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/chunk/LevelChunk$RebindableTickingBlockEntityWrapper;rebind(Lnet/minecraft/world/level/block/entity/TickingBlockEntity;)V"),
             locals = LocalCapture.CAPTURE_FAILHARD
     )

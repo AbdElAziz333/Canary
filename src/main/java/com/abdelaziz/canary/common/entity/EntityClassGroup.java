@@ -23,7 +23,18 @@ public class EntityClassGroup {
     public static final EntityClassGroup MINECART_BOAT_LIKE_COLLISION; //aka entities that will attempt to collide with all other entities when moving
 
     static {
-        String remapped_method_30949 = "canCollideWith"; //method_30949 - canCollideWith - m_7337_
+        /**
+         * For Developers :
+         *
+         * - When you use the mod in the dev environment, you should use the regular names
+         * use canCollideWith instead of m_7337_
+         *
+         * - When you are want to build this project use the SRG method names
+         * use m_7337_ instead of canCollideWith.
+         *
+         * You should also do that with mixin.world.block_entity_ticking.sleeping.LevelChunkMixin
+         * */
+        String remapped_method_30949 = "canCollideWith"; //canCollideWith - m_7337_
         MINECART_BOAT_LIKE_COLLISION = new EntityClassGroup(
                 (Class<?> entityClass) -> ReflectionUtil.hasMethodOverride(entityClass, Entity.class, true, remapped_method_30949, Entity.class));
 
@@ -85,7 +96,18 @@ public class EntityClassGroup {
         public static final NoDragonClassGroup BOAT_SHULKER_LIKE_COLLISION; //aka entities that other entities will do block-like collisions with when moving
 
         static {
-            String remapped_method_30948 = "canBeCollidedWith";//method_30948 - canBeCollidedWith - m_5829_
+            /**
+             * For Developers :
+             *
+             * - When you use the mod in the dev environment, you should use the regular names
+             * use canBeCollidedWith instead of m_5829_
+             *
+             * - When you are want to build this project use the SRG method names
+             * use m_5829_ instead of canBeCollidedWith.
+             *
+             * You should also do that with mixin.world.block_entity_ticking.sleeping.LevelChunkMixin
+             * */
+            String remapped_method_30948 = "canBeCollidedWith";//canBeCollidedWith - m_5829_
             BOAT_SHULKER_LIKE_COLLISION = new NoDragonClassGroup(
                     (Class<?> entityClass) -> ReflectionUtil.hasMethodOverride(entityClass, Entity.class, true, remapped_method_30948));
 
