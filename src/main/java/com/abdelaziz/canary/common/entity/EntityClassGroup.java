@@ -29,7 +29,7 @@ public class EntityClassGroup {
          * - When you use the mod in the dev environment, you should use the regular names
          * use canCollideWith instead of m_7337_
          *
-         * - When you are want to build this project use the SRG method names
+         * - When you are want to build this project use the SRG names
          * use m_7337_ instead of canCollideWith.
          *
          * You should also do that with mixin.world.block_entity_ticking.sleeping.LevelChunkMixin
@@ -102,7 +102,7 @@ public class EntityClassGroup {
              * - When you use the mod in the dev environment, you should use the regular names
              * use canBeCollidedWith instead of m_5829_
              *
-             * - When you are want to build this project use the SRG method names
+             * - When you are want to build this project use the SRG names
              * use m_5829_ instead of canBeCollidedWith.
              *
              * You should also do that with mixin.world.block_entity_ticking.sleeping.LevelChunkMixin
