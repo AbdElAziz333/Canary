@@ -1,16 +1,19 @@
 package com.abdelaziz.canary.common.reflection;
 
+import cpw.mods.modlauncher.api.INameMappingService;
 import net.minecraft.CrashReport;
 import net.minecraft.CrashReportCategory;
 import net.minecraft.ReportedException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import static net.minecraftforge.fml.util.ObfuscationReflectionHelper.remapName;
+
 public class ReflectionUtil {
     public static boolean hasMethodOverride(Class<?> clazz, Class<?> superclass, boolean fallbackResult, String methodName, Class<?>... methodArgs) {
         while (clazz != null && clazz != superclass && superclass.isAssignableFrom(clazz)) {
             try {
-                clazz.getDeclaredMethod(methodName, methodArgs);
+                clazz.getDeclaredMethod(remapName(INameMappingService.Domain.METHOD, methodName), methodArgs);
                 return true;
             } catch (NoSuchMethodException e) {
                 clazz = clazz.getSuperclass();

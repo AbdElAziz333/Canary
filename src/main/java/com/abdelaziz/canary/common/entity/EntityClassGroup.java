@@ -6,6 +6,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.monster.Shulker;
 import net.minecraft.world.entity.vehicle.Minecart;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 
 import java.util.Objects;
 import java.util.function.Predicate;
@@ -23,18 +24,7 @@ public class EntityClassGroup {
     public static final EntityClassGroup MINECART_BOAT_LIKE_COLLISION; //aka entities that will attempt to collide with all other entities when moving
 
     static {
-        /**
-         * For Developers :
-         *
-         * - When you use the mod in the dev environment, you should use the regular names
-         * use canCollideWith instead of m_7337_
-         *
-         * - When you are want to build this project use the SRG names
-         * use m_7337_ instead of canCollideWith.
-         *
-         * You should also do that with mixin.world.block_entity_ticking.sleeping.LevelChunkMixin
-         * */
-        String remapped_method_30949 = "canCollideWith"; //canCollideWith - m_7337_
+        String remapped_method_30949 = "m_7337_";
         MINECART_BOAT_LIKE_COLLISION = new EntityClassGroup(
                 (Class<?> entityClass) -> ReflectionUtil.hasMethodOverride(entityClass, Entity.class, true, remapped_method_30949, Entity.class));
 
@@ -96,18 +86,7 @@ public class EntityClassGroup {
         public static final NoDragonClassGroup BOAT_SHULKER_LIKE_COLLISION; //aka entities that other entities will do block-like collisions with when moving
 
         static {
-            /**
-             * For Developers :
-             *
-             * - When you use the mod in the dev environment, you should use the regular names
-             * use canBeCollidedWith instead of m_5829_
-             *
-             * - When you are want to build this project use the SRG names
-             * use m_5829_ instead of canBeCollidedWith.
-             *
-             * You should also do that with mixin.world.block_entity_ticking.sleeping.LevelChunkMixin
-             * */
-            String remapped_method_30948 = "canBeCollidedWith";//canBeCollidedWith - m_5829_
+            String remapped_method_30948 = "m_5829_";
             BOAT_SHULKER_LIKE_COLLISION = new NoDragonClassGroup(
                     (Class<?> entityClass) -> ReflectionUtil.hasMethodOverride(entityClass, Entity.class, true, remapped_method_30948));
 
