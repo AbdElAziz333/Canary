@@ -17,8 +17,8 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 public class LevelChunkMixin {
 
     @Inject(
-            method = "lambda$updateBlockEntityTicker$7", //m_187960_ - lambda$updateBlockEntityTicker$7
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addBlockEntityTicker(Lnet/minecraft/world/level/block/entity/TickingBlockEntity;)V"),
+            method = "lambda$updateBlockEntityTicker$7",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addBlockEntityTicker(Lnet/minecraft/world/level/block/entity/TickingBlockEntity;)V"), remap = true,
             locals = LocalCapture.CAPTURE_FAILHARD
     )
     private void setBlockEntityTickingOrder(BlockEntity blockEntity, BlockEntityTicker<?> blockEntityTicker, BlockPos pos, @Coerce Object wrappedBlockEntityTickInvoker, CallbackInfoReturnable<?> cir, TickingBlockEntity blockEntityTickInvoker, @Coerce Object wrappedBlockEntityTickInvoker2) {
@@ -29,7 +29,7 @@ public class LevelChunkMixin {
 
     @Inject(
             method = "lambda$updateBlockEntityTicker$7",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/chunk/LevelChunk$RebindableTickingBlockEntityWrapper;rebind(Lnet/minecraft/world/level/block/entity/TickingBlockEntity;)V"),
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/chunk/LevelChunk$RebindableTickingBlockEntityWrapper;rebind(Lnet/minecraft/world/level/block/entity/TickingBlockEntity;)V"), remap = true,
             locals = LocalCapture.CAPTURE_FAILHARD
     )
     private void setBlockEntityTickingOrder(BlockEntity blockEntity, BlockEntityTicker<?> blockEntityTicker, BlockPos pos, @Coerce Object wrappedBlockEntityTickInvoker, CallbackInfoReturnable<?> cir, TickingBlockEntity blockEntityTickInvoker) {
