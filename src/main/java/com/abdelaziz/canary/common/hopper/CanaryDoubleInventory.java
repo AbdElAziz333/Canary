@@ -97,11 +97,8 @@ public class CanaryDoubleInventory extends CompoundContainer implements CanaryIn
     @Override
     public void emitFirstComparatorAdded() {
         ReferenceOpenHashSet<InventoryChangeListener> inventoryChangeListeners = this.inventoryChangeListeners;
-        if (inventoryChangeListeners != null) {
-            for (InventoryChangeListener inventoryChangeListener : inventoryChangeListeners) {
-                inventoryChangeListener.handleComparatorAdded(this);
-            }
-            inventoryChangeListeners.clear();
+        if (inventoryChangeListeners != null && !inventoryChangeListeners.isEmpty()) {
+            inventoryChangeListeners.removeIf(inventoryChangeListener -> inventoryChangeListener.handleComparatorAdded(this));
         }
     }
 
@@ -164,8 +161,9 @@ public class CanaryDoubleInventory extends CompoundContainer implements CanaryIn
     }
 
     @Override
-    public void handleComparatorAdded(Container inventory) {
+    public boolean handleComparatorAdded(Container inventory) {
         this.emitFirstComparatorAdded();
+        return this.inventoryChangeListeners.isEmpty();
     }
 
     @Override
