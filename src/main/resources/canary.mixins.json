@@ -177,6 +177,8 @@
     "world.chunk_access.LevelMixin",
     "world.chunk_access.ServerChunkCacheMixin",
     "world.chunk_tickets.SortedArraySetMixin",
+    "world.combined_heightmap_update.HeightmapAccessor",
+    "world.combined_heightmap_update.LevelChunkMixin",
     "world.explosions.ExplosionMixin",
     "world.inline_block_access.LevelChunkMixin",
     "world.inline_block_access.LevelMixin",
