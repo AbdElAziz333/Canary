@@ -19,6 +19,7 @@
     "ai.nearby_entity_tracking.goals.AvoidEntityGoalMixin",
     "ai.nearby_entity_tracking.goals.LookAtPlayerGoalMixin",
     "ai.pathing.BlockStateBaseMixin",
+    "ai.pathing.FlyNodeEvaluatorMixin",
     "ai.pathing.PathNavigationRegionMixin",
     "ai.pathing.WalkNodeEvaluatorMixin",
     "ai.poi.PoiManagerMixin",
