@@ -11,7 +11,7 @@ import java.util.function.Predicate;
 @Mixin(Heightmap.class)
 public interface HeightmapAccessor {
     @Invoker("setHeight")
-    void setHeight(int x, int z, int height);
+    void set(int x, int z, int height);
 
     @Accessor("isOpaque")
     Predicate<BlockState> getOpaque();
