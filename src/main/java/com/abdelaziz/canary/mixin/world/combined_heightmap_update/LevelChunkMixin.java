@@ -63,7 +63,7 @@ public abstract class LevelChunkMixin extends ChunkAccess {
             ),
             locals = LocalCapture.CAPTURE_FAILHARD
     )
-    private void updateHeightmapsCombined(BlockPos pos, BlockState state, boolean moved, CallbackInfoReturnable<BlockState> cir, int i, LevelChunkSection chunkSection, boolean bl, int x, int y, int z, BlockState blockState, Block block) {
+    private void updateHeightmapsCombined(BlockPos pos, BlockState state, boolean moved, CallbackInfoReturnable<BlockState> cir, int y, LevelChunkSection chunkSection, boolean bl, int x, int yMod16, int z, BlockState blockState, Block block) {
         Heightmap heightmap0 = this.heightmaps.get(Heightmap.Types.MOTION_BLOCKING);
         Heightmap heightmap1 = this.heightmaps.get(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES);
         Heightmap heightmap2 = this.heightmaps.get(Heightmap.Types.OCEAN_FLOOR);
