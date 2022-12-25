@@ -1,7 +1,7 @@
 package com.abdelaziz.canary.mixin.ai.nearby_entity_tracking;
 
-import com.abdelaziz.canary.common.entity.tracker.nearby.NearbyEntityListenerMulti;
-import com.abdelaziz.canary.common.entity.tracker.nearby.NearbyEntityListenerProvider;
+import com.abdelaziz.canary.common.entity.nearby_tracker.NearbyEntityListenerMulti;
+import com.abdelaziz.canary.common.entity.nearby_tracker.NearbyEntityListenerProvider;
 import net.minecraft.core.SectionPos;
 import net.minecraft.world.level.entity.EntityAccess;
 import net.minecraft.world.level.entity.EntitySectionStorage;

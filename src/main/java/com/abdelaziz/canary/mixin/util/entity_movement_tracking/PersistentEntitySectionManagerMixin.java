@@ -1,9 +1,9 @@
-package com.abdelaziz.canary.mixin.ai.nearby_entity_tracking;
+package com.abdelaziz.canary.mixin.util.entity_movement_tracking;
 
-import com.abdelaziz.canary.common.entity.nearby_tracker.NearbyEntityListenerMulti;
-import com.abdelaziz.canary.common.entity.nearby_tracker.NearbyEntityListenerProvider;
+import com.abdelaziz.canary.common.entity.movement_tracker.EntityMovementTrackerSection;
+import com.abdelaziz.canary.common.entity.movement_tracker.MovementTrackerHelper;
+import com.abdelaziz.canary.common.entity.movement_tracker.ToggleableMovementTracker;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.SectionPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.entity.EntityAccess;
 import net.minecraft.world.level.entity.EntitySection;
@@ -17,24 +17,15 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-@Mixin(targets = "net/minecraft/world/level/entity/PersistentEntitySectionManager$Callback")
-public class PersistentEntitySectionManagerCallbackMixin<T extends EntityAccess> {
-    @Final
-    @SuppressWarnings("ShadowTarget")
+@Mixin(targets = "net.minecraft.world.level.entity.PersistentEntitySectionManager$Callback")
+public class PersistentEntitySectionManagerMixin<T extends EntityAccess> implements ToggleableMovementTracker {
     @Shadow
-    PersistentEntitySectionManager<T> this$0;
-
+    private EntitySection<T> currentSection;
     @Shadow
     @Final
     private T entity;
 
-    //@Shadow
-    //private EntitySection<T> currentSection;
-
-    @Shadow
-    private long currentSectionKey;
-
-    /*private int notificationMask;
+    private int notificationMask;
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void init(PersistentEntitySectionManager<?> outer, T entityLike, long l, EntitySection<T> entityTrackingSection, CallbackInfo ci) {
@@ -45,9 +36,9 @@ public class PersistentEntitySectionManagerCallbackMixin<T extends EntityAccess>
     }
 
     @Inject(method = "onMove()V", at = @At("RETURN"))
-    private void updateMovementTrackerHelper(CallbackInfo ci) {
+    private void updateEntityTrackerEngine(CallbackInfo ci) {
         this.notifyMovementListeners();
-    } */
+    }
 
     @Inject(
             method = "onMove()V",
@@ -59,16 +50,7 @@ public class PersistentEntitySectionManagerCallbackMixin<T extends EntityAccess>
             locals = LocalCapture.CAPTURE_FAILHARD
     )
     private void onAddEntity(CallbackInfo ci, BlockPos blockPos, long newPos, Visibility entityTrackingStatus, EntitySection<T> entityTrackingSection) {
-        NearbyEntityListenerMulti listener = ((NearbyEntityListenerProvider) this.entity).getListener();
-        if (listener != null) {
-            //noinspection unchecked
-            listener.forEachChunkInRangeChange(
-                    ((PersistentEntitySectionManagerAccessor<T>) this.this$0).getSectionStorage(),
-                    SectionPos.of(this.currentSectionKey),
-                    SectionPos.of(newPos)
-            );
-        }
-        //this.notifyMovementListeners();
+        this.notifyMovementListeners();
     }
 
     @Inject(
@@ -78,21 +60,12 @@ public class PersistentEntitySectionManagerCallbackMixin<T extends EntityAccess>
             )
     )
     private void onRemoveEntity(Entity.RemovalReason reason, CallbackInfo ci) {
-        NearbyEntityListenerMulti listener = ((NearbyEntityListenerProvider) this.entity).getListener();
-        if (listener != null) {
-            //noinspection unchecked
-            listener.forEachChunkInRangeChange(
-                    ((PersistentEntitySectionManagerAccessor<T>) this.this$0).getSectionStorage(),
-                    SectionPos.of(this.currentSectionKey),
-                    null
-            );
-        }
-        /* this.notifyMovementListeners();
+        this.notifyMovementListeners();
     }
 
     private void notifyMovementListeners() {
         if (this.notificationMask != 0) {
-            ((EntityTrackerSection) this.currentSection).trackEntityMovement(this.notificationMask, ((Entity) this.entity).getCommandSenderWorld().getGameTime());
+            ((EntityMovementTrackerSection) this.currentSection).trackEntityMovement(this.notificationMask, ((Entity) this.entity).getCommandSenderWorld().getGameTime());
         }
     }
 
@@ -100,6 +73,6 @@ public class PersistentEntitySectionManagerCallbackMixin<T extends EntityAccess>
     public int setNotificationMask(int notificationMask) {
         int oldNotificationMask = this.notificationMask;
         this.notificationMask = notificationMask;
-        return oldNotificationMask; */
+        return oldNotificationMask;
     }
 }

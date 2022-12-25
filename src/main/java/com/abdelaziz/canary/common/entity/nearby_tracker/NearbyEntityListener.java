@@ -1,7 +1,6 @@
-package com.abdelaziz.canary.common.entity.tracker.nearby;
+package com.abdelaziz.canary.common.entity.nearby_tracker;
 
-import com.abdelaziz.canary.common.entity.tracker.EntityTrackerEngine;
-import com.abdelaziz.canary.common.entity.tracker.EntityTrackerSection;
+import com.abdelaziz.canary.common.entity.movement_tracker.EntityTrackerSection;
 import com.abdelaziz.canary.common.util.tuples.Range6Int;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
@@ -12,10 +11,6 @@ import net.minecraft.world.level.entity.EntitySection;
 import net.minecraft.world.level.entity.EntitySectionStorage;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 
-/**
- * The main interface used to receive events from the
- * {@link EntityTrackerEngine} of a world.
- */
 public interface NearbyEntityListener {
     Range6Int EMPTY_RANGE = new Range6Int(0, 0, 0, -1, -1, -1);
 

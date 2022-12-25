@@ -1,8 +1,8 @@
-package com.abdelaziz.canary.mixin.ai.nearby_entity_tracking;
+package com.abdelaziz.canary.mixin.util.entity_movement_tracking;
 
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
-import com.abdelaziz.canary.common.entity.tracker.nearby.MovementTrackerCache;
-import com.abdelaziz.canary.common.entity.tracker.nearby.SectionedEntityMovementTracker;
+import com.abdelaziz.canary.common.entity.movement_tracker.MovementTrackerCache;
+import com.abdelaziz.canary.common.entity.movement_tracker.SectionedEntityMovementTracker;
 import net.minecraft.world.level.entity.EntityAccess;
 import net.minecraft.world.level.entity.EntitySectionStorage;
 import org.spongepowered.asm.mixin.Mixin;

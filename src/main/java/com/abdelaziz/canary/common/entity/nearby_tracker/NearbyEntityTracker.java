@@ -1,4 +1,4 @@
-package com.abdelaziz.canary.common.entity.tracker.nearby;
+package com.abdelaziz.canary.common.entity.nearby_tracker;
 
 import com.abdelaziz.canary.common.util.tuples.Range6Int;
 import it.unimi.dsi.fastutil.objects.Reference2LongOpenHashMap;

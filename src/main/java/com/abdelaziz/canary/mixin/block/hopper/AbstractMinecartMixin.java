@@ -1,6 +1,6 @@
 package com.abdelaziz.canary.mixin.block.hopper;
 
-import com.abdelaziz.canary.common.entity.tracker.nearby.ToggleableMovementTracker;
+import com.abdelaziz.canary.common.entity.movement_tracker.ToggleableMovementTracker;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.Entity;

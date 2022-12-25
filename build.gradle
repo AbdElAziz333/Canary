@@ -88,17 +88,18 @@ repositories {
 dependencies {
     minecraft "net.minecraftforge:forge:${project.forge_version}"
 
-    // Real mod deobf dependency examples - these get remapped to your current mappings
-    // compileOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}:api") // Adds JEI API as a compile dependency
-    // runtimeOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}") // Adds the full JEI mod as a runtime dependency
-    // implementation fg.deobf("com.tterrag.registrate:Registrate:MC${mc_version}-${registrate_version}") // Adds registrate as a dependency
-
-    // Examples using mod jars from ./libs
-    // implementation fg.deobf("blank:coolmod-${mc_version}:${coolmod_version}")
-
-    // For more info...
-    // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
-    // http://www.gradle.org/docs/current/userguide/dependency_management.html
+    implementation fg.deobf("curse.maven:ferritecore-429235:4117906") //Ferritecore
+    implementation fg.deobf("curse.maven:fastload-630620:4074712")//Fastload
+    implementation fg.deobf("curse.maven:smooth-boot-reloaded-633412:4049125")//Smooth Boot (Reloaded)
+    implementation fg.deobf("curse.maven:lazy-dfu-forge-460819:3831644")//Lazy DFU
+    implementation fg.deobf("curse.maven:starlight-forge-526854:3836016")//Starlight (Forge)
+    implementation fg.deobf("curse.maven:quark-243121:4140000")//Quark
+    implementation fg.deobf("curse.maven:autoreglib-250363:4100299")//AutoRegLib
+    implementation fg.deobf("curse.maven:crackers-wither-storm-mod-621405:4030212")//Cracker's Wither Storm
+    implementation fg.deobf("curse.maven:wooden-hopper-440985:3875585")//Wooden Hopper
+    implementation fg.deobf("curse.maven:create-328085:4174330")//Create
+    implementation fg.deobf("curse.maven:jei-238222:4175833")//Just Enough Items (JEI)
+    implementation fg.deobf("curse.maven:small-ships-450659:3926824") //Small Ships
 
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }

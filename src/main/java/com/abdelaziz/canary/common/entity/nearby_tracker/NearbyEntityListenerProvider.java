@@ -1,4 +1,4 @@
-package com.abdelaziz.canary.common.entity.tracker.nearby;
+package com.abdelaziz.canary.common.entity.nearby_tracker;
 
 import org.jetbrains.annotations.Nullable;
 

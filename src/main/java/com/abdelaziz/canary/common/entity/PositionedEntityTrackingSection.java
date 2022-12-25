@@ -1,4 +1,4 @@
-package com.abdelaziz.canary.common.entity.tracker;
+package com.abdelaziz.canary.common.entity;
 
 public interface PositionedEntityTrackingSection {
     void setPos(long chunkSectionPos);

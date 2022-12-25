@@ -1,6 +1,6 @@
 package com.abdelaziz.canary.mixin.block.hopper;
 
-import com.abdelaziz.canary.common.entity.tracker.nearby.ToggleableMovementTracker;
+import com.abdelaziz.canary.common.entity.movement_tracker.ToggleableMovementTracker;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.vehicle.ChestBoat;

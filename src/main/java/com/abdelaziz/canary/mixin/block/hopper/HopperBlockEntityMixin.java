@@ -7,8 +7,8 @@ import com.abdelaziz.canary.common.block.entity.inventory_change_tracking.Invent
 import com.abdelaziz.canary.common.block.entity.inventory_change_tracking.InventoryChangeTracker;
 import com.abdelaziz.canary.common.block.entity.inventory_comparator_tracking.ComparatorTracker;
 import com.abdelaziz.canary.common.entity.tracker.nearby.NearbyEntityMovementListener;
-import com.abdelaziz.canary.common.entity.tracker.nearby.SectionedInventoryEntityMovementTracker;
-import com.abdelaziz.canary.common.entity.tracker.nearby.SectionedItemEntityMovementTracker;
+import com.abdelaziz.canary.common.entity.movement_tracker.SectionedInventoryEntityMovementTracker;
+import com.abdelaziz.canary.common.entity.movement_tracker.SectionedItemEntityMovementTracker;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -26,7 +26,6 @@ import net.minecraft.world.level.block.entity.Hopper;
 import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
