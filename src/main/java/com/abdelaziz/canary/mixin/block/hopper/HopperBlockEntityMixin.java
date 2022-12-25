@@ -1,12 +1,13 @@
 package com.abdelaziz.canary.mixin.block.hopper;
 
+import com.abdelaziz.canary.api.inventory.CanaryCooldownReceivingInventory;
 import com.abdelaziz.canary.api.inventory.CanaryInventory;
+import com.abdelaziz.canary.common.entity.movement_tracker.SectionedEntityMovementListener;
 import com.abdelaziz.canary.common.hopper.*;
 import com.abdelaziz.canary.common.block.entity.SleepingBlockEntity;
 import com.abdelaziz.canary.common.block.entity.inventory_change_tracking.InventoryChangeListener;
 import com.abdelaziz.canary.common.block.entity.inventory_change_tracking.InventoryChangeTracker;
 import com.abdelaziz.canary.common.block.entity.inventory_comparator_tracking.ComparatorTracker;
-import com.abdelaziz.canary.common.entity.tracker.nearby.NearbyEntityMovementListener;
 import com.abdelaziz.canary.common.entity.movement_tracker.SectionedInventoryEntityMovementTracker;
 import com.abdelaziz.canary.common.entity.movement_tracker.SectionedItemEntityMovementTracker;
 import net.minecraft.core.BlockPos;
@@ -45,7 +46,7 @@ import java.util.Objects;
 import static net.minecraft.world.level.block.entity.HopperBlockEntity.getItemsAtAndAbove;
 
 @Mixin(value = HopperBlockEntity.class, priority = 950)
-public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopper, UpdateReceiver, CanaryInventory, InventoryChangeListener, NearbyEntityMovementListener {
+public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopper, UpdateReceiver, CanaryInventory, InventoryChangeListener, SectionedEntityMovementListener {
 
     public HopperBlockEntityMixin(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -128,7 +129,16 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
             }
         }
 
-        boolean insertInventoryWasEmptyHopperNotDisabled = insertInventory instanceof HopperBlockEntityMixin && !((HopperBlockEntityMixin) insertInventory).isOnCustomCooldown() && hopperBlockEntity.insertStackList != null && hopperBlockEntity.insertStackList.getOccupiedSlots() == 0;
+        boolean insertInventoryWasEmptyHopperNotDisabled = insertInventory instanceof HopperBlockEntityMixin &&
+                !((HopperBlockEntityMixin) insertInventory).isOnCustomCooldown() && hopperBlockEntity.insertStackList != null &&
+                hopperBlockEntity.insertStackList.getOccupiedSlots() == 0;
+
+        boolean insertInventoryHandlesModdedCooldown =
+                ((CanaryCooldownReceivingInventory) insertInventory).canReceiveTransferCooldown() &&
+                        hopperBlockEntity.insertStackList != null ?
+                        hopperBlockEntity.insertStackList.getOccupiedSlots() == 0 :
+                        insertInventory.isEmpty();
+
         //noinspection ConstantConditions
         if (!(hopperBlockEntity.insertInventory == insertInventory && hopperBlockEntity.insertStackList.getFullSlots() == hopperBlockEntity.insertStackList.size())) {
             Direction fromDirection = hopperState.getValue(HopperBlock.FACING).getOpposite();
@@ -147,6 +157,10 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
                             }
                             receivingHopper.setCooldown(k);
                         }
+                        if (insertInventoryHandlesModdedCooldown) {
+                            ((CanaryCooldownReceivingInventory) insertInventory).setTransferCooldown(hopperBlockEntity.tickedGameTime);
+                        }
+
                         insertInventory.setChanged();
                         cir.setReturnValue(true);
                         return;
