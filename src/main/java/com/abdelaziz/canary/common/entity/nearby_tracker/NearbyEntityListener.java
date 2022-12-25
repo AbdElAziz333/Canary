@@ -1,6 +1,5 @@
 package com.abdelaziz.canary.common.entity.nearby_tracker;
 
-import com.abdelaziz.canary.common.entity.movement_tracker.EntityTrackerSection;
 import com.abdelaziz.canary.common.util.tuples.Range6Int;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
@@ -33,7 +32,7 @@ public interface NearbyEntityListener {
                         if (after == null || !after.isInside(pos.set(x, y, z))) {
                             long sectionPos = SectionPos.asLong(x, y, z);
                             EntitySection<? extends EntityAccess> trackingSection = entityCache.getOrCreateSection(sectionPos);
-                            ((EntityTrackerSection) trackingSection).removeListener(entityCache, this);
+                            ((NearbyEntityListenerSection) trackingSection).removeListener(entityCache, this);
                             if (trackingSection.isEmpty()) {
                                 entityCache.remove(sectionPos);
                             }
@@ -47,7 +46,7 @@ public interface NearbyEntityListener {
                 for (int y = after.minY(); y <= after.maxY(); y++) {
                     for (int z = after.minZ(); z <= after.maxZ(); z++) {
                         if (before == null || !before.isInside(pos.set(x, y, z))) {
-                            ((EntityTrackerSection) entityCache.getOrCreateSection(SectionPos.asLong(x, y, z))).addListener(this);
+                            ((NearbyEntityListenerSection) entityCache.getOrCreateSection(SectionPos.asLong(x, y, z))).addListener(this);
                         }
                     }
                 }
