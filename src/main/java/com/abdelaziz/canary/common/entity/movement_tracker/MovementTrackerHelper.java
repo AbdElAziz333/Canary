@@ -1,8 +1,10 @@
-package com.abdelaziz.canary.common.entity.tracker;
+package com.abdelaziz.canary.common.entity.movement_tracker;
 
+import com.abdelaziz.canary.api.inventory.CanaryInventory;
 import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import net.minecraft.world.level.entity.EntityAccess;
 
 import java.util.List;
@@ -14,13 +16,17 @@ import java.util.List;
  * watched area. This removes the necessity to constantly poll the world for nearby entities each tick and generally
  * provides a sizable boost to performance of hoppers.
  */
-public abstract class EntityTrackerEngine {
+public abstract class MovementTrackerHelper {
     public static final List<Class<?>> MOVEMENT_NOTIFYING_ENTITY_CLASSES;
     public static volatile Reference2IntOpenHashMap<Class<? extends EntityAccess>> CLASS_2_NOTIFY_MASK;
     public static final int NUM_MOVEMENT_NOTIFYING_CLASSES;
 
     static {
-        MOVEMENT_NOTIFYING_ENTITY_CLASSES = List.of(ItemEntity.class, Container.class);
+        if (CanaryInventory.class.isAssignableFrom(HopperBlockEntity.class)) {
+            MOVEMENT_NOTIFYING_ENTITY_CLASSES = List.of(ItemEntity.class, Container.class);
+        } else {
+            MOVEMENT_NOTIFYING_ENTITY_CLASSES = List.of();
+        }
 
         CLASS_2_NOTIFY_MASK = new Reference2IntOpenHashMap<>();
         CLASS_2_NOTIFY_MASK.defaultReturnValue(-1);

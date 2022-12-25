@@ -1,7 +1,7 @@
 package com.abdelaziz.canary.mixin.ai.nearby_entity_tracking.goals;
 
-import com.abdelaziz.canary.common.entity.tracker.nearby.NearbyEntityListenerProvider;
-import com.abdelaziz.canary.common.entity.tracker.nearby.NearbyEntityTracker;
+import com.abdelaziz.canary.common.entity.nearby_tracker.NearbyEntityListenerProvider;
+import com.abdelaziz.canary.common.entity.nearby_tracker.NearbyEntityTracker;
 import net.minecraft.core.Vec3i;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;

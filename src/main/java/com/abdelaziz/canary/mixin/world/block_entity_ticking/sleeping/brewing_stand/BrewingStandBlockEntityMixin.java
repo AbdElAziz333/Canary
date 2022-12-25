@@ -4,6 +4,7 @@ import com.abdelaziz.canary.common.block.entity.SleepingBlockEntity;
 import com.abdelaziz.canary.mixin.world.block_entity_ticking.sleeping.RebindableTickingBlockEntityWrapperAccessor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.BrewingStandBlockEntity;
@@ -51,7 +52,7 @@ public class BrewingStandBlockEntityMixin extends BlockEntity implements Sleepin
 
     @Inject(method = "serverTick", at = @At("HEAD"))
     private static void checkSleep(Level world, BlockPos pos, BlockState state, BrewingStandBlockEntity blockEntity, CallbackInfo ci) {
-        ((BrewingStandBlockEntityMixin) (Object) blockEntity).checkSleep();
+        ((BrewingStandBlockEntityMixin) (Object) blockEntity).checkSleep(state);
     }
 
     @Inject(method = "serverTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/entity/BrewingStandBlockEntity;setChanged(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)V"))
@@ -59,8 +60,8 @@ public class BrewingStandBlockEntityMixin extends BlockEntity implements Sleepin
         ((BrewingStandBlockEntityMixin) (Object) blockEntity).wakeUpNow();
     }
 
-    private void checkSleep() {
-        if (this.brewTime == 0 && this.level != null) {
+    private void checkSleep(BlockState state) {
+        if (this.brewTime == 0 && state.is(Blocks.BREWING_STAND) && this.level != null) {
             this.startSleeping();
         }
     }

@@ -14,8 +14,6 @@ import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.level.pathfinder.WalkNodeEvaluator;
 
-import javax.swing.text.html.BlockView;
-
 public abstract class PathNodeCache {
     private static boolean isChunkSectionDangerousNeighbor(LevelChunkSection section) {
         return section.getStates()

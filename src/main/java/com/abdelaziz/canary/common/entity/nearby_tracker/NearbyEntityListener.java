@@ -1,7 +1,5 @@
-package com.abdelaziz.canary.common.entity.tracker.nearby;
+package com.abdelaziz.canary.common.entity.nearby_tracker;
 
-import com.abdelaziz.canary.common.entity.tracker.EntityTrackerEngine;
-import com.abdelaziz.canary.common.entity.tracker.EntityTrackerSection;
 import com.abdelaziz.canary.common.util.tuples.Range6Int;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
@@ -12,10 +10,6 @@ import net.minecraft.world.level.entity.EntitySection;
 import net.minecraft.world.level.entity.EntitySectionStorage;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 
-/**
- * The main interface used to receive events from the
- * {@link EntityTrackerEngine} of a world.
- */
 public interface NearbyEntityListener {
     Range6Int EMPTY_RANGE = new Range6Int(0, 0, 0, -1, -1, -1);
 
@@ -38,7 +32,7 @@ public interface NearbyEntityListener {
                         if (after == null || !after.isInside(pos.set(x, y, z))) {
                             long sectionPos = SectionPos.asLong(x, y, z);
                             EntitySection<? extends EntityAccess> trackingSection = entityCache.getOrCreateSection(sectionPos);
-                            ((EntityTrackerSection) trackingSection).removeListener(entityCache, this);
+                            ((NearbyEntityListenerSection) trackingSection).removeListener(entityCache, this);
                             if (trackingSection.isEmpty()) {
                                 entityCache.remove(sectionPos);
                             }
@@ -52,7 +46,7 @@ public interface NearbyEntityListener {
                 for (int y = after.minY(); y <= after.maxY(); y++) {
                     for (int z = after.minZ(); z <= after.maxZ(); z++) {
                         if (before == null || !before.isInside(pos.set(x, y, z))) {
-                            ((EntityTrackerSection) entityCache.getOrCreateSection(SectionPos.asLong(x, y, z))).addListener(this);
+                            ((NearbyEntityListenerSection) entityCache.getOrCreateSection(SectionPos.asLong(x, y, z))).addListener(this);
                         }
                     }
                 }

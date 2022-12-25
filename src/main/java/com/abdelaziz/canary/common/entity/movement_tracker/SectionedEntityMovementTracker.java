@@ -1,11 +1,9 @@
-package com.abdelaziz.canary.common.entity.tracker.nearby;
+package com.abdelaziz.canary.common.entity.movement_tracker;
 
 import com.abdelaziz.canary.common.util.tuples.WorldSectionBox;
-import com.abdelaziz.canary.mixin.ai.nearby_entity_tracking.PersistentEntitySectionManagerAccessor;
-import com.abdelaziz.canary.mixin.ai.nearby_entity_tracking.ServerLevelAccessor;
+import com.abdelaziz.canary.mixin.util.entity_movement_tracking.PersistentEntitySectionManagerAccessor;
+import com.abdelaziz.canary.mixin.util.entity_movement_tracking.ServerLevelAccessor;
 import it.unimi.dsi.fastutil.HashCommon;
-import com.abdelaziz.canary.common.entity.tracker.EntityTrackerEngine;
-import com.abdelaziz.canary.common.entity.tracker.EntityTrackerSection;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import net.minecraft.core.SectionPos;
 import net.minecraft.server.level.ServerLevel;
@@ -22,16 +20,16 @@ public abstract class SectionedEntityMovementTracker<E extends EntityAccess, S> 
     ArrayList<EntitySection<E>> sortedSections;
     boolean[] sectionVisible;
     private int timesRegistered;
-    private final ArrayList<EntityTrackerSection> sectionsNotListeningTo;
+    private final ArrayList<EntityMovementTrackerSection> sectionsNotListeningTo;
 
     private long maxChangeTime;
 
-    private ReferenceOpenHashSet<NearbyEntityMovementListener> nearbyEntityMovementListeners;
+    private ReferenceOpenHashSet<SectionedEntityMovementListener> nearbyEntityMovementListeners;
 
     public SectionedEntityMovementTracker(WorldSectionBox interactionChunks, Class<S> clazz) {
         this.clazz = clazz;
         this.trackedWorldSections = interactionChunks;
-        this.trackedClass = EntityTrackerEngine.MOVEMENT_NOTIFYING_ENTITY_CLASSES.indexOf(clazz);
+        this.trackedClass = MovementTrackerHelper.MOVEMENT_NOTIFYING_ENTITY_CLASSES.indexOf(clazz);
         assert this.trackedClass != -1;
         this.nearbyEntityMovementListeners = null;
         this.sectionsNotListeningTo = new ArrayList<>();
@@ -69,9 +67,9 @@ public abstract class SectionedEntityMovementTracker<E extends EntityAccess, S> 
 
     private long listenToAllSectionsAndGetMaxChangeTime() {
         long maxChangeTime = Long.MIN_VALUE;
-        ArrayList<EntityTrackerSection> notListeningTo = this.sectionsNotListeningTo;
+        ArrayList<EntityMovementTrackerSection> notListeningTo = this.sectionsNotListeningTo;
         for (int i = notListeningTo.size() - 1; i >= 0; i--) {
-            EntityTrackerSection entityTrackerSection = notListeningTo.remove(i);
+            EntityMovementTrackerSection entityTrackerSection = notListeningTo.remove(i);
             entityTrackerSection.listenToMovementOnce(this, this.trackedClass);
             maxChangeTime = Math.max(maxChangeTime, entityTrackerSection.getChangeTime(this.trackedClass));
         }
@@ -97,7 +95,7 @@ public abstract class SectionedEntityMovementTracker<E extends EntityAccess, S> 
                 for (int z = trackedSections.chunkZ1(); z < trackedSections.chunkZ2(); z++) {
                     for (int y = trackedSections.chunkY1(); y < trackedSections.chunkY2(); y++) {
                         EntitySection<E> section = cache.getOrCreateSection(SectionPos.asLong(x, y, z));
-                        EntityTrackerSection sectionAccess = (EntityTrackerSection) section;
+                        EntityMovementTrackerSection sectionAccess = (EntityMovementTrackerSection) section;
                         this.sortedSections.add(section);
                         sectionAccess.addListener(this);
                     }
@@ -123,10 +121,10 @@ public abstract class SectionedEntityMovementTracker<E extends EntityAccess, S> 
         ArrayList<EntitySection<E>> sections = this.sortedSections;
         for (int i = sections.size() - 1; i >= 0; i--) {
             EntitySection<E> section = sections.get(i);
-            EntityTrackerSection sectionAccess = (EntityTrackerSection) section;
+            EntityMovementTrackerSection sectionAccess = (EntityMovementTrackerSection) section;
             sectionAccess.removeListener(cache, this);
             if (!this.sectionsNotListeningTo.remove(section)) {
-                ((EntityTrackerSection) section).removeListenToMovementOnce(this, this.trackedClass);
+                ((EntityMovementTrackerSection) section).removeListenToMovementOnce(this, this.trackedClass);
             }
         }
         this.setChanged(world.getGameTime());
@@ -135,7 +133,7 @@ public abstract class SectionedEntityMovementTracker<E extends EntityAccess, S> 
     /**
      * Register an entity section to this listener, so this listener can look for changes in the section.
      */
-    public void onSectionEnteredRange(EntityTrackerSection section) {
+    public void onSectionEnteredRange(EntityMovementTrackerSection section) {
         this.setChanged(this.trackedWorldSections.world().getGameTime());
         //noinspection SuspiciousMethodCalls
         int sectionIndex = this.sortedSections.lastIndexOf(section);
@@ -144,7 +142,7 @@ public abstract class SectionedEntityMovementTracker<E extends EntityAccess, S> 
         this.sectionsNotListeningTo.add(section);
     }
 
-    public void onSectionLeftRange(EntityTrackerSection section) {
+    public void onSectionLeftRange(EntityMovementTrackerSection section) {
         this.setChanged(this.trackedWorldSections.world().getGameTime());
         //noinspection SuspiciousMethodCalls
         int sectionIndex = this.sortedSections.lastIndexOf(section);
@@ -165,7 +163,7 @@ public abstract class SectionedEntityMovementTracker<E extends EntityAccess, S> 
         }
     }
 
-    public void listenToEntityMovementOnce(NearbyEntityMovementListener listener) {
+    public void listenToEntityMovementOnce(SectionedEntityMovementListener listener) {
         if (this.nearbyEntityMovementListeners == null) {
             this.nearbyEntityMovementListeners = new ReferenceOpenHashSet<>();
         }
@@ -177,11 +175,11 @@ public abstract class SectionedEntityMovementTracker<E extends EntityAccess, S> 
 
     }
 
-    public void emitEntityMovement(int classMask, EntityTrackerSection section) {
+    public void emitEntityMovement(int classMask, EntityMovementTrackerSection section) {
         if ((classMask & (1 << this.trackedClass)) != 0) {
-            ReferenceOpenHashSet<NearbyEntityMovementListener> listeners = this.nearbyEntityMovementListeners;
+            ReferenceOpenHashSet<SectionedEntityMovementListener> listeners = this.nearbyEntityMovementListeners;
             if (listeners != null) {
-                for (NearbyEntityMovementListener listener : listeners) {
+                for (SectionedEntityMovementListener listener : listeners) {
                     listener.handleEntityMovement(this.clazz);
                 }
                 listeners.clear();

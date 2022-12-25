@@ -1,4 +1,4 @@
-package com.abdelaziz.canary.common.entity.tracker.nearby;
+package com.abdelaziz.canary.common.entity.movement_tracker;
 
 public interface ToggleableMovementTracker {
 

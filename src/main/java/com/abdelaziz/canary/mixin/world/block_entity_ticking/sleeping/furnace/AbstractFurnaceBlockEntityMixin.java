@@ -4,6 +4,7 @@ import com.abdelaziz.canary.common.block.entity.SleepingBlockEntity;
 import com.abdelaziz.canary.mixin.world.block_entity_ticking.sleeping.RebindableTickingBlockEntityWrapperAccessor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -51,18 +52,18 @@ public abstract class AbstractFurnaceBlockEntityMixin extends BlockEntity implem
         this.sleepingTicker = sleepingTicker;
     }
 
-    @Inject(method = "serverTick", at = @At("RETURN" ))
+    @Inject(method = "serverTick", at = @At("RETURN"))
     private static void checkSleep(Level world, BlockPos pos, BlockState state, AbstractFurnaceBlockEntity blockEntity, CallbackInfo ci) {
-        ((AbstractFurnaceBlockEntityMixin) (Object) blockEntity).checkSleep();
+        ((AbstractFurnaceBlockEntityMixin) (Object) blockEntity).checkSleep(state);
     }
 
-    private void checkSleep() {
-        if (!this.isLit() && this.cookingProgress == 0 && this.level != null) {
+    private void checkSleep(BlockState state) {
+        if (!this.isLit() && this.cookingProgress == 0 && (state.is(Blocks.FURNACE) || state.is(Blocks.BLAST_FURNACE) || state.is(Blocks.SMOKER)) && this.level != null) {
             this.startSleeping();
         }
     }
 
-    @Inject(method = "load", at = @At("RETURN" ))
+    @Inject(method = "load", at = @At("RETURN"))
     private void wakeUpAfterFromTag(CallbackInfo ci) {
         if (this.isSleeping() && this.level != null && !this.level.isClientSide) {
             this.wakeUpNow();

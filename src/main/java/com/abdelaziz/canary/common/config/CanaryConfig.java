@@ -31,7 +31,7 @@ public class CanaryConfig {
         // You must manually add a rule for any new mixins not covered by an existing package rule.
 
         this.addMixinRule("ai", true);
-        this.addMixinRule("ai.nearby_entity_tracking", true);
+        this.addMixinRule("ai.nearby_entity_tracking", false);
         this.addMixinRule("ai.nearby_entity_tracking.goals", true);
         this.addMixinRule("ai.pathing", true);
         this.addMixinRule("ai.poi", true);
@@ -85,7 +85,6 @@ public class CanaryConfig {
 
         this.addMixinRule("entity", true);
         this.addMixinRule("entity.collisions", true);
-        //this.addMixinRule("entity.collisions.fluid", true);
         this.addMixinRule("entity.collisions.intersection", true);
         this.addMixinRule("entity.collisions.movement", true);
         this.addMixinRule("entity.collisions.suffocation", true);
@@ -124,6 +123,7 @@ public class CanaryConfig {
         this.addMixinRule("shapes.specialized_shapes", true);
 
         this.addMixinRule("util", true);
+        this.addMixinRule("util.entity_movement_tracking", true);
         this.addMixinRule("util.entity_section_position", true);
         this.addMixinRule("util.world_border_listener", true);
         this.addMixinRule("util.inventory_change_listening", true);
@@ -143,6 +143,7 @@ public class CanaryConfig {
         this.addMixinRule("world.chunk_access", true);
         this.addMixinRule("world.chunk_tickets", true);
         this.addMixinRule("world.chunk_ticking", true);
+        this.addMixinRule("world.combined_heightmap_update", true);
         this.addMixinRule("world.explosions", true);
         this.addMixinRule("world.inline_block_access", true);
         this.addMixinRule("world.inline_height", true);
@@ -151,16 +152,15 @@ public class CanaryConfig {
 
         this.addRuleDependency("ai.nearby_entity_tracking", "util", true);
         this.addRuleDependency("ai.nearby_entity_tracking", "util.entity_section_position", true);
-        this.addRuleDependency("block.hopper", "ai", true);
-        this.addRuleDependency("block.hopper", "ai.nearby_entity_tracking", true);
+        this.addRuleDependency("block.hopper", "util", true);
+        this.addRuleDependency("block.hopper", "util.entity_movement_tracking", true);
         this.addRuleDependency("block.hopper", "world", true);
         this.addRuleDependency("block.hopper", "world.block_entity_retrieval", true);
         this.addRuleDependency("block.hopper", "util.inventory_change_listening", true);
 
         this.addRuleDependency("util.inventory_comparator_tracking", "world.block_entity_retrieval", true);
 
-        //this.addRuleDependency("entity.collisions.fluid", "chunk", true);
-        //this.addRuleDependency("entity.collisions.fluid", "chunk.block_counting", true);
+        this.addRuleDependency("util.entity_movement_tracking", "util.entity_section_position", true);
 
         this.addRuleDependency("entity.collisions.unpushable_cramming", "chunk.entity_class_groups", true);
 
