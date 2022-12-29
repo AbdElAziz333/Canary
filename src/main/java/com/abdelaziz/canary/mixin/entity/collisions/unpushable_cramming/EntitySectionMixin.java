@@ -6,6 +6,7 @@ import com.abdelaziz.canary.common.entity.pushable.PushableEntityClassGroup;
 import com.abdelaziz.canary.common.util.collections.ReferenceMaskedList;
 import com.abdelaziz.canary.common.world.ClimbingMobCachingSection;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.util.AbortableIterationConsumer;
 import net.minecraft.util.ClassInstanceMultiMap;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
@@ -43,7 +44,7 @@ public abstract class EntitySectionMixin<T extends EntityAccess> implements Clim
     private ReferenceMaskedList<Entity> pushableEntities;
 
     @Override
-    public void collectPushableEntities(Level world, Entity except, AABB box, EntityPushablePredicate<? super Entity> entityPushablePredicate, ArrayList<Entity> entities) {
+    public AbortableIterationConsumer.Continuation collectPushableEntities(Level world, Entity except, AABB box, EntityPushablePredicate<? super Entity> entityPushablePredicate, ArrayList<Entity> entities) {
         Iterator<?> entityIterator;
         if (this.pushableEntities != null) {
             entityIterator = this.pushableEntities.iterator();
@@ -66,6 +67,7 @@ public abstract class EntitySectionMixin<T extends EntityAccess> implements Clim
         if (this.pushableEntities == null && i >= 25 && i >= (j * 2)) {
             this.startFilteringPushableEntities();
         }
+        return AbortableIterationConsumer.Continuation.CONTINUE;
     }
 
     private void startFilteringPushableEntities() {

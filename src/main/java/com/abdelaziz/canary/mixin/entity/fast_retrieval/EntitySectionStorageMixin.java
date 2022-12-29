@@ -1,6 +1,7 @@
 package com.abdelaziz.canary.mixin.entity.fast_retrieval;
 
 import net.minecraft.core.SectionPos;
+import net.minecraft.util.AbortableIterationConsumer;
 import net.minecraft.world.level.entity.EntityAccess;
 import net.minecraft.world.level.entity.EntitySection;
 import net.minecraft.world.level.entity.EntitySectionStorage;
@@ -13,8 +14,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import java.util.function.Consumer;
-
 @Mixin(EntitySectionStorage.class)
 public abstract class EntitySectionStorageMixin<T extends EntityAccess> {
     @Shadow
@@ -25,7 +24,6 @@ public abstract class EntitySectionStorageMixin<T extends EntityAccess> {
      * @author 2No2Name
      * @reason avoid iterating through LongAVLTreeSet, possibly iterating over hundreds of irrelevant longs to save up to 8 hash set gets
      */
-    @SuppressWarnings("InvalidInjectorMethodSignature")
     @Inject(
             method = "forEachAccessibleNonEmptySection",
             at = @At(
@@ -37,7 +35,7 @@ public abstract class EntitySectionStorageMixin<T extends EntityAccess> {
             locals = LocalCapture.CAPTURE_FAILHARD,
             cancellable = true
     )
-    public void forEachInBox(AABB box, Consumer<EntitySection<T>> action, CallbackInfo ci, int i, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+    public void forEachInBox(AABB box, AbortableIterationConsumer<EntitySection<T>> action, CallbackInfo ci, int i, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
         if (maxX >= minX + 4 || maxZ >= minZ + 4) {
             return; // Vanilla is likely more optimized when shooting entities with TNT cannons over huge distances.
             // Choosing a cutoff of 4 chunk size, as it becomes more likely that these entity sections do not exist when
@@ -54,31 +52,43 @@ public abstract class EntitySectionStorageMixin<T extends EntityAccess> {
 
         for (int x = minX; x <= maxX; x++) {
             for (int z = Math.max(minZ, 0); z <= maxZ; z++) {
-                this.forEachInColumn(x, minY, maxY, z, action);
+                if (this.forEachInColumn(x, minY, maxY, z, action).shouldAbort()) {
+                    return;
+                }
             }
 
             int bound = Math.min(-1, maxZ);
             for (int z = minZ; z <= bound; z++) {
-                this.forEachInColumn(x, minY, maxY, z, action);
+                if (this.forEachInColumn(x, minY, maxY, z, action).shouldAbort()) {
+                    return;
+                }
             }
         }
     }
 
-    private void forEachInColumn(int x, int minY, int maxY, int z, Consumer<EntitySection<T>> action) {
+    private AbortableIterationConsumer.Continuation forEachInColumn(int x, int minY, int maxY, int z, AbortableIterationConsumer<EntitySection<T>> action) {
+        AbortableIterationConsumer.Continuation ret = AbortableIterationConsumer.Continuation.CONTINUE;
         //y from negative to positive, but y is treated as unsigned
         for (int y = Math.max(minY, 0); y <= maxY; y++) {
-            this.consumeSection(SectionPos.asLong(x, y, z), action);
+            if ((ret = this.consumeSection(SectionPos.asLong(x, y, z), action)).shouldAbort()) {
+                return ret;
+            }
         }
         int bound = Math.min(-1, maxY);
         for (int y = minY; y <= bound; y++) {
-            this.consumeSection(SectionPos.asLong(x, y, z), action);
+            if ((ret = this.consumeSection(SectionPos.asLong(x, y, z), action)).shouldAbort()) {
+                return ret;
+            }
         }
+        return ret;
     }
 
-    private void consumeSection(long pos, Consumer<EntitySection<T>> action) {
+    private AbortableIterationConsumer.Continuation consumeSection(long pos, AbortableIterationConsumer<EntitySection<T>> action) {
         EntitySection<T> section = this.getSection(pos);
         if (section != null && 0 != section.size() && section.getStatus().isAccessible()) {
-            action.accept(section);
+            return action.accept(section);
         }
+
+        return AbortableIterationConsumer.Continuation.CONTINUE;
     }
 }

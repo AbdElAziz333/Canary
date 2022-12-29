@@ -9,6 +9,7 @@ import net.minecraft.util.VisibleForDebug;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.Brain;
 import net.minecraft.world.entity.ai.behavior.Behavior;
+import net.minecraft.world.entity.ai.behavior.BehaviorControl;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.memory.MemoryStatus;
 import net.minecraft.world.entity.schedule.Activity;
@@ -27,14 +28,14 @@ public class BrainMixin<E extends LivingEntity> {
 
     @Shadow
     @Final
-    private Map<Integer, Map<Activity, Set<Behavior<? super E>>>> availableBehaviorsByPriority;
+    private Map<Integer, Map<Activity, Set<BehaviorControl<? super E>>>> availableBehaviorsByPriority;
 
     @Shadow
     @Final
     private Set<Activity> activeActivities;
 
-    private ArrayList<Behavior<? super E>> possibleTasks;
-    private MaskedList<Behavior<? super E>> runningTasks;
+    private ArrayList<BehaviorControl<? super E>> possibleTasks;
+    private MaskedList<BehaviorControl<? super E>> runningTasks;
 
     private void onTasksChanged() {
         this.runningTasks = null;
@@ -47,14 +48,14 @@ public class BrainMixin<E extends LivingEntity> {
 
     private void initPossibleTasks() {
         this.possibleTasks = new ArrayList<>();
-        for (Map<Activity, Set<Behavior<? super E>>> map : this.availableBehaviorsByPriority.values()) {
-            for (Map.Entry<Activity, Set<Behavior<? super E>>> entry : map.entrySet()) {
+        for (Map<Activity, Set<BehaviorControl<? super E>>> map : this.availableBehaviorsByPriority.values()) {
+            for (Map.Entry<Activity, Set<BehaviorControl<? super E>>> entry : map.entrySet()) {
                 Activity activity = entry.getKey();
                 if (!this.activeActivities.contains(activity)) {
                     continue;
                 }
-                Set<Behavior<? super E>> set = entry.getValue();
-                for (Behavior<? super E> task : set) {
+                Set<BehaviorControl<? super E>> set = entry.getValue();
+                for (BehaviorControl<? super E> task : set) {
                     //noinspection UseBulkOperation
                     this.possibleTasks.add(task);
                 }
@@ -62,14 +63,14 @@ public class BrainMixin<E extends LivingEntity> {
         }
     }
 
-    private ArrayList<Behavior<? super E>> getPossibleTasks() {
+    private ArrayList<BehaviorControl<? super E>> getPossibleTasks() {
         if (this.possibleTasks == null) {
             this.initPossibleTasks();
         }
         return this.possibleTasks;
     }
 
-    private MaskedList<Behavior<? super E>> getCurrentlyRunningTasks() {
+    private MaskedList<BehaviorControl<? super E>> getCurrentlyRunningTasks() {
         if (this.runningTasks == null) {
             this.initCurrentlyRunningTasks();
         }
@@ -77,11 +78,11 @@ public class BrainMixin<E extends LivingEntity> {
     }
 
     private void initCurrentlyRunningTasks() {
-        MaskedList<Behavior<? super E>> list = new MaskedList<>(new ObjectArrayList<>(), false);
+        MaskedList<BehaviorControl<? super E>> list = new MaskedList<>(new ObjectArrayList<>(), false);
 
-        for (Map<Activity, Set<Behavior<? super E>>> map : this.availableBehaviorsByPriority.values()) {
-            for (Set<Behavior<? super E>> set : map.values()) {
-                for (Behavior<? super E> task : set) {
+        for (Map<Activity, Set<BehaviorControl<? super E>>> map : this.availableBehaviorsByPriority.values()) {
+            for (Set<BehaviorControl<? super E>> set : map.values()) {
+                for (BehaviorControl<? super E> task : set) {
                     list.addOrSet(task, task.getStatus() == Behavior.Status.RUNNING);
                 }
             }
@@ -96,7 +97,7 @@ public class BrainMixin<E extends LivingEntity> {
     @Overwrite
     private void startEachNonRunningBehavior(ServerLevel world, E entity) {
         long startTime = world.getGameTime();
-        for (Behavior<? super E> task : this.getPossibleTasks()) {
+        for (BehaviorControl<? super E> task : this.getPossibleTasks()) {
             if (task.getStatus() == Behavior.Status.STOPPED) {
                 task.tryStart(world, entity, startTime);
             }
@@ -111,7 +112,7 @@ public class BrainMixin<E extends LivingEntity> {
     @Overwrite
     @Deprecated
     @Debug
-    public List<Behavior<? super E>> getRunningBehaviors() {
+    public List<BehaviorControl<? super E>> getRunningBehaviors() {
         return this.getCurrentlyRunningTasks();
     }
 
@@ -157,11 +158,11 @@ public class BrainMixin<E extends LivingEntity> {
             method = "stopAll",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/world/entity/ai/behavior/Behavior;doStop(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/LivingEntity;J)V"
+                    target = "Lnet/minecraft/world/entity/ai/behavior/BehaviorControl;doStop(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/LivingEntity;J)V"
             ),
             locals = LocalCapture.CAPTURE_FAILHARD
     )
-    private void removeStoppedTask(ServerLevel world, E entity, CallbackInfo ci, long l, Iterator<?> it, Behavior<? super E> task) {
+    private void removeStoppedTask(ServerLevel world, E entity, CallbackInfo ci, long l, Iterator<?> it, BehaviorControl<? super E> task) {
         if (this.runningTasks != null) {
             this.runningTasks.setVisible(task, false);
         }
@@ -171,12 +172,12 @@ public class BrainMixin<E extends LivingEntity> {
             method = "tickEachRunningBehavior",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/world/entity/ai/behavior/Behavior;tickOrStop(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/LivingEntity;J)V",
+                    target = "Lnet/minecraft/world/entity/ai/behavior/BehaviorControl;tickOrStop(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/LivingEntity;J)V",
                     shift = At.Shift.AFTER
             ),
             locals = LocalCapture.CAPTURE_FAILHARD
     )
-    private void removeTaskIfStopped(ServerLevel world, E entity, CallbackInfo ci, long l, Iterator<?> it, Behavior<? super E> task) {
+    private void removeTaskIfStopped(ServerLevel world, E entity, CallbackInfo ci, long l, Iterator<?> it, BehaviorControl<? super E> task) {
         if (this.runningTasks != null && task.getStatus() != Behavior.Status.RUNNING) {
             this.runningTasks.setVisible(task, false);
         }
@@ -186,11 +187,11 @@ public class BrainMixin<E extends LivingEntity> {
             method = "startEachNonRunningBehavior",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/world/entity/ai/behavior/Behavior;tryStart(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/LivingEntity;J)Z",
+                    target = "Lnet/minecraft/world/entity/ai/behavior/BehaviorControl;tryStart(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/LivingEntity;J)Z",
                     shift = At.Shift.AFTER
             )
     )
-    private Behavior<? super E> addStartedTasks(Behavior<? super E> task) {
+    private BehaviorControl<? super E> addStartedTasks(BehaviorControl<? super E> task) {
         if (this.runningTasks != null && task.getStatus() == Behavior.Status.RUNNING) {
             this.runningTasks.setVisible(task, true);
         }

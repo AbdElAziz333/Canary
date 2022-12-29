@@ -9,6 +9,7 @@ import com.abdelaziz.canary.mixin.chunk.entity_class_groups.EntitySectionAccesso
 import com.abdelaziz.canary.mixin.chunk.entity_class_groups.ServerLevelAccessor;
 import com.abdelaziz.canary.mixin.chunk.entity_class_groups.TransientEntitySectionManagerAccessor;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.AbortableIterationConsumer;
 import net.minecraft.util.ClassInstanceMultiMap;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.EntityGetter;
@@ -76,6 +77,7 @@ public class WorldHelper {
                     }
                 }
             }
+            return AbortableIterationConsumer.Continuation.CONTINUE;
         });
         return entities;
     }

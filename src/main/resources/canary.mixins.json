@@ -71,7 +71,6 @@
     "block.hopper.InventoryAccessors$InventoryAccessorHopperBlockEntity",
     "block.hopper.InventoryAccessors$InventoryAccessorRandomizableContainerBlockEntity",
     "block.hopper.InventoryAccessors$InventoryAccessorShulkerBoxBlockEntity",
-    "block.hopper.InventoryMixin",
     "block.hopper.ItemStackMixin",
     "block.hopper.NonNullListAccessor",
     "block.hopper.ScreenHandlerMixin",

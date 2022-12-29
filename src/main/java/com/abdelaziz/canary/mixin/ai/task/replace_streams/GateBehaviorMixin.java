@@ -5,6 +5,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.Brain;
 import net.minecraft.world.entity.ai.behavior.Behavior;
+import net.minecraft.world.entity.ai.behavior.BehaviorControl;
 import net.minecraft.world.entity.ai.behavior.GateBehavior;
 import net.minecraft.world.entity.ai.behavior.ShufflingList;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
@@ -16,41 +17,33 @@ import org.spongepowered.asm.mixin.Shadow;
 import java.util.Set;
 
 @Mixin(GateBehavior.class)
-public class GateBehaviorMixin<E extends LivingEntity> {
+public abstract class GateBehaviorMixin<E extends LivingEntity> {
     @Shadow
     @Final
-    private ShufflingList<Behavior<? super E>> behaviors;
+    private ShufflingList<BehaviorControl<? super E>> behaviors;
+
     @Shadow
     @Final
     private Set<MemoryModuleType<?>> exitErasedMemories;
 
+    @Shadow
+    private Behavior.Status status;
+
     /**
      * @reason Replace stream code with traditional iteration
-     * @author JellySquid
+     * @author JellySquid, IMS, 2No2Name
      */
     @Overwrite
-    public boolean canStillUse(ServerLevel world, E entity, long time) {
-        for (Behavior<? super E> task : WeightedListIterable.cast(this.behaviors)) {
+    public final void tickOrStop(ServerLevel world, E entity, long time) {
+        boolean hasOneTaskRunning = false;
+        for (BehaviorControl<? super E> task : WeightedListIterable.cast(this.behaviors)) {
             if (task.getStatus() == Behavior.Status.RUNNING) {
-                if (task.canStillUse(world, entity, time)) {
-                    return true;
-                }
+                hasOneTaskRunning |= task.getStatus() == Behavior.Status.RUNNING;
             }
         }
 
-        return false;
-    }
-
-    /**
-     * @reason Replace stream code with traditional iteration
-     * @author JellySquid
-     */
-    @Overwrite
-    public void tick(ServerLevel world, E entity, long time) {
-        for (Behavior<? super E> task : WeightedListIterable.cast(this.behaviors)) {
-            if (task.getStatus() == Behavior.Status.RUNNING) {
-                task.tickOrStop(world, entity, time);
-            }
+        if (!hasOneTaskRunning) {
+            this.doStop(world, entity, time);
         }
     }
 
@@ -59,8 +52,9 @@ public class GateBehaviorMixin<E extends LivingEntity> {
      * @author JellySquid
      */
     @Overwrite
-    public void stop(ServerLevel world, E entity, long time) {
-        for (Behavior<? super E> task : WeightedListIterable.cast(this.behaviors)) {
+    public final void doStop(ServerLevel world, E entity, long time) {
+        this.status = Behavior.Status.STOPPED;
+        for (BehaviorControl<? super E> task : WeightedListIterable.cast(this.behaviors)) {
             if (task.getStatus() == Behavior.Status.RUNNING) {
                 task.doStop(world, entity, time);
             }

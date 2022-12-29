@@ -21,7 +21,7 @@ import java.util.Set;
 public class CanaryConfig {
     private static final Logger LOGGER = LogManager.getLogger("CanaryConfig");
 
-    private static final String JSON_KEY_CANARY_OPTIONS = "canary:options";
+    //private static final String JSON_KEY_CANARY_OPTIONS = "canary:options";
 
     private final Map<String, Option> options = new HashMap<>();
     private final Set<Option> optionsWithDependencies = new ObjectLinkedOpenHashSet<>();
@@ -86,7 +86,7 @@ public class CanaryConfig {
         this.addMixinRule("entity", true);
         this.addMixinRule("entity.collisions", true);
         this.addMixinRule("entity.collisions.intersection", true);
-        this.addMixinRule("entity.collisions.movement", true);
+        this.addMixinRule("entity.collisions.movement", false);
         this.addMixinRule("entity.collisions.suffocation", true);
         this.addMixinRule("entity.collisions.unpushable_cramming", true);
         this.addMixinRule("entity.data_tracker", true);
@@ -102,7 +102,7 @@ public class CanaryConfig {
         this.addMixinRule("entity.skip_fire_check", true);
 
         this.addMixinRule("gen", true);
-        this.addMixinRule("gen.cached_generator_settings", true);
+        this.addMixinRule("gen.cached_generator_settings", false);
         this.addMixinRule("gen.chunk_region", true);
 
         this.addMixinRule("item", true);
