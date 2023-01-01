@@ -86,7 +86,7 @@ public class CanaryConfig {
         this.addMixinRule("entity", true);
         this.addMixinRule("entity.collisions", true);
         this.addMixinRule("entity.collisions.intersection", true);
-        this.addMixinRule("entity.collisions.movement", false);
+        this.addMixinRule("entity.collisions.movement", true);
         this.addMixinRule("entity.collisions.suffocation", true);
         this.addMixinRule("entity.collisions.unpushable_cramming", true);
         this.addMixinRule("entity.data_tracker", true);
