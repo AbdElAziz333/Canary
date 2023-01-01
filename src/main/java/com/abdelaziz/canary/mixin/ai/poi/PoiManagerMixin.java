@@ -7,6 +7,7 @@ import com.abdelaziz.canary.common.world.interests.RegionBasedStorageSectionExte
 import com.abdelaziz.canary.common.world.interests.iterator.NearbyPointOfInterestStream;
 import com.abdelaziz.canary.common.world.interests.iterator.SinglePointOfInterestTypeFilter;
 import com.abdelaziz.canary.common.world.interests.iterator.SphereChunkOrderedPoiSetSpliterator;
+import com.abdelaziz.canary.common.world.interests.types.PointOfInterestTypeHelper;
 import com.mojang.datafixers.DataFixer;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
@@ -46,6 +47,31 @@ public abstract class PoiManagerMixin extends SectionStorage<PoiSection>
 
     public PoiManagerMixin(Path path, Function<Runnable, Codec<PoiSection>> codecFactory, Function<Runnable, PoiSection> factory, DataFixer dataFixer, DataFixTypes dataFixTypes, boolean dsync, RegistryAccess dynamicRegistryManager, LevelHeightAccessor world) {
         super(path, codecFactory, factory, dataFixer, dataFixTypes, dsync, dynamicRegistryManager, world);
+    }
+
+    /**
+     * @reason Avoid Stream API
+     * @author Jellysquid
+     */
+    @Overwrite
+    public void checkConsistencyWithBlocks(ChunkPos chunkPos_1, LevelChunkSection section) {
+        SectionPos sectionPos = SectionPos.of(chunkPos_1, section.bottomBlockY() >> 4);
+
+        PoiSection set = this.get(sectionPos.asLong()).orElse(null);
+
+        if (set != null) {
+            set.refresh(consumer -> {
+                if (PointOfInterestTypeHelper.shouldScan(section)) {
+                    this.updateFromSection(section, sectionPos, consumer);
+                }
+            });
+        } else {
+            if (PointOfInterestTypeHelper.shouldScan(section)) {
+                set = this.getOrCreate(sectionPos.asLong());
+
+                this.updateFromSection(section, sectionPos, set::add);
+            }
+        }
     }
 
     /**
@@ -223,5 +249,5 @@ public abstract class PoiManagerMixin extends SectionStorage<PoiSection>
     }
 
     @Shadow
-    protected abstract void updateFromSection(LevelChunkSection section, SectionPos sectionPos, BiConsumer<BlockPos, PoiType> entryConsumer);
+    protected abstract void updateFromSection(LevelChunkSection section, SectionPos sectionPos, BiConsumer<BlockPos, Holder<PoiType>> entryConsumer);
 }
