@@ -69,7 +69,7 @@ public class CanaryConfig {
         this.addMixinRule("chunk.entity_class_groups", true);
         this.addMixinRule("chunk.no_locking", true);
         this.addMixinRule("chunk.no_validation", true);
-        this.addMixinRule("chunk.palette", true);
+        this.addMixinRule("chunk.palette", false);
         this.addMixinRule("chunk.serialization", true);
 
         this.addMixinRule("collections", true);
@@ -85,8 +85,8 @@ public class CanaryConfig {
 
         this.addMixinRule("entity", true);
         this.addMixinRule("entity.collisions", true);
-        this.addMixinRule("entity.collisions.intersection", true);
-        this.addMixinRule("entity.collisions.movement", true);
+        this.addMixinRule("entity.collisions.intersection", false);
+        this.addMixinRule("entity.collisions.movement", false);
         this.addMixinRule("entity.collisions.suffocation", true);
         this.addMixinRule("entity.collisions.unpushable_cramming", true);
         this.addMixinRule("entity.data_tracker", true);
