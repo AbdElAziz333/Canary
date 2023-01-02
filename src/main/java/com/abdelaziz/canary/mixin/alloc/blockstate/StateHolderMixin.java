@@ -25,7 +25,9 @@ public class StateHolderMixin<O, S> {
 
     @Inject(method = "populateNeighbours", at = @At("RETURN"))
     private void postCreateWithTable(Map<Map<Property<?>, Comparable<?>>, S> states, CallbackInfo ci) {
-        this.neighbours = new FastImmutableTable<>(this.neighbours, StatePropertyTableCache.getTableCache(this.owner));
+        if (this.owner instanceof Block || this.owner instanceof Fluid) {
+            this.neighbours = new FastImmutableTable<>(this.neighbours, StatePropertyTableCache.getTableCache(this.owner));
+        }
     }
 
 }
