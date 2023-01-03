@@ -41,13 +41,7 @@ public abstract class SectionStorageMixin<R> implements RegionBasedStorageSectio
     @Shadow
     protected abstract Optional<R> get(long pos);
 
-    /* private static long getChunkFromSection(long section) {
-        int x = SectionPos.x(section);
-        int z = SectionPos.z(section);
-        return ChunkPos.asLong(x, z);
-    } */
-
-    private Long2ObjectOpenHashMap<BitSet> columns;
+    private Long2ObjectOpenHashMap<RegionBasedStorageColumn> columns;
 
     @Shadow
     protected abstract void readColumn(ChunkPos pos);
@@ -64,25 +58,6 @@ public abstract class SectionStorageMixin<R> implements RegionBasedStorageSectio
     }
 
     private void onEntryRemoved(long key, Optional<R> value) {
-        int y = Pos.SectionYIndex.fromSectionCoord(this.levelHeightAccessor, SectionPos.y(key));
-
-        // We only care about items belonging to a valid sub-chunk
-        if (y < 0 || y >= Pos.SectionYIndex.getNumYSections(this.levelHeightAccessor)) {
-            return;
-        }
-
-        int x = SectionPos.x(key);
-        int z = SectionPos.z(key);
-
-        long pos = ChunkPos.asLong(x, z);
-        BitSet flags = this.columns.get(pos);
-
-        if (flags != null) {
-            flags.clear(y);
-            if (flags.isEmpty()) {
-                this.columns.remove(pos);
-            }
-        }
     }
 
     private void onEntryAdded(long key, Optional<R> value) {
@@ -99,10 +74,10 @@ public abstract class SectionStorageMixin<R> implements RegionBasedStorageSectio
 
         long pos = ChunkPos.asLong(x, z);
 
-        BitSet flags = this.columns.get(pos);
+        RegionBasedStorageColumn flags = this.columns.get(pos);
 
         if (flags == null) {
-            this.columns.put(pos, flags = new BitSet()); //Pos.SectionYIndex.getNumYSections(this.world)
+            this.columns.put(pos, flags = new RegionBasedStorageColumn()); //Pos.SectionYIndex.getNumYSections(this.world)
         }
 
         flags.set(y, value.isPresent());
@@ -110,16 +85,16 @@ public abstract class SectionStorageMixin<R> implements RegionBasedStorageSectio
 
     @Override
     public Stream<R> getWithinChunkColumn(int chunkX, int chunkZ) { //getNonEmptyPOISections
-        BitSet sectionsWithPOI = this.getNonEmptyPOISections(chunkX, chunkZ);
+        RegionBasedStorageColumn sectionsWithPOI = this.getNonEmptyPOISections(chunkX, chunkZ);
 
         // No items are present in this column
-        if (sectionsWithPOI.isEmpty()) {
+        if (sectionsWithPOI.noSectionsPresent()) {
             return Stream.empty();
         }
 
         List<R> list = new ArrayList<>();
         int minYSection = Pos.SectionYCoord.getMinYSection(this.levelHeightAccessor);
-        for (int chunkYIndex = sectionsWithPOI.nextSetBit(0); chunkYIndex != -1; chunkYIndex = sectionsWithPOI.nextSetBit(chunkYIndex + 1)) {
+        for (int chunkYIndex = sectionsWithPOI.nextNonEmptySection(0); chunkYIndex != -1; chunkYIndex = sectionsWithPOI.nextNonEmptySection(chunkYIndex + 1)) {
             int chunkY = chunkYIndex + minYSection;
             //noinspection SimplifyOptionalCallChains
             R r = this.storage.get(SectionPos.asLong(chunkX, chunkY, chunkZ)).orElse(null);
@@ -133,10 +108,10 @@ public abstract class SectionStorageMixin<R> implements RegionBasedStorageSectio
 
     @Override
     public Iterable<R> getInChunkColumn(int chunkX, int chunkZ) {
-        BitSet sectionsWithPOI = this.getNonEmptyPOISections(chunkX, chunkZ);
+        RegionBasedStorageColumn sectionsWithPOI = this.getNonEmptyPOISections(chunkX, chunkZ);
 
         // No items are present in this column
-        if (sectionsWithPOI.isEmpty()) {
+        if (sectionsWithPOI.noSectionsPresent()) {
             return Collections::emptyIterator;
         }
 
@@ -144,7 +119,7 @@ public abstract class SectionStorageMixin<R> implements RegionBasedStorageSectio
         LevelHeightAccessor world = this.levelHeightAccessor;
 
         return () -> new AbstractIterator<>() {
-            private int nextBit = sectionsWithPOI.nextSetBit(0);
+            private int nextBit = sectionsWithPOI.nextNonEmptySection(0);
 
 
             @Override
@@ -154,7 +129,7 @@ public abstract class SectionStorageMixin<R> implements RegionBasedStorageSectio
                     Optional<R> next = storage.get(SectionPos.asLong(chunkX, Pos.SectionYCoord.fromSectionIndex(world, this.nextBit), chunkZ));
 
                     // Find and advance to the next set bit
-                    this.nextBit = sectionsWithPOI.nextSetBit(this.nextBit + 1);
+                    this.nextBit = sectionsWithPOI.nextNonEmptySection(this.nextBit + 1);
 
                     if (next.isPresent()) {
                         return next.get();
@@ -166,10 +141,10 @@ public abstract class SectionStorageMixin<R> implements RegionBasedStorageSectio
         };
     }
 
-    private BitSet getNonEmptyPOISections(int chunkX, int chunkZ) {
+    private RegionBasedStorageColumn getNonEmptyPOISections(int chunkX, int chunkZ) {
         long pos = ChunkPos.asLong(chunkX, chunkZ);
 
-        BitSet flags = this.getNonEmptySections(pos, false);
+        RegionBasedStorageColumn flags = this.getNonEmptySections(pos, false);
 
         if (flags != null) {
             return flags;
@@ -180,8 +155,8 @@ public abstract class SectionStorageMixin<R> implements RegionBasedStorageSectio
         return this.getNonEmptySections(pos, true);
     }
 
-    private BitSet getNonEmptySections(long pos, boolean required) {
-        BitSet set = this.columns.get(pos);
+    private RegionBasedStorageColumn getNonEmptySections(long pos, boolean required) {
+        RegionBasedStorageColumn set = this.columns.get(pos);
 
         if (set == null && required) {
             throw new NullPointerException("No data is present for column: " + new ChunkPos(pos));

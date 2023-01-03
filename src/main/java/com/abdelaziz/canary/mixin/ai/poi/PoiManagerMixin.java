@@ -7,14 +7,13 @@ import com.abdelaziz.canary.common.world.interests.RegionBasedStorageSectionExte
 import com.abdelaziz.canary.common.world.interests.iterator.NearbyPointOfInterestStream;
 import com.abdelaziz.canary.common.world.interests.iterator.SinglePointOfInterestTypeFilter;
 import com.abdelaziz.canary.common.world.interests.iterator.SphereChunkOrderedPoiSetSpliterator;
-import com.abdelaziz.canary.common.world.interests.types.PointOfInterestTypeHelper;
 import com.mojang.datafixers.DataFixer;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.SectionPos;
 import net.minecraft.util.RandomSource;
+import net.minecraft.util.VisibleForDebug;
 import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.entity.ai.village.poi.PoiManager;
 import net.minecraft.world.entity.ai.village.poi.PoiRecord;
@@ -23,18 +22,15 @@ import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.border.WorldBorder;
-import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.storage.SectionStorage;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Debug;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Optional;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -50,34 +46,10 @@ public abstract class PoiManagerMixin extends SectionStorage<PoiSection>
     }
 
     /**
-     * @reason Avoid Stream API
-     * @author Jellysquid
-     */
-    @Overwrite
-    public void checkConsistencyWithBlocks(ChunkPos chunkPos_1, LevelChunkSection section) {
-        SectionPos sectionPos = SectionPos.of(chunkPos_1, section.bottomBlockY() >> 4);
-
-        PoiSection set = this.get(sectionPos.asLong()).orElse(null);
-
-        if (set != null) {
-            set.refresh(consumer -> {
-                if (PointOfInterestTypeHelper.shouldScan(section)) {
-                    this.updateFromSection(section, sectionPos, consumer);
-                }
-            });
-        } else {
-            if (PointOfInterestTypeHelper.shouldScan(section)) {
-                set = this.getOrCreate(sectionPos.asLong());
-
-                this.updateFromSection(section, sectionPos, set::add);
-            }
-        }
-    }
-
-    /**
      * @reason Retrieve all points of interest in one operation
      * @author JellySquid
      */
+    @VisibleForDebug
     @Debug
     @SuppressWarnings("unchecked")
     @Overwrite
@@ -247,7 +219,4 @@ public abstract class PoiManagerMixin extends SectionStorage<PoiSection>
 
         return StreamSupport.stream(new NearbyPointOfInterestStream(typePredicate, status, useSquareDistanceLimit, preferNegativeY, afterSortingPredicate, origin, radius, storage), false);
     }
-
-    @Shadow
-    protected abstract void updateFromSection(LevelChunkSection section, SectionPos sectionPos, BiConsumer<BlockPos, Holder<PoiType>> entryConsumer);
 }
