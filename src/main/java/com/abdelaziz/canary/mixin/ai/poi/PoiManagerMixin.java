@@ -49,32 +49,6 @@ public abstract class PoiManagerMixin extends SectionStorage<PoiSection>
     }
 
     /**
-     * @reason Avoid Stream API
-     * @author Jellysquid
-     */
-    @Overwrite
-    public void checkConsistencyWithBlocks(ChunkPos chunkPos_1, LevelChunkSection section) {
-        SectionPos sectionPos = SectionPos.of(chunkPos_1, section.bottomBlockY() >> 4);
-
-        PoiSection set = this.get(sectionPos.asLong()).orElse(null);
-
-        if (set != null) {
-            set.refresh(consumer -> {
-                if (PoiTypeHelper.shouldScan(section)) {
-                    this.updateFromSection(section, sectionPos, consumer);
-                }
-            });
-        } else {
-            if (PoiTypeHelper.shouldScan(section)) {
-                set = this.getOrCreate(sectionPos.asLong());
-
-                this.updateFromSection(section, sectionPos, set::add);
-            }
-        }
-    }
-
-
-    /**
      * @reason Retrieve all points of interest in one operation
      * @author JellySquid
      */
@@ -248,7 +222,4 @@ public abstract class PoiManagerMixin extends SectionStorage<PoiSection>
 
         return StreamSupport.stream(new NearbyPointOfInterestStream(typePredicate, status, useSquareDistanceLimit, preferNegativeY, afterSortingPredicate, origin, radius, storage), false);
     }
-
-    @Shadow
-    protected abstract void updateFromSection(LevelChunkSection section, SectionPos sectionPos, BiConsumer<BlockPos, PoiType> entryConsumer);
 }

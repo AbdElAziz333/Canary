@@ -1,47 +1,24 @@
 package com.abdelaziz.canary.common.world.interests.types;
 
-import com.abdelaziz.canary.common.Canary;
-import com.abdelaziz.canary.common.util.collections.SetFactory;
-import com.abdelaziz.canary.mixin.ai.poi.PoiTypeMixin;
-import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
-import net.minecraft.world.entity.ai.village.poi.PoiManager;
-import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunkSection;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
-import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 
-/**
- * Replaces the type of the blockstate to POI map with a faster collection type which uses reference equality.
- */
-@Mod.EventBusSubscriber(modid = Canary.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class PoiTypeHelper {
-    private static Set<BlockState> TYPES;
+    private static Predicate<BlockState> POI_BLOCKSTATE_PREDICATE;
 
-    public static boolean shouldScan(LevelChunkSection section) {
-        return section.maybeHas(TYPES::contains);
-    }
-
-    @SubscribeEvent
-    public static void setup(FMLCommonSetupEvent ev) {
-        if (!EnabledMarker.class.isAssignableFrom(PoiManager.class)) {
-            return;
-        }
-
-        if (TYPES != null) {
+    public static void setup(Set<BlockState> types) {
+        if (POI_BLOCKSTATE_PREDICATE != null) {
             throw new IllegalStateException("Already initialized");
         }
 
-        Map<BlockState, PoiType> blockstatePOIMap = PoiTypeMixin.getBlockStateToPointOfInterestType();
-        blockstatePOIMap = new Reference2ReferenceOpenHashMap<>(blockstatePOIMap);
-        PoiTypeMixin.setBlockStateToPointOfInterestType(blockstatePOIMap);
-        TYPES = SetFactory.createFastRefBasedCopy(blockstatePOIMap.keySet());
+        POI_BLOCKSTATE_PREDICATE = types::contains;
     }
 
-    public interface EnabledMarker {
+    public static boolean shouldScan(LevelChunkSection section) {
+        return section.maybeHas(POI_BLOCKSTATE_PREDICATE);
     }
+
 }
