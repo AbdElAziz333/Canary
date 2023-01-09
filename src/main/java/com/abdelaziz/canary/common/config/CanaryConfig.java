@@ -31,7 +31,7 @@ public class CanaryConfig {
         // You must manually add a rule for any new mixins not covered by an existing package rule.
 
         this.addMixinRule("ai", true);
-        this.addMixinRule("ai.nearby_entity_tracking", false);
+        this.addMixinRule("ai.nearby_entity_tracking", true);
         this.addMixinRule("ai.nearby_entity_tracking.goals", true);
         this.addMixinRule("ai.pathing", true);
         this.addMixinRule("ai.poi", true);
@@ -85,8 +85,8 @@ public class CanaryConfig {
 
         this.addMixinRule("entity", true);
         this.addMixinRule("entity.collisions", true);
-        this.addMixinRule("entity.collisions.intersection", false);
-        this.addMixinRule("entity.collisions.movement", false);
+        this.addMixinRule("entity.collisions.intersection", true);
+        this.addMixinRule("entity.collisions.movement", true);
         this.addMixinRule("entity.collisions.suffocation", true);
         this.addMixinRule("entity.collisions.unpushable_cramming", true);
         this.addMixinRule("entity.data_tracker", true);
