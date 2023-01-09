@@ -68,7 +68,6 @@
     "block.hopper.InventoryAccessors$InventoryAccessorChestBlockEntity",
     "block.hopper.InventoryAccessors$InventoryAccessorDispenserBlockEntity",
     "block.hopper.InventoryAccessors$InventoryAccessorHopperBlockEntity",
-    "block.hopper.InventoryAccessors$InventoryAccessorRandomizableContainerBlockEntity",
     "block.hopper.InventoryAccessors$InventoryAccessorShulkerBoxBlockEntity",
     "block.hopper.ItemStackMixin",
     "block.hopper.NonNullListAccessor",

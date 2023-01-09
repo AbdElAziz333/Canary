@@ -83,25 +83,6 @@ public class InventoryAccessors {
         public abstract void setInventoryCanary(NonNullList<ItemStack> inventoryCanary);
     }
 
-    @Mixin(RandomizableContainerBlockEntity.class)
-    public abstract static class InventoryAccessorRandomizableContainerBlockEntity implements CanaryInventory {
-        @Shadow
-        protected abstract NonNullList<ItemStack> getItems();
-
-        @Shadow
-        protected abstract void setItems(NonNullList<ItemStack> list);
-
-        @Override
-        public NonNullList<ItemStack> getInventoryCanary() {
-            return this.getItems();
-        }
-
-        @Override
-        public void setInventoryCanary(NonNullList<ItemStack> inventory) {
-            this.setItems(inventory);
-        }
-    }
-
     @Mixin(AbstractMinecartContainer.class)
     public abstract static class InventoryAccessorAbstractMinecartEntity implements CanaryInventory {
         @Override
