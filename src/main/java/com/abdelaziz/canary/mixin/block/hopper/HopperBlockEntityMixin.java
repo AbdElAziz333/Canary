@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.BooleanSupplier;
 
 import static net.minecraft.world.level.block.entity.HopperBlockEntity.getItemsAtAndAbove;
 
@@ -71,6 +72,9 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
     //The currently used inventories (optimized type, if not present, skip optimizations)
     @Nullable
     private CanaryInventory insertInventory, extractInventory;
+
+    @Shadow
+    private static native boolean ejectItems(Level level, BlockPos pos, BlockState state, HopperBlockEntity inventory);
 
     @Nullable //Null iff corresp. CanaryInventory field is null
     private CanaryStackList insertStackList, extractStackList;
@@ -104,42 +108,30 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
      */
     @SuppressWarnings("JavadocReference")
     //call the vanilla code, but with target inventory nullify (mixin above) to allow other mods inject features */
-    @Inject(
-            cancellable = true,
-            method = "ejectItems(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/entity/HopperBlockEntity;)Z",
-            at = @At(
-                    value = "INVOKE", shift = At.Shift.BEFORE,
-                    target = "Lnet/minecraft/world/level/block/entity/HopperBlockEntity;isFullContainer(Lnet/minecraft/world/Container;Lnet/minecraft/core/Direction;)Z"
-            ), locals = LocalCapture.CAPTURE_FAILHARD
+    @Redirect(method = "tryMoveItems(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/entity/HopperBlockEntity;Ljava/util/function/BooleanSupplier;)Z",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/level/block/entity/HopperBlockEntity;ejectItems(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/entity/HopperBlockEntity;)Z"
+            )
     )
-    private static void canaryInsert(Level world, BlockPos pos, BlockState hopperState, HopperBlockEntity hopper, CallbackInfoReturnable<Boolean> cir, Container insertInventory, Direction direction) {
-        if (insertInventory == null || !(hopper instanceof HopperBlockEntity) || hopper instanceof WorldlyContainer) {
-            //call the vanilla code to allow other mods inject features
-            // e.g. carpet mod allows hoppers to insert items into wool blocks
-            return;
+    private static boolean canaryInsert(Level world, BlockPos pos, BlockState hopperState, HopperBlockEntity blockEntity, Level world2,
+                                        BlockPos pos2, BlockState state2, HopperBlockEntity blockentity2, BooleanSupplier booleanSupplier) {
+        HopperBlockEntityMixin hopperBlockEntity = (HopperBlockEntityMixin) blockEntity.getContainerAt(world, pos);
+        Container insertInventory = hopperBlockEntity.getInsertInventory(world, hopperState);
+        if (insertInventory == null) {
+            //call the vanilla code, but with target inventory nullify (mixin above) to allow other mods inject features
+            //e.g. carpet mod allows hoppers to insert items into wool blocks
+            return ejectItems(world, pos, hopperState, blockEntity);
         }
-        HopperBlockEntityMixin hopperBlockEntity = (HopperBlockEntityMixin) HopperBlockEntity.getContainerAt(world, pos);
 
         CanaryStackList hopperStackList = InventoryHelper.getCanaryStackList(hopperBlockEntity);
         if (hopperBlockEntity.insertInventory == insertInventory && hopperStackList.getModCount() == hopperBlockEntity.myModCountAtLastInsert) {
-            if (hopperBlockEntity.insertStackList != null && hopperBlockEntity.insertStackList.getModCount() == hopperBlockEntity.insertStackListModCount) {
+            if (hopperBlockEntity.insertStackList.getModCount() == hopperBlockEntity.insertStackListModCount) {
 //                ComparatorUpdatePattern.NO_UPDATE.apply(hopperBlockEntity, hopperStackList); //commented because it's a noop, Hoppers do not send useless comparator updates
-                cir.setReturnValue(false);
-                return;
+                return false;
             }
         }
 
-        boolean insertInventoryWasEmptyHopperNotDisabled = insertInventory instanceof HopperBlockEntityMixin &&
-                !((HopperBlockEntityMixin) insertInventory).isOnCustomCooldown() && hopperBlockEntity.insertStackList != null &&
-                hopperBlockEntity.insertStackList.getOccupiedSlots() == 0;
-
-        boolean insertInventoryHandlesModdedCooldown =
-                ((CanaryCooldownReceivingInventory) insertInventory).canReceiveTransferCooldown() &&
-                        hopperBlockEntity.insertStackList != null ?
-                        hopperBlockEntity.insertStackList.getOccupiedSlots() == 0 :
-                        insertInventory.isEmpty();
-
-        //noinspection ConstantConditions
+        boolean insertInventoryWasEmptyHopperNotDisabled = insertInventory instanceof HopperBlockEntityMixin && !((HopperBlockEntityMixin) insertInventory).isOnCustomCooldown() && hopperBlockEntity.insertStackList.getOccupiedSlots() == 0;
         if (!(hopperBlockEntity.insertInventory == insertInventory && hopperBlockEntity.insertStackList.getFullSlots() == hopperBlockEntity.insertStackList.size())) {
             Direction fromDirection = hopperState.getValue(HopperBlock.FACING).getOpposite();
             int size = hopperStackList.size();
@@ -157,13 +149,8 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
                             }
                             receivingHopper.setCooldown(k);
                         }
-                        if (insertInventoryHandlesModdedCooldown) {
-                            ((CanaryCooldownReceivingInventory) insertInventory).setTransferCooldown(hopperBlockEntity.tickedGameTime);
-                        }
-
                         insertInventory.setChanged();
-                        cir.setReturnValue(true);
-                        return;
+                        return true;
                     }
                 }
             }
@@ -172,7 +159,7 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
         if (hopperBlockEntity.insertStackList != null) {
             hopperBlockEntity.insertStackListModCount = hopperBlockEntity.insertStackList.getModCount();
         }
-        cir.setReturnValue(false);
+        return false;
     }
 
     @Redirect(method = "suckInItems(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/block/entity/Hopper;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/entity/HopperBlockEntity;getSourceContainer(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/block/entity/Hopper;)Lnet/minecraft/world/Container;"))
