@@ -88,6 +88,10 @@ repositories {
 dependencies {
     minecraft "net.minecraftforge:forge:${project.forge_version}"
 
+    implementation fg.deobf("curse.maven:ferritecore-429235:4074294")
+    implementation fg.deobf("curse.maven:fastload-630620:4271605")
+    implementation fg.deobf("curse.maven:lazy-dfu-forge-460819:3544496")
+
     // Mowzie's Mobs - Cracker's Wither Storm - Quark (Hoppers) - Origin - Wooden Hoppers
 
     // Real mod deobf dependency examples - these get remapped to your current mappings
