@@ -1,5 +1,6 @@
 package com.abdelaziz.canary.mixin.block.hopper;
 
+import com.abdelaziz.canary.api.inventory.CanaryCooldownReceivingInventory;
 import com.abdelaziz.canary.api.inventory.CanaryInventory;
 import com.abdelaziz.canary.common.entity.movement_tracker.SectionedEntityMovementListener;
 import com.abdelaziz.canary.common.hopper.*;
@@ -129,7 +130,17 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
             }
         }
 
-        boolean insertInventoryWasEmptyHopperNotDisabled = insertInventory instanceof HopperBlockEntityMixin && !((HopperBlockEntityMixin) insertInventory).isOnCustomCooldown() && hopperBlockEntity.insertStackList.getOccupiedSlots() == 0;
+        boolean insertInventoryWasEmptyHopperNotDisabled = insertInventory instanceof HopperBlockEntityMixin &&
+                !((HopperBlockEntityMixin) insertInventory).isOnCustomCooldown() && hopperBlockEntity.insertStackList != null &&
+                hopperBlockEntity.insertStackList.getOccupiedSlots() == 0;
+
+        boolean insertInventoryHandlesModdedCooldown =
+                ((CanaryCooldownReceivingInventory) insertInventory).canReceiveTransferCooldown() &&
+                        hopperBlockEntity.insertStackList != null ?
+                        hopperBlockEntity.insertStackList.getOccupiedSlots() == 0 :
+                        insertInventory.isEmpty();
+
+        //noinspection ConstantConditions
         if (!(hopperBlockEntity.insertInventory == insertInventory && hopperBlockEntity.insertStackList.getFullSlots() == hopperBlockEntity.insertStackList.size())) {
             Direction fromDirection = hopperState.getValue(HopperBlock.FACING).getOpposite();
             int size = hopperStackList.size();
