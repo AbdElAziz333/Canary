@@ -124,14 +124,24 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
         }
 
         CanaryStackList hopperStackList = InventoryHelper.getCanaryStackList(hopperBlockEntity);
-        if (hopperBlockEntity.insertInventory == insertInventory && hopperStackList.getModCount() == hopperBlockEntity.myModCountAtLastInsert) {
+        if (hopperBlockEntity.insertStackList != null && hopperBlockEntity.insertInventory == insertInventory && hopperStackList.getModCount() == hopperBlockEntity.myModCountAtLastInsert) {
             if (hopperBlockEntity.insertStackList.getModCount() == hopperBlockEntity.insertStackListModCount) {
 //                ComparatorUpdatePattern.NO_UPDATE.apply(hopperBlockEntity, hopperStackList); //commented because it's a noop, Hoppers do not send useless comparator updates
                 return false;
             }
         }
 
-        boolean insertInventoryWasEmptyHopperNotDisabled = insertInventory instanceof HopperBlockEntityMixin && !((HopperBlockEntityMixin) insertInventory).isOnCustomCooldown() && hopperBlockEntity.insertStackList.getOccupiedSlots() == 0;
+        boolean insertInventoryWasEmptyHopperNotDisabled = insertInventory instanceof HopperBlockEntityMixin &&
+                !((HopperBlockEntityMixin) insertInventory).isOnCustomCooldown() && hopperBlockEntity.insertStackList != null &&
+                hopperBlockEntity.insertStackList.getOccupiedSlots() == 0;
+
+        boolean insertInventoryHandlesModdedCooldown =
+                ((CanaryCooldownReceivingInventory) insertInventory).canReceiveTransferCooldown() &&
+                        hopperBlockEntity.insertStackList != null ?
+                        hopperBlockEntity.insertStackList.getOccupiedSlots() == 0 :
+                        insertInventory.isEmpty();
+
+        //noinspection ConstantConditions
         if (!(hopperBlockEntity.insertInventory == insertInventory && hopperBlockEntity.insertStackList.getFullSlots() == hopperBlockEntity.insertStackList.size())) {
             Direction fromDirection = hopperState.getValue(HopperBlock.FACING).getOpposite();
             int size = hopperStackList.size();
