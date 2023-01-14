@@ -18,28 +18,6 @@ import java.util.List;
 
 @Mixin(Entity.class)
 public class EntityMixin {
-
-    @Redirect(
-            method = "collide(Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/phys/Vec3;",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/entity/Entity;collideBoundingBox(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/world/phys/AABB;Lnet/minecraft/world/level/Level;Ljava/util/List;)Lnet/minecraft/world/phys/Vec3;"
-            ),
-            require = 5
-    )
-    private static Vec3 adjustMovmentForCollisionsGetEntitiesLater(@Nullable Entity entity, Vec3 movement, AABB entityBoundingBox, Level world, List<VoxelShape> collisions) {
-        return canaryCollideMultiAxisMovement(entity, movement, entityBoundingBox, world, true, collisions);
-    }
-
-    /**
-     * @author 2No2Name
-     * @reason Replace with optimized implementation
-     */
-    @Overwrite
-    public static Vec3 collideBoundingBox(@Nullable Entity entity, Vec3 movement, AABB entityBoundingBox, Level world, List<VoxelShape> collisions) {
-        return canaryCollideMultiAxisMovement(entity, movement, entityBoundingBox, world, false, collisions);
-    }
-
     private static Vec3 canaryCollideMultiAxisMovement(@Nullable Entity entity, Vec3 movement, AABB entityBoundingBox, Level world, boolean getEntityCollisions, List<VoxelShape> otherCollisions) {
         //vanilla order: entities, worldborder, blocks. It is unknown whether changing this order changes the result regarding the confusing 1e-7 VoxelShape margin behavior. Not yet investigated
         double velX = movement.x;
@@ -48,8 +26,16 @@ public class EntityMixin {
         boolean isVerticalOnly = velX == 0 && velZ == 0;
         AABB movementSpace;
         if (isVerticalOnly) {
-            //Reduced collision volume optimization for entities that are just standing around
             if (velY < 0) {
+                //Check block directly below center of entity first
+                VoxelShape voxelShape = CanaryEntityCollisions.getCollisionShapeBelowEntity(world, entity, entityBoundingBox);
+                if (voxelShape != null) {
+                    double v = voxelShape.collide(Direction.Axis.Y, entityBoundingBox, velY);
+                    if (v == 0) {
+                        return Vec3.ZERO;
+                    }
+                }
+                //Reduced collision volume optimization for entities that are just standing around
                 movementSpace = new AABB(entityBoundingBox.minX, entityBoundingBox.minY + velY, entityBoundingBox.minZ, entityBoundingBox.maxX, entityBoundingBox.minY, entityBoundingBox.maxZ);
             } else {
                 movementSpace = new AABB(entityBoundingBox.minX, entityBoundingBox.maxY, entityBoundingBox.minZ, entityBoundingBox.maxX, entityBoundingBox.maxY + velY, entityBoundingBox.maxZ);
@@ -76,17 +62,13 @@ public class EntityMixin {
                 }
             }
         }
-
         boolean velXSmallerVelZ = Math.abs(velX) < Math.abs(velZ);
-
         if (velXSmallerVelZ) {
             velZ = Shapes.collide(Direction.Axis.Z, entityBoundingBox, blockCollisions, velZ);
             if (velZ != 0.0) {
-
                 if (!otherCollisions.isEmpty()) {
                     velZ = Shapes.collide(Direction.Axis.Z, entityBoundingBox, otherCollisions, velZ);
                 }
-
                 if (velZ != 0.0 && getEntityCollisions) {
                     if (entityWorldBorderCollisions == null) {
                         entityWorldBorderCollisions = CanaryEntityCollisions.getEntityWorldBorderCollisions(world, entity, movementSpace, entity != null);
@@ -94,13 +76,11 @@ public class EntityMixin {
 
                     velZ = Shapes.collide(Direction.Axis.Z, entityBoundingBox, entityWorldBorderCollisions, velZ);
                 }
-
                 if (velZ != 0.0) {
                     entityBoundingBox = entityBoundingBox.move(0.0, 0.0, velZ);
                 }
             }
         }
-
         if (velX != 0.0) {
             velX = Shapes.collide(Direction.Axis.X, entityBoundingBox, blockCollisions, velX);
             if (velX != 0.0) {
@@ -146,5 +126,26 @@ public class EntityMixin {
     )
     private List<VoxelShape> getEntitiesLater(Level world, Entity entity, AABB box) {
         return List.of();
+    }
+
+    /**
+     * @author 2No2Name
+     * @reason Replace with optimized implementation
+     */
+    @Overwrite
+    public static Vec3 collideBoundingBox(@Nullable Entity entity, Vec3 movement, AABB entityBoundingBox, Level world, List<VoxelShape> collisions) {
+        return canaryCollideMultiAxisMovement(entity, movement, entityBoundingBox, world, false, collisions);
+    }
+
+    @Redirect(
+            method = "collide(Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/phys/Vec3;",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/world/entity/Entity;collideBoundingBox(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/world/phys/AABB;Lnet/minecraft/world/level/Level;Ljava/util/List;)Lnet/minecraft/world/phys/Vec3;"
+            ),
+            require = 5
+    )
+    private Vec3 adjustMovementForCollisionsGetEntitiesLater(@Nullable Entity entity, Vec3 movement, AABB entityBoundingBox, Level world, List<VoxelShape> collisions) {
+        return canaryCollideMultiAxisMovement(entity, movement, entityBoundingBox, world, true, collisions);
     }
 }
