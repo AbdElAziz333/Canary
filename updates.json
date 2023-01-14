@@ -1,11 +1,11 @@
 {
   "homepage": "https://www.curseforge.com/minecraft/mc-mods/canary",
   "promos": {
-    "1.19.3-latest": "0.1.9",
-    "1.19.3-recommended": "0.1.9",
-    "1.19.2-latest": "0.1.9",
-    "1.19.2-recommended": "0.1.9",
-    "1.18.2-latest": "0.1.5",
-    "1.18.2-recommended": "0.1.5"
+    "1.19.3-latest": "0.1.8",
+    "1.19.3-recommended": "0.1.8",
+    "1.19.2-latest": "0.1.8",
+    "1.19.2-recommended": "0.1.8",
+    "1.18.2-latest": "0.1.4",
+    "1.18.2-recommended": "0.1.4"
   }
 }
