@@ -21,8 +21,6 @@ import java.util.Set;
 public class CanaryConfig {
     private static final Logger LOGGER = LogManager.getLogger("CanaryConfig");
 
-    private static final String JSON_KEY_CANARY_OPTIONS = "canary:options";
-
     private final Map<String, Option> options = new HashMap<>();
     private final Set<Option> optionsWithDependencies = new ObjectLinkedOpenHashSet<>();
 

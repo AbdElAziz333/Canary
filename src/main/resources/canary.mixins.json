@@ -53,7 +53,6 @@
     "block.flatten_states.FluidStateMixin",
     "block.hopper.AbstractMinecartMixin",
     "block.hopper.ClassInstanceMultiMapMixin",
-    "block.hopper.ComposterBlockInputContainerMixin",
     "block.hopper.ComposterBlockMixin$ComposterBlockEmptyContainerMixin",
     "block.hopper.ComposterBlockMixin$ComposterBlockInputContainerMixin",
     "block.hopper.ComposterBlockMixin$ComposterBlockOutputContainerMixin",
