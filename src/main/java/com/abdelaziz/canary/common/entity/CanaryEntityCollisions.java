@@ -29,12 +29,13 @@ public class CanaryEntityCollisions {
      * VoxelShape system.
      */
     public static List<VoxelShape> getBlockCollisions(CollisionGetter world, Entity entity, AABB box) {
-        ArrayList<VoxelShape> shapes = new ArrayList<>();
+        /* ArrayList<VoxelShape> shapes = new ArrayList<>();
         ChunkAwareBlockCollisionSweeper sweeper = new ChunkAwareBlockCollisionSweeper(world, entity, box);
         while (sweeper.hasNext()) {
             shapes.add(sweeper.next());
         }
-        return shapes;
+        return shapes; */
+        return new ChunkAwareBlockCollisionSweeper(world, entity, box).collectAll();
     }
 
     /***
