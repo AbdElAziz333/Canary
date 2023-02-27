@@ -18,6 +18,7 @@ import net.minecraft.world.Container;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.HopperBlock;
@@ -398,7 +399,7 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
                 this.insertionMode = HopperCachingState.BlockInventory.NO_BLOCK_INVENTORY;
             } else {
                 this.insertBlockInventory = insertInventory;
-                this.insertionMode = HopperCachingState.BlockInventory.BLOCK_STATE;
+                this.insertionMode = insertInventory instanceof BlockStateOnlyInventory ? HopperCachingState.BlockInventory.BLOCK_STATE : HopperCachingState.BlockInventory.UNKNOWN;
             }
         }
 
@@ -598,6 +599,7 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
      */
     private void cacheExtractBlockInventory(Container extractInventory) {
         assert !(extractInventory instanceof Entity);
+        //Container blockInventory = this.extractBlockInventory;
         if (extractInventory instanceof BlockEntity || extractInventory instanceof CompoundContainer) {
             this.extractBlockInventory = extractInventory;
             if (extractInventory instanceof InventoryChangeTracker) {
@@ -612,7 +614,7 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
                 this.extractionMode = HopperCachingState.BlockInventory.NO_BLOCK_INVENTORY;
             } else {
                 this.extractBlockInventory = extractInventory;
-                this.extractionMode = HopperCachingState.BlockInventory.BLOCK_STATE;
+                this.extractionMode = extractInventory instanceof BlockStateOnlyInventory ? HopperCachingState.BlockInventory.BLOCK_STATE : HopperCachingState.BlockInventory.UNKNOWN;
             }
         }
     }
