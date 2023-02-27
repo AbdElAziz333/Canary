@@ -10,6 +10,7 @@ buildscript {
 
 plugins {
     id 'net.minecraftforge.gradle' version '5.1.+'
+    id 'org.parchmentmc.librarian.forgegradle' version '1.+'
 }
 
 apply plugin: 'org.spongepowered.mixin'
@@ -23,7 +24,7 @@ java {
 }
 
 minecraft {
-    mappings channel: 'official', version: project.minecraft_version
+    mappings channel: 'parchment', version: project.parchment_version
 
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
