@@ -53,6 +53,14 @@ public class CanaryMixinPlugin implements IMixinConfigPlugin {
             return false;
         }
 
+        if (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "ai.nearby_entity_tracking") && (FMLLoader.getLoadingModList().getModFileById("quark") != null)) {
+            return false;
+        }
+
+        if (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "ai.nearby_entity_tracking") && (FMLLoader.getLoadingModList().getModFileById("witherstormmod") != null)) {
+            return false;
+        }
+
         //Fix: if Forge errors is not empty then disable shapes, math.sine_lut and alloc.blockstate optimizations. (Thanks for malte!)
         if (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "shapes") && !LoadingModList.get().getErrors().isEmpty()) {
             return false;
