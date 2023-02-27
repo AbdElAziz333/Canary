@@ -28,6 +28,7 @@ import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.Intrinsic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
@@ -619,11 +620,16 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
     //Cached data invalidation:
 
     @SuppressWarnings("deprecation")
+    @Intrinsic
     @Override
     public void setBlockState(BlockState state) {
-        BlockState cachedState = this.getBlockState();
         super.setBlockState(state);
-        if (this.level != null && !this.level.isClientSide() && state.getValue(HopperBlock.FACING) != cachedState.getValue(HopperBlock.FACING)) {
+    }
+
+    @SuppressWarnings({"MixinAnnotationTarget", "UnresolvedMixinReference"})
+    @Inject(method = "setBlockState(Lnet/minecraft/world/level/block/state/BlockState;)V", at = @At("HEAD"))
+    private void invalidateOnSetCachedState(BlockState state, CallbackInfo ci) {
+        if (this.level != null && !this.level.isClientSide() && state.getValue(HopperBlock.FACING) != this.getBlockState().getValue(HopperBlock.FACING)) {
             this.invalidateCachedData();
         }
     }
