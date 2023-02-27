@@ -5,26 +5,33 @@ import net.minecraft.core.IdMap;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.chunk.Palette;
 import net.minecraft.world.level.chunk.PalettedContainer;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.*;
 
 import static net.minecraft.world.level.chunk.PalettedContainer.Strategy.LINEAR_PALETTE_FACTORY;
+import static net.minecraft.world.level.chunk.PalettedContainer.Strategy.SINGLE_VALUE_PALETTE_FACTORY;
 
 @Mixin(PalettedContainer.Strategy.class)
 public abstract class PalettedContainerMixin {
-    @Unique
-    private static final PalettedContainer.Configuration<?>[] BLOCKSTATE_DATA_PROVIDERS;
-    @Unique
-    private static final PalettedContainer.Configuration<?>[] BIOME_DATA_PROVIDERS;
-    @Unique
-    private static final Palette.Factory HASH = CanaryHashPalette::create;
     @Mutable
     @Shadow
     @Final
     public static PalettedContainer.Strategy SECTION_STATES;
+
+    @Unique
+    private static final PalettedContainer.Configuration<?>[] BLOCKSTATE_DATA_PROVIDERS;
+
+    @Unique
+    private static final PalettedContainer.Configuration<?>[] BIOME_DATA_PROVIDERS;
+
+    @Unique
+    private static final Palette.Factory HASH = CanaryHashPalette::create;
+
     @Mutable
     @Shadow
     @Final
     public static PalettedContainer.Strategy SECTION_BIOMES;
+
     @Shadow
     @Final
     static Palette.Factory GLOBAL_PALETTE_FACTORY;
@@ -40,7 +47,7 @@ public abstract class PalettedContainerMixin {
         PalettedContainer.Configuration<?> arrayDataProvider4bit = new PalettedContainer.Configuration<>(LINEAR_PALETTE_FACTORY, 4);
         PalettedContainer.Configuration<?> hashDataProvider4bit = new PalettedContainer.Configuration<>(HASH, 4);
         BLOCKSTATE_DATA_PROVIDERS = new PalettedContainer.Configuration<?>[]{
-                new PalettedContainer.Configuration<>(LINEAR_PALETTE_FACTORY, 0),
+                new PalettedContainer.Configuration<>(SINGLE_VALUE_PALETTE_FACTORY, 0),
                 // Bits 1-4 must all pass 4 bits as parameter, otherwise chunk sections will corrupt.
                 arrayDataProvider4bit,
                 arrayDataProvider4bit,
@@ -64,7 +71,7 @@ public abstract class PalettedContainerMixin {
         };
 
         BIOME_DATA_PROVIDERS = new PalettedContainer.Configuration<?>[]{
-                new PalettedContainer.Configuration<>(LINEAR_PALETTE_FACTORY, 0),
+                new PalettedContainer.Configuration<>(SINGLE_VALUE_PALETTE_FACTORY, 0),
                 new PalettedContainer.Configuration<>(LINEAR_PALETTE_FACTORY, 1),
                 new PalettedContainer.Configuration<>(LINEAR_PALETTE_FACTORY, 2),
                 new PalettedContainer.Configuration<>(HASH, 3)
@@ -73,7 +80,7 @@ public abstract class PalettedContainerMixin {
 
         SECTION_BIOMES = new PalettedContainer.Strategy(2) {
             @Override
-            public <A> PalettedContainer.Configuration<A> getConfiguration(IdMap<A> idList, int bits) {
+            public <A> PalettedContainer.@NotNull Configuration<A> getConfiguration(IdMap<A> idList, int bits) {
                 if (bits >= 0 && bits < BIOME_DATA_PROVIDERS.length) {
                     //noinspection unchecked
                     return (PalettedContainer.Configuration<A>) BIOME_DATA_PROVIDERS[bits];

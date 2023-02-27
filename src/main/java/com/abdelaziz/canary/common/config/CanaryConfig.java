@@ -69,7 +69,7 @@ public class CanaryConfig {
         this.addMixinRule("chunk.entity_class_groups", true);
         this.addMixinRule("chunk.no_locking", true);
         this.addMixinRule("chunk.no_validation", true);
-        this.addMixinRule("chunk.palette", false);
+        this.addMixinRule("chunk.palette", true);
         this.addMixinRule("chunk.serialization", true);
 
         this.addMixinRule("collections", true);
