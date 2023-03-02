@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.TickingBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import org.spongepowered.asm.mixin.Intrinsic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -70,12 +71,17 @@ public abstract class AbstractFurnaceBlockEntityMixin extends BlockEntity implem
         }
     }
 
+    @Intrinsic
     @Override
     public void setChanged() {
         super.setChanged();
+    }
+
+    @SuppressWarnings({"MixinAnnotationTarget", "UnresolvedMixinReference"})
+    @Inject(method = "setChanged()V", at = @At("RETURN"))
+    private void wakeOnMarkDirty(CallbackInfo ci) {
         if (this.isSleeping() && this.level != null && !this.level.isClientSide) {
             this.wakeUpNow();
         }
     }
-
 }

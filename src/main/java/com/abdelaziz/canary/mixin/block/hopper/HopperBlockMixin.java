@@ -13,10 +13,12 @@ import net.minecraft.world.level.block.HopperBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
+import org.spongepowered.asm.mixin.Intrinsic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(HopperBlock.class)
 public abstract class HopperBlockMixin extends BaseEntityBlock {
@@ -26,14 +28,19 @@ public abstract class HopperBlockMixin extends BaseEntityBlock {
     }
 
     @SuppressWarnings("deprecation")
+    @Intrinsic
     @Override
     public BlockState updateShape(BlockState myBlockState, Direction direction, BlockState newState, LevelAccessor world, BlockPos myPos, BlockPos posFrom) {
+        return super.updateShape(myBlockState, direction, newState, world, myPos, posFrom);
+    }
+
+    @SuppressWarnings({"MixinAnnotationTarget", "UnresolvedMixinReference"})
+    @Inject(method = "updateShape(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/LevelAccessor;Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;", at = @At("HEAD"))
+    private void notifyOnNeighborUpdate(BlockState myBlockState, Direction direction, BlockState newState, LevelAccessor world, BlockPos myPos, BlockPos posFrom, CallbackInfoReturnable<BlockState> ci) {
         //invalidate cache when composters change state
         if (!world.isClientSide() && newState.getBlock() instanceof WorldlyContainerHolder) {
             this.updateHopper(world, myBlockState, myPos, posFrom);
         }
-        return super.updateShape(myBlockState, direction, newState, world, myPos, posFrom);
-
     }
 
     @Inject(method = "neighborChanged(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/Block;Lnet/minecraft/core/BlockPos;Z)V", at = @At(value = "HEAD"))

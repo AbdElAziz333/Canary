@@ -18,6 +18,15 @@ import java.util.List;
 
 @Mixin(Entity.class)
 public class EntityMixin {
+    /**
+     * @author 2No2Name
+     * @reason Replace with optimized implementation
+     */
+    @Overwrite
+    public static Vec3 collideBoundingBox(@Nullable Entity entity, Vec3 movement, AABB entityBoundingBox, Level world, List<VoxelShape> collisions) {
+        return canaryCollideMultiAxisMovement(entity, movement, entityBoundingBox, world, false, collisions);
+    }
+
     private static Vec3 canaryCollideMultiAxisMovement(@Nullable Entity entity, Vec3 movement, AABB entityBoundingBox, Level world, boolean getEntityCollisions, List<VoxelShape> otherCollisions) {
         //vanilla order: entities, worldborder, blocks. It is unknown whether changing this order changes the result regarding the confusing 1e-7 VoxelShape margin behavior. Not yet investigated
         double velX = movement.x;
@@ -126,15 +135,6 @@ public class EntityMixin {
     )
     private List<VoxelShape> getEntitiesLater(Level world, Entity entity, AABB box) {
         return List.of();
-    }
-
-    /**
-     * @author 2No2Name
-     * @reason Replace with optimized implementation
-     */
-    @Overwrite
-    public static Vec3 collideBoundingBox(@Nullable Entity entity, Vec3 movement, AABB entityBoundingBox, Level world, List<VoxelShape> collisions) {
-        return canaryCollideMultiAxisMovement(entity, movement, entityBoundingBox, world, false, collisions);
     }
 
     @Redirect(

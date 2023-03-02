@@ -1,18 +1,25 @@
 package com.abdelaziz.canary.common.entity;
 
 import com.abdelaziz.canary.common.entity.movement.ChunkAwareBlockCollisionSweeper;
+import com.abdelaziz.canary.common.util.Pos;
 import com.abdelaziz.canary.common.world.WorldHelper;
 import com.google.common.collect.AbstractIterator;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.CollisionGetter;
 import net.minecraft.world.level.EntityGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.border.WorldBorder;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.BooleanOp;
+import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,12 +36,7 @@ public class CanaryEntityCollisions {
      * VoxelShape system.
      */
     public static List<VoxelShape> getBlockCollisions(CollisionGetter world, Entity entity, AABB box) {
-        ArrayList<VoxelShape> shapes = new ArrayList<>();
-        ChunkAwareBlockCollisionSweeper sweeper = new ChunkAwareBlockCollisionSweeper(world, entity, box);
-        while (sweeper.hasNext()) {
-            shapes.add(sweeper.next());
-        }
-        return shapes;
+        return new ChunkAwareBlockCollisionSweeper(world, entity, box).collectAll();
     }
 
     /***
@@ -181,5 +183,20 @@ public class CanaryEntityCollisions {
         AABB box = entity.getBoundingBox();
         WorldBorder worldBorder = collisionView.getWorldBorder();
         return worldBorder.isInsideCloseToBorder(entity, box) ? worldBorder.getCollisionShape() : null;
+    }
+
+    public static VoxelShape getCollisionShapeBelowEntity(Level world, @Nullable Entity entity, AABB entityBoundingBox) {
+        int x = Mth.floor(entityBoundingBox.minX + (entityBoundingBox.maxX - entityBoundingBox.minX) / 2);
+        int y = Mth.floor(entityBoundingBox.minY);
+        int z = Mth.floor(entityBoundingBox.minZ + (entityBoundingBox.maxZ - entityBoundingBox.minZ) / 2);
+        if (world.isOutsideBuildHeight(y)) {
+            return null;
+        }
+        ChunkAccess chunk = (ChunkAccess) world.getChunkForCollisions(Pos.ChunkCoord.fromBlockCoord(x), Pos.ChunkCoord.fromBlockCoord(z));
+        if (chunk != null) {
+            LevelChunkSection cachedChunkSection = chunk.getSections()[Pos.SectionYIndex.fromBlockCoord(world, y)];
+            return cachedChunkSection.getBlockState(x & 15, y & 15, z & 15).getCollisionShape(world, new BlockPos(x, y, z), entity == null ? CollisionContext.empty() : CollisionContext.of(entity));
+        }
+        return null;
     }
 }
