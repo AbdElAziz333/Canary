@@ -10,7 +10,7 @@ buildscript {
 
 plugins {
     id 'net.minecraftforge.gradle' version '5.1.+'
-    id 'org.parchmentmc.librarian.forgegradle' version '1.+'
+    //id 'org.parchmentmc.librarian.forgegradle' version '1.+'
 }
 
 apply plugin: 'org.spongepowered.mixin'
@@ -24,7 +24,8 @@ java {
 }
 
 minecraft {
-    mappings channel: 'parchment', version: project.parchment_version
+    //mappings channel: 'parchment', version: project.parchment_version
+    mappings channel: 'official', version: project.minecraft_version
 
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
@@ -89,11 +90,19 @@ repositories {
 dependencies {
     minecraft "net.minecraftforge:forge:${project.forge_version}"
 
-    implementation fg.deobf("curse.maven:ferritecore-429235:4074294")
-    implementation fg.deobf("curse.maven:fastload-630620:4271605")
-    implementation fg.deobf("curse.maven:lazy-dfu-forge-460819:3544496")
+    implementation fg.deobf("curse.maven:ferritecore-429235:4074294") //Ferritecore
+    implementation fg.deobf("curse.maven:fastload-630620:4271605") //Fastload
+    implementation fg.deobf("curse.maven:lazy-dfu-forge-460819:3544496") //Lazy DFU
+    implementation fg.deobf("curse.maven:smooth-boot-reloaded-633412:4162938")
 
-    // Mowzie's Mobs - Cracker's Wither Storm - Quark (Hoppers) - Origin - Wooden Hoppers
+    //compatibility issues
+    implementation fg.deobf("curse.maven:mowzies-mobs-250498:4142172") //Mowzie's Mobs
+    implementation fg.deobf("curse.maven:crackers-wither-storm-mod-621405:4407364") //Cracker's Wither Storm mod
+    implementation fg.deobf("curse.maven:quark-243121:3840125") //Quark
+    implementation fg.deobf("curse.maven:geckolib-388172:4181370") //GeckoLib
+    implementation fg.deobf("curse.maven:autoreglib-250363:3642382")//AutoRegLib
+    implementation fg.deobf("curse.maven:origins-forge-474438:3847281") //Origins (Forge)
+    implementation fg.deobf("curse.maven:caelus-308989:3650485") //Caelus
 
     // Real mod deobf dependency examples - these get remapped to your current mappings
     // compileOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}:api") // Adds JEI API as a compile dependency
