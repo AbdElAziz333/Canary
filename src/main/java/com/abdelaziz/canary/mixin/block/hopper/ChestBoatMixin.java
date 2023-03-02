@@ -7,7 +7,10 @@ import net.minecraft.world.entity.vehicle.ChestBoat;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.entity.EntityInLevelCallback;
 import net.minecraft.world.phys.Vec3;
+import org.spongepowered.asm.mixin.Intrinsic;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(ChestBoat.class)
 public abstract class ChestBoatMixin extends Entity {
@@ -15,14 +18,23 @@ public abstract class ChestBoatMixin extends Entity {
         super(type, world);
     }
 
+    @Intrinsic
     @Override
     public void rideTick() {
+        super.rideTick();
+    }
+
+    @SuppressWarnings({"MixinAnnotationTarget", "UnresolvedMixinReference"})
+    @Redirect(
+            method = "rideTick()V",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;rideTick()V")
+    )
+    private void tickRidingSummarizeMovementNotifications(Entity entity) {
         EntityInLevelCallback changeListener = ((EntityAccessor) this).getLevelCallback();
         if (changeListener instanceof ToggleableMovementTracker toggleableMovementTracker) {
             Vec3 beforeTickPos = this.position();
             int beforeMovementNotificationMask = toggleableMovementTracker.setNotificationMask(0);
 
-            super.rideTick();
 
             toggleableMovementTracker.setNotificationMask(beforeMovementNotificationMask);
 

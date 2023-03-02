@@ -21,6 +21,9 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * ChunkAwareBlockCollisionSweeper iterates over blocks in one chunk section at a time. Together with the chunk
  * section keeping track of the amount of oversized blocks inside the number of iterations can often be reduced.
@@ -52,6 +55,12 @@ public class ChunkAwareBlockCollisionSweeper extends AbstractIterator<VoxelShape
     private int cEndX, cEndZ;
     private int cX, cY, cZ;
 
+    private int maxHitX;
+    private int maxHitY;
+    private int maxHitZ;
+    private int maxIndex;
+    private int index;
+
     private int cTotalSize;
     private int cIterated;
 
@@ -71,6 +80,12 @@ public class ChunkAwareBlockCollisionSweeper extends AbstractIterator<VoxelShape
         this.maxY = Mth.clamp(Mth.floor(box.maxY + CanaryEntityCollisions.EPSILON), Pos.BlockCoord.getMinY(this.view), Pos.BlockCoord.getMaxYInclusive(this.view));
         this.minZ = Mth.floor(box.minZ - CanaryEntityCollisions.EPSILON);
         this.maxZ = Mth.floor(box.maxZ + CanaryEntityCollisions.EPSILON);
+
+        this.maxHitX = Integer.MIN_VALUE;
+        this.maxHitY = Integer.MIN_VALUE;
+        this.maxHitZ = Integer.MIN_VALUE;
+        this.maxIndex = Integer.MIN_VALUE;
+        this.index = 0;
 
         this.chunkX = Pos.ChunkCoord.fromBlockCoord(expandMin(this.minX));
         this.chunkZ = Pos.ChunkCoord.fromBlockCoord(expandMin(this.minZ));
@@ -160,7 +175,7 @@ public class ChunkAwareBlockCollisionSweeper extends AbstractIterator<VoxelShape
                             Pos.SectionYIndex.getMaxYSectionIndexInclusive(this.view)
                     );
 
-                    if ((this.chunkX < Pos.ChunkCoord.fromBlockCoord(expandMax(this.maxX)))) {
+                    if (this.chunkX < Pos.ChunkCoord.fromBlockCoord(expandMax(this.maxX))) {
                         //first initialization takes this branch
                         this.chunkX++;
                     } else {
@@ -267,11 +282,34 @@ public class ChunkAwareBlockCollisionSweeper extends AbstractIterator<VoxelShape
             if (collisionShape != Shapes.empty() && collisionShape != null /*collisionShape should never be null, but we received crash reports.*/) {
                 VoxelShape collidedShape = getCollidedShape(this.box, this.shape, collisionShape, x, y, z);
                 if (collidedShape != null) {
+                    if (z >= this.maxHitZ && (z > this.maxHitZ || y >= this.maxHitY && (y > this.maxHitY || x > this.maxHitX))) {
+                        this.maxHitX = x;
+                        this.maxHitY = y;
+                        this.maxHitZ = z;
+                        this.maxIndex = this.index;
+                    }
+                    this.index++;
+
                     return collidedShape;
                 }
             }
         }
 
         return this.endOfData();
+    }
+
+    public List<VoxelShape> collectAll() {
+        ArrayList<VoxelShape> collisions = new ArrayList<>();
+
+        while (this.hasNext()) {
+            collisions.add(this.next());
+        }
+        if (collisions.size() >= 2) {
+            //Swap the maxIndex element to the end.
+            //Part of a fix of wrong movement when last collision results in movement smaller than 1e-7. Changing which collision is the last one will change the result. https://github.com/CaffeineMC/lithium-fabric/issues/443
+            collisions.set(this.maxIndex, collisions.set(collisions.size() - 1, collisions.get(this.maxIndex)));
+        }
+
+        return collisions;
     }
 }

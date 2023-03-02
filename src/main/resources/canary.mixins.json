@@ -54,7 +54,6 @@
     "block.hopper.AbstractMinecartMixin",
     "block.hopper.ChestBoatMixin",
     "block.hopper.ClassInstanceMultiMapMixin",
-    "block.hopper.ComposterBlockInputContainerMixin",
     "block.hopper.CompoundContainerAccessor",
     "block.hopper.ContainerMixin",
     "block.hopper.EntityAccessor",

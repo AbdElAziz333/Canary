@@ -83,7 +83,6 @@ public class EntityClassGroup {
         return contains == 1;
     }
 
-    @OnlyIn(Dist.CLIENT)
     public static class NoDragonClassGroup extends EntityClassGroup {
         public static final NoDragonClassGroup BOAT_SHULKER_LIKE_COLLISION; //aka entities that other entities will do block-like collisions with when moving
 
