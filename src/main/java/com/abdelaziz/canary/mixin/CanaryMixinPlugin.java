@@ -66,6 +66,11 @@ public class CanaryMixinPlugin implements IMixinConfigPlugin {
             return false;
         }
 
+        //For now, disable block.hopper optimization when Quark is loaded, until i fix this issue
+        if (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "block.hopper") && (FMLLoader.getLoadingModList().getModFileById("quark") != null)) {
+            return false;
+        }
+
         if (!mixinClassName.startsWith(MIXIN_PACKAGE_ROOT)) {
             this.logger.error("Expected mixin '{}' to start with package root '{}', treating as foreign and " +
                     "disabling!", mixinClassName, MIXIN_PACKAGE_ROOT);
