@@ -48,12 +48,12 @@ public class CanaryMixinPlugin implements IMixinConfigPlugin {
             return false;
         }
 
-        //For now, disable entity.fast_retrieval optimization when Mowzie's Mobs is loaded, until i fix this issue
+        //For now, disable optimizations to fix some mod compatibilities.
         if (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "entity.fast_retrieval") && (FMLLoader.getLoadingModList().getModFileById("mowziesmobs") != null)) {
             return false;
         }
 
-        if (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "ai.nearby_entity_tracking") && (FMLLoader.getLoadingModList().getModFileById("quark") != null)) {
+        if (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "block.hopper") && (FMLLoader.getLoadingModList().getModFileById("quark") != null)) {
             return false;
         }
 
