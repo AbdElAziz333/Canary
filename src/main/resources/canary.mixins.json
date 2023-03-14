@@ -44,10 +44,10 @@
     "alloc.composter.ComposterMixin$ComposterBlockOutputContainerMixin",
     "alloc.deep_passengers.EntityMixin",
     "alloc.entity_tracker.TrackedEntityMixin",
-    "alloc.enum_values.LivingEntityMixin",
-    "alloc.enum_values.PistonBaseBlockMixin",
-    "alloc.enum_values.PistonStructureResolverMixin",
-    "alloc.enum_values.RedStoneWireBlockMixin",
+    "alloc.enum_values.living_entity.LivingEntityMixin",
+    "alloc.enum_values.piston_block.PistonBaseBlockMixin",
+    "alloc.enum_values.piston_structure.PistonStructureResolverMixin",
+    "alloc.enum_values.redstone_wire.RedStoneWireBlockMixin",
     "alloc.explosion_behavior.EntityBasedExplosionDamageCalculatorMixin",
     "block.flatten_states.BlockStateBaseMixin",
     "block.flatten_states.FluidStateMixin",
@@ -102,7 +102,6 @@
     "collections.goals.GoalSelectorMixin",
     "collections.mob_spawning.MobSpawnSettingsMixin",
     "collections.mob_spawning.WeightedRandomListMixin",
-    "entity.collisions.intersection.CollisionGetterMixin",
     "entity.collisions.movement.EntityMixin",
     "entity.collisions.suffocation.EntityMixin",
     "entity.collisions.unpushable_cramming.AbstractMinecartMixin",
@@ -201,6 +200,7 @@
   ],
   "client": [
     "chunk.entity_class_groups.ClientLevelMixin",
-    "chunk.entity_class_groups.TransientEntitySectionManagerAccessor"
+    "chunk.entity_class_groups.TransientEntitySectionManagerAccessor",
+    "entity.collisions.intersection.CollisionGetterMixin"
   ]
 }
