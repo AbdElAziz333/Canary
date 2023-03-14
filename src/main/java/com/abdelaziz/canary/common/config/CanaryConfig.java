@@ -51,6 +51,10 @@ public class CanaryConfig {
         this.addMixinRule("alloc.deep_passengers", true);
         this.addMixinRule("alloc.entity_tracker", true);
         this.addMixinRule("alloc.enum_values", true);
+        this.addMixinRule("alloc.enum_values.living_entity", true);
+        this.addMixinRule("alloc.enum_values.piston_block", true);
+        this.addMixinRule("alloc.enum_values.piston_structure", true);
+        this.addMixinRule("alloc.enum_values.redstone_wire", true);
         this.addMixinRule("alloc.explosion_behavior", true);
         this.addMixinRule("alloc.nbt", true);
 
