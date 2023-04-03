@@ -98,10 +98,13 @@
     "collections.entity_by_type.ClassInstanceMultiMapMixin",
     "collections.entity_filtering.ClassInstanceMultiMapMixin",
     "collections.entity_ticking.EntityTickListMixin",
+    "collections.fluid_submersion.EntityMixin",
     "collections.gamerules.GameRulesMixin",
     "collections.goals.GoalSelectorMixin",
     "collections.mob_spawning.MobSpawnSettingsMixin",
     "collections.mob_spawning.WeightedRandomListMixin",
+    "entity.collisions.intersection.CollisionGetterMixin",
+    "entity.collisions.intersection.LevelMixin",
     "entity.collisions.movement.EntityMixin",
     "entity.collisions.suffocation.EntityMixin",
     "entity.collisions.unpushable_cramming.AbstractMinecartMixin",
@@ -152,6 +155,8 @@
     "shapes.shape_merging.ShapesMixin",
     "shapes.specialized_shapes.ShapesMixin",
     "shapes.specialized_shapes.VoxelShapeMixin",
+    "util.chunk_access.LevelReaderMixin",
+    "util.chunk_access.PathNavigationRegionMixin",
     "util.entity_movement_tracking.EntitySectionMixin",
     "util.entity_movement_tracking.EntitySectionStorageMixin",
     "util.entity_movement_tracking.PersistentEntitySectionManagerAccessor",
@@ -200,7 +205,6 @@
   ],
   "client": [
     "chunk.entity_class_groups.ClientLevelMixin",
-    "chunk.entity_class_groups.TransientEntitySectionManagerAccessor",
-    "entity.collisions.intersection.CollisionGetterMixin"
+    "chunk.entity_class_groups.TransientEntitySectionManagerAccessor"
   ]
 }

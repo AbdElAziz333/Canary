@@ -81,13 +81,14 @@ public class CanaryConfig {
         this.addMixinRule("collections.entity_by_type", true);
         this.addMixinRule("collections.entity_filtering", true);
         this.addMixinRule("collections.entity_ticking", true);
+        this.addMixinRule("collections.fluid_submersion", true);
         this.addMixinRule("collections.gamerules", true);
         this.addMixinRule("collections.goals", true);
         this.addMixinRule("collections.mob_spawning", true);
 
         this.addMixinRule("entity", true);
         this.addMixinRule("entity.collisions", true);
-        this.addMixinRule("entity.collisions.intersection", false);
+        this.addMixinRule("entity.collisions.intersection", true);
         this.addMixinRule("entity.collisions.movement", true);
         this.addMixinRule("entity.collisions.suffocation", true);
         this.addMixinRule("entity.collisions.unpushable_cramming", true);
@@ -125,6 +126,7 @@ public class CanaryConfig {
         this.addMixinRule("shapes.specialized_shapes", true);
 
         this.addMixinRule("util", true);
+        this.addMixinRule("util.chunk_access", true);
         this.addMixinRule("util.entity_movement_tracking", true);
         this.addMixinRule("util.entity_section_position", true);
         this.addMixinRule("util.world_border_listener", false); //Disabled due to memory leak
