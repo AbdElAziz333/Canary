@@ -12,6 +12,7 @@ import net.minecraft.world.level.EntityGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.BooleanOp;
@@ -35,15 +36,15 @@ public class CanaryEntityCollisions {
      * Checks against the world border are replaced with our own optimized functions which do not go through the
      * VoxelShape system.
      */
-    public static List<VoxelShape> getBlockCollisions(CollisionGetter world, Entity entity, AABB box) {
-        return new ChunkAwareBlockCollisionSweeper(world, entity, box).collectAll();
+    public static List<VoxelShape> getBlockCollisions(Level level, Entity entity, AABB box) {
+        return new ChunkAwareBlockCollisionSweeper(level, entity, box).collectAll();
     }
 
     /***
      * @return True if the box (possibly that of an entity's) collided with any blocks
      */
-    public static boolean doesBoxCollideWithBlocks(CollisionGetter world, Entity entity, AABB box) {
-        final ChunkAwareBlockCollisionSweeper sweeper = new ChunkAwareBlockCollisionSweeper(world, entity, box);
+    public static boolean doesBoxCollideWithBlocks(Level level, Entity entity, AABB box) {
+        final ChunkAwareBlockCollisionSweeper sweeper = new ChunkAwareBlockCollisionSweeper(level, entity, box);
 
         final VoxelShape shape = sweeper.computeNext();
 
@@ -192,7 +193,7 @@ public class CanaryEntityCollisions {
         if (world.isOutsideBuildHeight(y)) {
             return null;
         }
-        ChunkAccess chunk = (ChunkAccess) world.getChunkForCollisions(Pos.ChunkCoord.fromBlockCoord(x), Pos.ChunkCoord.fromBlockCoord(z));
+        ChunkAccess chunk = world.getChunk(Pos.ChunkCoord.fromBlockCoord(x), Pos.ChunkCoord.fromBlockCoord(z), ChunkStatus.FULL, false);
         if (chunk != null) {
             LevelChunkSection cachedChunkSection = chunk.getSections()[Pos.SectionYIndex.fromBlockCoord(world, y)];
             return cachedChunkSection.getBlockState(x & 15, y & 15, z & 15).getCollisionShape(world, new BlockPos(x, y, z), entity == null ? CollisionContext.empty() : CollisionContext.of(entity));

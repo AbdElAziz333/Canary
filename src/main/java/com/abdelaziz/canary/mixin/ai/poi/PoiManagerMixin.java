@@ -72,7 +72,9 @@ public abstract class PoiManagerMixin extends SectionStorage<PoiSection>
                                         RandomSource rand) {
         ArrayList<PoiRecord> list = this.withinSphereChunkSectionSorted(typePredicate, pos, radius, status);
 
-        for (int i = list.size() - 1; i >= 0; i--) {
+        int size = list.size();
+
+        for (int i = size - 1; i >= 0; i--) {
             //shuffle by swapping randomly
             PoiRecord currentPOI = list.set(rand.nextInt(i + 1), list.get(i));
             list.set(i, currentPOI); //Move to the end of the unconsumed part of the list

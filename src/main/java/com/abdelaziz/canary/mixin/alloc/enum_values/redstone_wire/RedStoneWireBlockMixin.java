@@ -1,4 +1,4 @@
-package com.abdelaziz.canary.mixin.alloc.enum_values;
+package com.abdelaziz.canary.mixin.alloc.enum_values.redstone_wire;
 
 import com.abdelaziz.canary.common.util.DirectionConstants;
 import net.minecraft.core.Direction;

@@ -28,9 +28,11 @@ public class AvoidEntityGoalMixin<T extends LivingEntity> {
     @Shadow
     @Final
     protected PathfinderMob mob;
+
     @Shadow
     @Final
     protected float maxDist;
+
     private NearbyEntityTracker<T> tracker;
 
     @Inject(method = "<init>(Lnet/minecraft/world/entity/PathfinderMob;Ljava/lang/Class;Ljava/util/function/Predicate;FDDLjava/util/function/Predicate;)V", at = @At("RETURN"))

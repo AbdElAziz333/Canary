@@ -1,4 +1,4 @@
-package com.abdelaziz.canary.mixin.alloc.enum_values;
+package com.abdelaziz.canary.mixin.alloc.enum_values.piston_block;
 
 import com.abdelaziz.canary.common.util.DirectionConstants;
 import net.minecraft.core.Direction;

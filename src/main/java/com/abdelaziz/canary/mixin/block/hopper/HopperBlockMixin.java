@@ -57,19 +57,24 @@ public abstract class HopperBlockMixin extends BaseEntityBlock {
         if (above || posFrom.getX() == myPos.getX() + facing.getStepX() && posFrom.getY() == myPos.getY() + facing.getStepY() && posFrom.getZ() == myPos.getZ() + facing.getStepZ()) {
             BlockEntity hopper = ((BlockEntityGetter) world).getLoadedExistingBlockEntity(myPos);
             if (hopper instanceof UpdateReceiver updateReceiver) {
-                updateReceiver.onNeighborUpdate(above);
+                updateReceiver.invalidateCacheOnNeighborUpdate(above);
             }
         }
     }
 
-    @Inject(method = "onPlace(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Z)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/HopperBlock;checkPoweredState(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)V", shift = At.Shift.AFTER))
-    private void workAroundVanillaUpdateSuppression(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean moved, CallbackInfo ci) {
+    @Inject(method = "onPlace(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Z)V",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/world/level/block/HopperBlock;checkPoweredState(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)V",
+                    shift = At.Shift.AFTER
+            )
+    )    private void workAroundVanillaUpdateSuppression(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean moved, CallbackInfo ci) {
         //invalidate caches of nearby hoppers when placing an update suppressed hopper
         if (world.getBlockState(pos) != state) {
             for (Direction direction : UPDATE_SHAPE_ORDER) {
                 BlockEntity hopper = ((BlockEntityGetter) world).getLoadedExistingBlockEntity(pos.relative(direction));
                 if (hopper instanceof UpdateReceiver updateReceiver) {
-                    updateReceiver.onNeighborUpdate(direction == Direction.DOWN);
+                    updateReceiver.invalidateCacheOnNeighborUpdate(direction == Direction.DOWN);
                 }
             }
         }
