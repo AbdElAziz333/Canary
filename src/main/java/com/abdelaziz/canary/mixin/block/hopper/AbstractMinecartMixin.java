@@ -19,12 +19,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class AbstractMinecartMixin extends Entity {
 
     private Vec3 beforeMoveOnRailPos;
+    private int beforeMoveOnRailNotificationMask;
 
     public AbstractMinecartMixin(EntityType<?> type, Level world) {
         super(type, world);
     }
-
-    private int beforeMoveOnRailNotificationMask;
 
     @Inject(
             method = "moveAlongTrack",

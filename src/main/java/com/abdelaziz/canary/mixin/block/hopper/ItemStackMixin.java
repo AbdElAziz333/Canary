@@ -27,7 +27,7 @@ public abstract class ItemStackMixin implements StorableItemStack {
     @Override
     public void registerToInventory(CanaryStackList itemStacks, int mySlot) {
         if (this.myLocation != null) {
-            this.lithiumRegisterMultipleInventories(itemStacks, mySlot);
+            this.canaryRegisterMultipleInventories(itemStacks, mySlot);
         } else {
             this.myLocation = itemStacks;
             this.mySlot = mySlot;
@@ -45,7 +45,7 @@ public abstract class ItemStackMixin implements StorableItemStack {
             this.myLocation = null;
             this.mySlot = -1;
         } else if (this.myLocation instanceof Set<?>) {
-            this.lithiumUnregisterMultipleInventories(myInventoryList, index);
+            this.canaryUnregisterMultipleInventories(myInventoryList, index);
         } else {
             //Todo does this even happen? This seems to be unexpected behavior
             this.myLocation = null;
@@ -58,13 +58,13 @@ public abstract class ItemStackMixin implements StorableItemStack {
             if (this.myLocation instanceof CanaryStackList stackList) {
                 stackList.beforeSlotCountChange(this.mySlot, count);
             } else {
-                this.lithiumUpdateMultipleInventories();
+                this.canaryUpdateMultipleInventories();
             }
         }
         return count;
     }
 
-    private void lithiumRegisterMultipleInventories(CanaryStackList itemStacks, int mySlot) {
+    private void canaryRegisterMultipleInventories(CanaryStackList itemStacks, int mySlot) {
         Set<RefIntPair<CanaryStackList>> stackLists;
         if (this.myLocation instanceof Set<?>) {
             //noinspection unchecked
@@ -82,7 +82,7 @@ public abstract class ItemStackMixin implements StorableItemStack {
         stackLists.add(pair);
     }
 
-    private void lithiumUnregisterMultipleInventories(CanaryStackList itemStacks, int mySlot) {
+    private void canaryUnregisterMultipleInventories(CanaryStackList itemStacks, int mySlot) {
         //Handle shadow item technology correctly (Item in multiple inventories at once!)
         if (this.myLocation instanceof Set<?> set) {
             //noinspection unchecked
@@ -96,7 +96,7 @@ public abstract class ItemStackMixin implements StorableItemStack {
         }
     }
 
-    private void lithiumUpdateMultipleInventories() {
+    private void canaryUpdateMultipleInventories() {
         //Handle shadow item technology correctly (Item in multiple inventories at once!)
         if (this.myLocation instanceof Set<?> set) {
             //noinspection unchecked

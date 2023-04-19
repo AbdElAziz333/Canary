@@ -3,10 +3,10 @@ package com.abdelaziz.canary.common.ai.pathing;
 import com.abdelaziz.canary.common.block.BlockCountingSection;
 import com.abdelaziz.canary.common.block.BlockStateFlags;
 import com.abdelaziz.canary.common.util.Pos;
+import com.abdelaziz.canary.common.world.ChunkView;
 import com.abdelaziz.canary.common.world.WorldHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.CollisionGetter;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -57,12 +57,12 @@ public abstract class PathNodeCache {
 
         // Check that all the block's neighbors are within the same chunk column. If so, we can isolate all our block
         // reads to just one chunk and avoid hits against the server chunk manager.
-        if (world instanceof CollisionGetter && WorldHelper.areNeighborsWithinSameChunk(pos)) {
+        if (world instanceof ChunkView chunkView && WorldHelper.areNeighborsWithinSameChunkSection(pos)) {
             // If the y-coordinate is within bounds, we can cache the chunk section. Otherwise, the if statement to check
             // if the cached chunk section was initialized will early-exit.
             if (!world.isOutsideBuildHeight(y)) {
                 // This cast is always safe and is necessary to obtain direct references to chunk sections.
-                ChunkAccess chunk = (ChunkAccess) ((CollisionGetter) world).getChunkForCollisions(Pos.ChunkCoord.fromBlockCoord(x), Pos.ChunkCoord.fromBlockCoord(z));
+                ChunkAccess chunk = chunkView.getLoadedChunk(Pos.ChunkCoord.fromBlockCoord(x), Pos.ChunkCoord.fromBlockCoord(z));
 
                 // If the chunk is absent, the cached section above will remain null, as there is no chunk section anyways.
                 // An empty chunk or section will never pose any danger sources, which will be caught later.

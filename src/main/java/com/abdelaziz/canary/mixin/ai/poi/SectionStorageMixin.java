@@ -33,6 +33,7 @@ public abstract class SectionStorageMixin<R> implements RegionBasedStorageSectio
     @Shadow
     @Final
     protected LevelHeightAccessor levelHeightAccessor;
+
     @Mutable
     @Shadow
     @Final
@@ -52,19 +53,33 @@ public abstract class SectionStorageMixin<R> implements RegionBasedStorageSectio
         this.storage = new ListeningLong2ObjectOpenHashMap<>(this::onEntryAdded, this::onEntryRemoved);
     }
 
-    private static boolean isSectionValid(int y) {
-        return y >= 0 && y < RegionBasedStorageColumn.SECTIONS_IN_CHUNK;
-    }
-
     private void onEntryRemoved(long key, Optional<R> value) {
+        int y = Pos.SectionYIndex.fromSectionCoord(this.levelHeightAccessor, SectionPos.y(key));
+
+        // We only care about items belonging to a valid sub-chunk
+        if (y < 0 || y >= Pos.SectionYIndex.getNumYSections(this.levelHeightAccessor)) {
+            return;
+        }
+
+        int x = SectionPos.x(key);
+        int z = SectionPos.z(key);
+
+        long pos = ChunkPos.asLong(x, z);
+        RegionBasedStorageColumn flags = this.columns.get(pos);
+
+        if (flags != null) {
+            flags.clear(y);
+            if (flags.noSectionsPresent()) {
+                this.columns.remove(pos);
+            }
+        }
     }
 
     private void onEntryAdded(long key, Optional<R> value) {
         int y = Pos.SectionYIndex.fromSectionCoord(this.levelHeightAccessor, SectionPos.y(key));
 
         // We only care about items belonging to a valid sub-chunk
-        //if (y < 0 || y >= Pos.SectionYIndex.getNumYSections(this.world)) {
-        if (!isSectionValid(y)) {
+        if (y < 0 || y >= Pos.SectionYIndex.getNumYSections(this.levelHeightAccessor)) {
             return;
         }
 

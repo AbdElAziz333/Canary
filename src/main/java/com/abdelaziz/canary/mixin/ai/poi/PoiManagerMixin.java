@@ -7,11 +7,9 @@ import com.abdelaziz.canary.common.world.interests.RegionBasedStorageSectionExte
 import com.abdelaziz.canary.common.world.interests.iterator.NearbyPointOfInterestStream;
 import com.abdelaziz.canary.common.world.interests.iterator.SinglePointOfInterestTypeFilter;
 import com.abdelaziz.canary.common.world.interests.iterator.SphereChunkOrderedPoiSetSpliterator;
-import com.abdelaziz.canary.common.world.interests.types.PoiTypeHelper;
 import com.mojang.datafixers.DataFixer;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.SectionPos;
 import net.minecraft.util.VisibleForDebug;
 import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.entity.ai.village.poi.PoiManager;
@@ -21,19 +19,16 @@ import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.border.WorldBorder;
-import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.storage.SectionStorage;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Debug;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Random;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -75,7 +70,9 @@ public abstract class PoiManagerMixin extends SectionStorage<PoiSection>
                                         Random rand) {
         ArrayList<PoiRecord> list = this.withinSphereChunkSectionSorted(typePredicate, pos, radius, status);
 
-        for (int i = list.size() - 1; i >= 0; i--) {
+        int size = list.size();
+
+        for (int i = size - 1; i >= 0; i--) {
             //shuffle by swapping randomly
             PoiRecord currentPOI = list.set(rand.nextInt(i + 1), list.get(i));
             list.set(i, currentPOI); //Move to the end of the unconsumed part of the list

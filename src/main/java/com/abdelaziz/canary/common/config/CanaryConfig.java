@@ -51,12 +51,17 @@ public class CanaryConfig {
         this.addMixinRule("alloc.deep_passengers", true);
         this.addMixinRule("alloc.entity_tracker", true);
         this.addMixinRule("alloc.enum_values", true);
+        this.addMixinRule("alloc.enum_values.living_entity", true);
+        this.addMixinRule("alloc.enum_values.piston_block", true);
+        this.addMixinRule("alloc.enum_values.piston_structure", true);
+        this.addMixinRule("alloc.enum_values.redstone_wire", true);
         this.addMixinRule("alloc.explosion_behavior", true);
         this.addMixinRule("alloc.nbt", true);
 
         this.addMixinRule("block", true);
         this.addMixinRule("block.flatten_states", true);
         this.addMixinRule("block.hopper", true);
+        this.addMixinRule("block.hopper.world_edit_compat", true);
         this.addMixinRule("block.moving_block_shapes", true);
         this.addMixinRule("block.redstone_wire", true);
 
@@ -121,6 +126,8 @@ public class CanaryConfig {
         this.addMixinRule("shapes.specialized_shapes", true);
 
         this.addMixinRule("util", true);
+        this.addMixinRule("util.block_entity_retrieval", true);
+        this.addMixinRule("util.block_tracking", true);
         this.addMixinRule("util.entity_movement_tracking", true);
         this.addMixinRule("util.entity_section_position", true);
         this.addMixinRule("util.world_border_listener", true);
@@ -140,7 +147,6 @@ public class CanaryConfig {
         this.addMixinRule("world.block_entity_ticking.world_border", true);
         this.addMixinRule("world.chunk_access", true);
         this.addMixinRule("world.chunk_tickets", true);
-        this.addMixinRule("world.chunk_ticking", true);
         this.addMixinRule("world.combined_heightmap_update", true);
         this.addMixinRule("world.explosions", true);
         this.addMixinRule("world.inline_block_access", true);
@@ -153,15 +159,11 @@ public class CanaryConfig {
         this.addRuleDependency("block.hopper", "util", true);
         this.addRuleDependency("block.hopper", "util.entity_movement_tracking", true);
         this.addRuleDependency("block.hopper", "world", true);
-        this.addRuleDependency("block.hopper", "world.block_entity_retrieval", true);
+        this.addRuleDependency("block.hopper", "util.block_entity_retrieval", true);
         this.addRuleDependency("block.hopper", "util.inventory_change_listening", true);
-
-        this.addRuleDependency("util.inventory_comparator_tracking", "world.block_entity_retrieval", true);
-
+        this.addRuleDependency("util.inventory_comparator_tracking", "util.block_entity_retrieval", true);
         this.addRuleDependency("util.entity_movement_tracking", "util.entity_section_position", true);
-
         this.addRuleDependency("entity.collisions.unpushable_cramming", "chunk.entity_class_groups", true);
-
         this.addRuleDependency("world.block_entity_ticking.world_border", "util.world_border_listener", true);
 
     }
