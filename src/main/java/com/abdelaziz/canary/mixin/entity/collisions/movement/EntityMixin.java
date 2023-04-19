@@ -18,6 +18,30 @@ import java.util.List;
 
 @Mixin(Entity.class)
 public class EntityMixin {
+
+    @Redirect(
+            method = "collide(Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/phys/Vec3;",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/world/level/Level;getEntityCollisions(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/AABB;)Ljava/util/List;"
+            )
+    )
+    private List<VoxelShape> getEntitiesLater(Level world, Entity entity, AABB box) {
+        return List.of();
+    }
+
+    @Redirect(
+            method = "collide(Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/phys/Vec3;",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/world/entity/Entity;collideBoundingBox(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/world/phys/AABB;Lnet/minecraft/world/level/Level;Ljava/util/List;)Lnet/minecraft/world/phys/Vec3;"
+            ),
+            require = 5
+    )
+    private Vec3 adjustMovementForCollisionsGetEntitiesLater(@Nullable Entity entity, Vec3 movement, AABB entityBoundingBox, Level world, List<VoxelShape> collisions) {
+        return canaryCollideMultiAxisMovement(entity, movement, entityBoundingBox, world, true, collisions);
+    }
+
     /**
      * @author 2No2Name
      * @reason Replace with optimized implementation
@@ -71,13 +95,17 @@ public class EntityMixin {
                 }
             }
         }
+
         boolean velXSmallerVelZ = Math.abs(velX) < Math.abs(velZ);
+
         if (velXSmallerVelZ) {
             velZ = Shapes.collide(Direction.Axis.Z, entityBoundingBox, blockCollisions, velZ);
             if (velZ != 0.0) {
+
                 if (!otherCollisions.isEmpty()) {
                     velZ = Shapes.collide(Direction.Axis.Z, entityBoundingBox, otherCollisions, velZ);
                 }
+
                 if (velZ != 0.0 && getEntityCollisions) {
                     if (entityWorldBorderCollisions == null) {
                         entityWorldBorderCollisions = CanaryEntityCollisions.getEntityWorldBorderCollisions(world, entity, movementSpace, entity != null);
@@ -85,11 +113,13 @@ public class EntityMixin {
 
                     velZ = Shapes.collide(Direction.Axis.Z, entityBoundingBox, entityWorldBorderCollisions, velZ);
                 }
+
                 if (velZ != 0.0) {
                     entityBoundingBox = entityBoundingBox.move(0.0, 0.0, velZ);
                 }
             }
         }
+
         if (velX != 0.0) {
             velX = Shapes.collide(Direction.Axis.X, entityBoundingBox, blockCollisions, velX);
             if (velX != 0.0) {
@@ -108,6 +138,7 @@ public class EntityMixin {
                 }
             }
         }
+
         if (!velXSmallerVelZ && velZ != 0.0) {
             velZ = Shapes.collide(Direction.Axis.Z, entityBoundingBox, blockCollisions, velZ);
             if (velZ != 0.0) {
@@ -124,28 +155,5 @@ public class EntityMixin {
             }
         }
         return new Vec3(velX, velY, velZ);
-    }
-
-    @Redirect(
-            method = "collide(Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/phys/Vec3;",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/level/Level;getEntityCollisions(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/AABB;)Ljava/util/List;"
-            )
-    )
-    private List<VoxelShape> getEntitiesLater(Level world, Entity entity, AABB box) {
-        return List.of();
-    }
-
-    @Redirect(
-            method = "collide(Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/phys/Vec3;",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/entity/Entity;collideBoundingBox(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/world/phys/AABB;Lnet/minecraft/world/level/Level;Ljava/util/List;)Lnet/minecraft/world/phys/Vec3;"
-            ),
-            require = 5
-    )
-    private Vec3 adjustMovementForCollisionsGetEntitiesLater(@Nullable Entity entity, Vec3 movement, AABB entityBoundingBox, Level world, List<VoxelShape> collisions) {
-        return canaryCollideMultiAxisMovement(entity, movement, entityBoundingBox, world, true, collisions);
     }
 }

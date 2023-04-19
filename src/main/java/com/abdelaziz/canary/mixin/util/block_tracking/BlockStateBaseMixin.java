@@ -1,4 +1,4 @@
-package com.abdelaziz.canary.mixin.chunk.block_counting;
+package com.abdelaziz.canary.mixin.util.block_tracking;
 
 import com.abdelaziz.canary.common.block.BlockStateFlagHolder;
 import com.abdelaziz.canary.common.block.BlockStateFlags;

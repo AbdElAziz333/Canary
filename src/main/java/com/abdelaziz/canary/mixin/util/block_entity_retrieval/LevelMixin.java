@@ -1,4 +1,4 @@
-package com.abdelaziz.canary.mixin.world.block_entity_retrieval;
+package com.abdelaziz.canary.mixin.util.block_entity_retrieval;
 
 import com.abdelaziz.canary.common.world.blockentity.BlockEntityGetter;
 import net.minecraft.core.BlockPos;

@@ -6,7 +6,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.monster.Shulker;
 import net.minecraft.world.entity.vehicle.Minecart;
-import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 
 import java.util.Objects;
 import java.util.function.Predicate;
