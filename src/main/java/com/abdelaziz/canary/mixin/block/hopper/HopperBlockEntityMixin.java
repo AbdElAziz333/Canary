@@ -97,9 +97,6 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
     private static native Container getSourceContainer(Level world, Hopper hopper);
 
     @Shadow
-    private static native boolean canTakeItemFromContainer(Container inv, ItemStack stack, int slot, Direction facing);
-
-    @Shadow
     public abstract boolean isOnCustomCooldown();
 
     @Shadow
@@ -107,6 +104,9 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
 
     @Shadow
     protected abstract boolean isOnCooldown();
+
+    @Shadow
+    private static native boolean canTakeItemFromContainer(Container p_273433_, Container p_273542_, ItemStack p_273400_, int p_273519_, Direction p_273088_);
 
     /**
      * Effectively overwrites {@link HopperBlockEntity#insert(Level, BlockPos, BlockState, Container)} (only usage redirect)
@@ -221,7 +221,7 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
         for (int i = 0; i < fromSize; i++) {
             int fromSlot = availableSlots != null ? availableSlots[i] : i;
             ItemStack itemStack = fromStackList.get(fromSlot);
-            if (!itemStack.isEmpty() && canTakeItemFromContainer(from, itemStack, fromSlot, Direction.DOWN)) {
+            if (!itemStack.isEmpty() && canTakeItemFromContainer(to, from, itemStack, fromSlot, Direction.DOWN)) {
                 //calling removeStack is necessary due to its side effects (setChanged in LootableContainerBlockEntity)
                 ItemStack takenItem = from.removeItem(fromSlot, 1);
                 assert !takenItem.isEmpty();

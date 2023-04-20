@@ -2,6 +2,7 @@ package com.abdelaziz.canary.mixin.world.inline_height;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.level.Level;
@@ -32,7 +33,7 @@ public abstract class LevelMixin implements LevelHeightAccessor {
             method = "<init>",
             at = @At("RETURN")
     )
-    private void initHeightCache(WritableLevelData properties, ResourceKey<Level> registryRef, Holder<DimensionType> dimension, Supplier<ProfilerFiller> supplier, boolean isClient, boolean debugWorld, long seed, int maxChainedNeighborUpdates, CallbackInfo ci) {
+    private void initHeightCache(WritableLevelData properties, ResourceKey<Level> resourceKey, RegistryAccess registryAccess, Holder<DimensionType> holder, Supplier<ProfilerFiller> profiler, boolean isClient, boolean debugWorld, long biomeAccess, int maxChainedNeighborUpdates, CallbackInfo ci) {
         this.height = this.dimensionType().height();
         this.bottomY = this.dimensionType().minY();
         this.topYInclusive = this.bottomY + this.height - 1;

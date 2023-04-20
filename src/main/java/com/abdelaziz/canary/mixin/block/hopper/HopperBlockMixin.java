@@ -62,10 +62,10 @@ public abstract class HopperBlockMixin extends BaseEntityBlock {
         }
     }
 
-    @Inject(method = "onPlace(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Z)V",
+    @Inject(method = "onPlace",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/world/level/block/HopperBlock;checkPoweredState(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)V",
+                    target = "Lnet/minecraft/world/level/block/HopperBlock;checkPoweredState(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)V",
                     shift = At.Shift.AFTER
             )
     )    private void workAroundVanillaUpdateSuppression(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean moved, CallbackInfo ci) {
