@@ -13,16 +13,12 @@ import org.spongepowered.asm.mixin.Mixin;
 /**
  * Replaces collision testing methods with jumps to our own (faster) entity collision testing code.
  */
-/**
- * Replaces collision testing methods with jumps to our own (faster) entity collision testing code.
- */
 @Mixin(Level.class)
 public abstract class LevelMixin implements LevelAccessor {
 
     /**
      * Checks whether the area is empty from blocks, hard entities and the world border.
      * Only access relevant entity classes, use more efficient block access
-     *
      * @author 2No2Name
      */
     @Override
@@ -32,11 +28,11 @@ public abstract class LevelMixin implements LevelAccessor {
         // If no blocks were collided with, try to check for entity collisions if we can read entities
         if (ret && this instanceof EntityGetter) {
             //needs to include world border collision
-            ret = !CanaryEntityCollisions.doesBoxCollideWithHardEntities((EntityGetter) this, entity, box);
+            ret = !CanaryEntityCollisions.doesBoxCollideWithHardEntities(this, entity, box);
         }
 
         if (ret && entity != null) {
-            ret = !CanaryEntityCollisions.doesEntityCollideWithWorldBorder((CollisionGetter) this, entity);
+            ret = !CanaryEntityCollisions.doesEntityCollideWithWorldBorder(this, entity);
         }
         return ret;
     }
