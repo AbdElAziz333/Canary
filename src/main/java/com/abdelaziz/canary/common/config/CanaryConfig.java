@@ -51,6 +51,9 @@ public class CanaryConfig {
         this.addMixinRule("alloc.chunk_ticking", true);
         this.addMixinRule("alloc.composter", true);
         this.addMixinRule("alloc.deep_passengers", true);
+        this.addMixinRule("alloc.empty_chunk", true);
+        this.addMixinRule("alloc.empty_iterator", true);
+        this.addMixinRule("alloc.empty_list", true);
         this.addMixinRule("alloc.entity_tracker", true);
         this.addMixinRule("alloc.enum_values", true);
         this.addMixinRule("alloc.enum_values.living_entity", true);
@@ -68,6 +71,36 @@ public class CanaryConfig {
 
         this.addMixinRule("cached_hashcode", true);
 
+        this.addMixinRule("calc", true);
+        this.addMixinRule("calc.dedeuplicate", true);
+        this.addMixinRule("calc.dedeuplicate.player_statistics", true);
+        this.addMixinRule("calc.if_else", true);
+        this.addMixinRule("calc.if_else.ai", true);
+        this.addMixinRule("calc.if_else.ai.evaluator", true);
+        this.addMixinRule("calc.if_else.block_entity", true);
+        this.addMixinRule("calc.if_else.block_entity.can_place_item", true);
+        this.addMixinRule("calc.if_else.block_entity.can_place_item.brewing_stand", true);
+        this.addMixinRule("calc.if_else.block_entity.composter", true);
+        this.addMixinRule("calc.if_else.block_entity.get_capability", true);
+        this.addMixinRule("calc.if_else.block_entity.get_capability.brewing_stand", true);
+        this.addMixinRule("calc.if_else.block_entity.get_capability.furnace", true);
+        this.addMixinRule("calc.if_else.block_entity.get_slots_for_face", true);
+        this.addMixinRule("calc.if_else.block_entity.get_slots_for_face.brewing_stand", true);
+        this.addMixinRule("calc.if_else.block_entity.get_slots_for_face.furnace", true);
+        this.addMixinRule("calc.if_else.entity", true);
+        this.addMixinRule("calc.if_else.entity.handle_entity_event", true);
+        this.addMixinRule("calc.if_else.entity.handle_entity_event.goat", true);
+        this.addMixinRule("calc.if_else.entity.handle_entity_event.horse", true);
+        this.addMixinRule("calc.if_else.entity.handle_entity_event.iron_golem", true);
+        this.addMixinRule("calc.if_else.entity.handle_entity_event.ocelot", true);
+        this.addMixinRule("calc.if_else.entity.handle_entity_event.player", true);
+        this.addMixinRule("calc.if_else.entity.handle_entity_event.tamable_animal", true);
+        this.addMixinRule("calc.if_else.entity.handle_entity_event.villager", true);
+        this.addMixinRule("calc.if_else.entity.handle_entity_event.warden", true);
+        this.addMixinRule("calc.if_else.entity.handle_entity_event.wolf", true);
+        this.addMixinRule("calc.if_else.player_slot", true);
+        this.addMixinRule("calc.if_else.raid_odds", true);
+
         this.addMixinRule("chunk", true);
         this.addMixinRule("chunk.block_counting", true);
         this.addMixinRule("chunk.entity_class_groups", true);
@@ -83,14 +116,15 @@ public class CanaryConfig {
         this.addMixinRule("collections.entity_by_type", true);
         this.addMixinRule("collections.entity_filtering", true);
         this.addMixinRule("collections.entity_ticking", true);
+        this.addMixinRule("collections.fluid_submersion", true);
         this.addMixinRule("collections.gamerules", true);
         this.addMixinRule("collections.goals", true);
         this.addMixinRule("collections.mob_spawning", true);
 
         this.addMixinRule("entity", true);
         this.addMixinRule("entity.collisions", true);
-        this.addMixinRule("entity.collisions.intersection", true);
-        this.addMixinRule("entity.collisions.movement", true);
+        this.addMixinRule("entity.collisions.intersection", false);
+        this.addMixinRule("entity.collisions.movement", false);
         this.addMixinRule("entity.collisions.suffocation", true);
         this.addMixinRule("entity.collisions.unpushable_cramming", true);
         this.addMixinRule("entity.data_tracker", true);
@@ -117,6 +151,7 @@ public class CanaryConfig {
         this.addMixinRule("math.sine_lut", true);
 
         this.addMixinRule("profiler", true);
+
 
         this.addMixinRule("shapes", true);
         this.addMixinRule("shapes.blockstate_cache", true);

@@ -8,7 +8,7 @@ import net.minecraft.world.level.entity.EntitySectionStorage;
 import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(EntitySectionStorage.class)
-public class EntitySectionStorageMixin<T extends EntityAccess> implements MovementTrackerCache {
+public class EntitySectionStorageMixin implements MovementTrackerCache {
 
     private final Object2ReferenceOpenHashMap<SectionedEntityMovementTracker<?, ?>, SectionedEntityMovementTracker<?, ?>> sectionEntityMovementTrackers = new Object2ReferenceOpenHashMap<>();
 
