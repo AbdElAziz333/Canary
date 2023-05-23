@@ -30,17 +30,17 @@ public abstract class BlockStateBaseMixin extends StateHolder<Block, BlockState>
 
     @Deprecated
     @Inject(
-            method = "initCache",
+            method = "<init>",
             at = @At(
                     value = "RETURN"
             )
     )
-    private void initialize(CallbackInfo ci) {
+    private void initBlockCache(CallbackInfo ci) {
         tags = this.getBlock().builtInRegistryHolder().tags();
     }
 
     /**
-     * @reason cache allocations
+     * @reason Use cached property
      * @author AbdElAziz
      * */
     @Overwrite

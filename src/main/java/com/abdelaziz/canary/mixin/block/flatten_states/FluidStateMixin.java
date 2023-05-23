@@ -39,7 +39,7 @@ public abstract class FluidStateMixin {
     }
 
     /**
-     * @reason cache allocations
+     * @reason Use cached property
      * @author AbdElAziz
      * */
     @Overwrite
