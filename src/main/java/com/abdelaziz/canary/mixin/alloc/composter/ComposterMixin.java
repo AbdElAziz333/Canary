@@ -1,12 +1,23 @@
 package com.abdelaziz.canary.mixin.alloc.composter;
 
-import com.abdelaziz.canary.common.util.ArrayConstants;
+import com.abdelaziz.canary.common.util.constants.ArrayConstants;
 import net.minecraft.core.Direction;
 import net.minecraft.world.WorldlyContainer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 
 public class ComposterMixin {
+    @Mixin(targets = "net.minecraft.world.level.block.ComposterBlock$EmptyContainer")
+    static abstract class ComposterBlockEmptyContainerMixin implements WorldlyContainer {
+        /**
+         * @author 2No2Name
+         * @reason avoid allocation
+         */
+        @Overwrite
+        public int[] getSlotsForFace(Direction side) {
+            return ArrayConstants.EMPTY_ARRAY;
+        }
+    }
 
     @Mixin(targets = "net.minecraft.world.level.block.ComposterBlock$InputContainer")
     static abstract class ComposterBlockInputContainerMixin implements WorldlyContainer {
@@ -16,19 +27,7 @@ public class ComposterMixin {
          */
         @Overwrite
         public int[] getSlotsForFace(Direction side) {
-            return side == Direction.UP ? ArrayConstants.ZERO : ArrayConstants.EMPTY;
-        }
-    }
-
-    @Mixin(targets = "net.minecraft.world.level.block.ComposterBlock$EmptyContainer")
-    static abstract class ComposterBlockEmptyContainerMixin implements WorldlyContainer {
-        /**
-         * @author 2No2Name
-         * @reason avoid allocation
-         */
-        @Overwrite
-        public int[] getSlotsForFace(Direction side) {
-            return ArrayConstants.EMPTY;
+            return side == Direction.UP ? ArrayConstants.ZERO_ARRAY : ArrayConstants.EMPTY_ARRAY;
         }
     }
 
@@ -40,7 +39,7 @@ public class ComposterMixin {
          */
         @Overwrite
         public int[] getSlotsForFace(Direction side) {
-            return side == Direction.DOWN ? ArrayConstants.ZERO : ArrayConstants.EMPTY;
+            return side == Direction.DOWN ? ArrayConstants.ZERO_ARRAY : ArrayConstants.EMPTY_ARRAY;
         }
     }
 }

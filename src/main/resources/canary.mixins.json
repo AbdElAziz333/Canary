@@ -44,6 +44,8 @@
     "alloc.composter.ComposterMixin$ComposterBlockOutputContainerMixin",
     "alloc.deep_passengers.EntityMixin",
     "alloc.empty_chunk.EmptyLevelChunkMixin",
+    "alloc.empty_iterator.ClassInstanceMultiMapMixin",
+    "alloc.empty_list.WorldGenRegionMixin",
     "alloc.entity_tracker.TrackedEntityMixin",
     "alloc.enum_values.living_entity.LivingEntityMixin",
     "alloc.enum_values.piston_block.PistonBaseBlockMixin",
