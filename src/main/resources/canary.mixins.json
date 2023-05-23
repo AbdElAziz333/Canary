@@ -141,7 +141,7 @@
     "entity.fast_hand_swing.LivingEntityMixin",
     "entity.fast_powder_snow_check.LivingEntityMixin",
     "entity.fast_retrieval.EntitySectionStorageMixin",
-    "entity.fluid_submesion.EntityMixin",
+    "collections.fluid_submersion.EntityMixin",
     "entity.hopper_minecart.HopperBlockEntityMixin",
     "entity.inactive_navigations.DrownedGoToBeachGoalMixin",
     "entity.inactive_navigations.DrownedMixin",

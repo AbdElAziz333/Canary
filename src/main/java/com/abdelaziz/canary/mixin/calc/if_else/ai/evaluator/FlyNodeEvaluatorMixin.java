@@ -1,5 +1,6 @@
 package com.abdelaziz.canary.mixin.calc.if_else.ai.evaluator;
 
+import com.abdelaziz.canary.common.ai.pathing.PathNodeCache;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
@@ -7,7 +8,6 @@ import net.minecraft.world.level.pathfinder.FlyNodeEvaluator;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 
-import static net.minecraft.world.level.pathfinder.WalkNodeEvaluator.checkNeighbourBlocks;
 import static net.minecraft.world.level.pathfinder.WalkNodeEvaluator.getBlockPathTypeRaw;
 
 @Mixin(FlyNodeEvaluator.class)
@@ -48,7 +48,7 @@ public abstract class FlyNodeEvaluatorMixin extends WalkNodeEvaluatorMixin {
         }
 
         if (blockPathTypes == BlockPathTypes.WALKABLE || blockPathTypes == BlockPathTypes.OPEN) {
-            blockPathTypes = checkNeighbourBlocks(blockGetter, mutableBlockPos.set(x, y, z), blockPathTypes);
+            blockPathTypes = PathNodeCache.getNodeTypeFromNeighbors(blockGetter, mutableBlockPos.set(x, y, z), blockPathTypes);
         }
 
         return blockPathTypes;
