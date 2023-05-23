@@ -18,7 +18,6 @@ public abstract class LevelMixin implements LevelAccessor {
     /**
      * Checks whether the area is empty from blocks, hard entities and the world border.
      * Only access relevant entity classes, use more efficient block access
-     *
      * @author 2No2Name
      */
     @Override
