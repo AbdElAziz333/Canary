@@ -2,7 +2,6 @@ package com.abdelaziz.canary.mixin.entity.collisions.intersection;
 
 import com.abdelaziz.canary.common.entity.CanaryEntityCollisions;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.CollisionGetter;
 import net.minecraft.world.level.EntityGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
