@@ -30,7 +30,7 @@ public abstract class BlockStateBaseMixin extends StateHolder<Block, BlockState>
 
     @Deprecated
     @Inject(
-            method = "<init>",
+            method = "initCache",
             at = @At(
                     value = "RETURN"
             )
