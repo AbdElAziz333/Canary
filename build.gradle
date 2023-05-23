@@ -10,7 +10,6 @@ buildscript {
 
 plugins {
     id 'net.minecraftforge.gradle' version '5.1.+'
-    id 'org.parchmentmc.librarian.forgegradle' version '1.+'
 }
 
 apply plugin: 'org.spongepowered.mixin'
@@ -24,8 +23,7 @@ java {
 }
 
 minecraft {
-    //mappings channel: 'official', version: project.minecraft_version
-    mappings channel: 'parchment', version: project.parchment_version
+    mappings channel: 'official', version: project.minecraft_version
 
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
@@ -89,12 +87,6 @@ repositories {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${project.forge_version}"
-
-    implementation fg.deobf("curse.maven:ferritecore-429235:4117906")//Ferritecore
-    implementation fg.deobf("curse.maven:fastload-630620:4074712")//Fastload
-    implementation fg.deobf("curse.maven:lazy-dfu-forge-460819:3831644")//Lazy DFU
-
-    implementation fg.deobf("curse.maven:applied-energistics-2-223794:4293558")
 
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
