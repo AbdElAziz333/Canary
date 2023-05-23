@@ -1,5 +1,6 @@
 package com.abdelaziz.canary.mixin.calc.if_else.ai.evaluator;
 
+import com.abdelaziz.canary.common.ai.pathing.PathNodeCache;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
@@ -11,8 +12,9 @@ import org.spongepowered.asm.mixin.Overwrite;
 @Mixin(FlyNodeEvaluator.class)
 public abstract class FlyNodeEvaluatorMixin extends WalkNodeEvaluator {
     /**
-     * @reason replace if-else with switch statement
-     * @author AbdElAziz
+     * @reason Use optimized implementation which avoids scanning blocks for dangers where possible,
+     *         replace if-else with switch statement
+     * @author JellySquid, 2No2Name, AbdElAziz
      */
     @Overwrite
     public BlockPathTypes getBlockPathType(BlockGetter blockGetter, int x, int y, int z) {
@@ -46,7 +48,7 @@ public abstract class FlyNodeEvaluatorMixin extends WalkNodeEvaluator {
         }
 
         if (blockPathTypes == BlockPathTypes.WALKABLE || blockPathTypes == BlockPathTypes.OPEN) {
-            blockPathTypes = checkNeighbourBlocks(blockGetter, mutableBlockPos.set(x, y, z), blockPathTypes);
+            blockPathTypes = PathNodeCache.getNodeTypeFromNeighbors(blockGetter, mutableBlockPos.set(x, y, z), blockPathTypes);
         }
 
         return blockPathTypes;

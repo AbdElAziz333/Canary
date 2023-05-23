@@ -54,7 +54,7 @@ public abstract class FluidStateMixin {
      */
     @Overwrite
     public boolean isEmpty() {
-        return this.isEmptyCache;
+        return this.isEmpty;
     }
 
     /**

@@ -9,7 +9,6 @@ import net.minecraft.world.level.pathfinder.WalkNodeEvaluator;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
@@ -70,14 +69,5 @@ public abstract class WalkNodeEvaluatorMixin {
                 cir.setReturnValue(null);
             }
         }
-    }
-
-    /**
-     * @reason Use optimized implementation which avoids scanning blocks for dangers where possible
-     * @author JellySquid, 2No2Name
-     */
-    @Redirect(method = "getBlockPathTypeStatic", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/pathfinder/WalkNodeEvaluator;checkNeighbourBlocks(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos$MutableBlockPos;Lnet/minecraft/world/level/pathfinder/BlockPathTypes;)Lnet/minecraft/world/level/pathfinder/BlockPathTypes;"))
-    private static BlockPathTypes getNodeTypeFromNeighbors(BlockGetter world, BlockPos.MutableBlockPos pos, BlockPathTypes type) {
-        return PathNodeCache.getNodeTypeFromNeighbors(world, pos, type);
     }
 }
