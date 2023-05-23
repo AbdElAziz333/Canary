@@ -1,4 +1,4 @@
-package com.abdelaziz.canary.mixin.collections.fluid_submesion;
+package com.abdelaziz.canary.mixin.collections.fluid_submersion;
 
 import it.unimi.dsi.fastutil.objects.ReferenceArraySet;
 import net.minecraft.tags.TagKey;

@@ -3,12 +3,11 @@ package com.abdelaziz.canary.mixin.util.entity_movement_tracking;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
 import com.abdelaziz.canary.common.entity.movement_tracker.MovementTrackerCache;
 import com.abdelaziz.canary.common.entity.movement_tracker.SectionedEntityMovementTracker;
-import net.minecraft.world.level.entity.EntityAccess;
 import net.minecraft.world.level.entity.EntitySectionStorage;
 import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(EntitySectionStorage.class)
-public class EntitySectionStorageMixin<T extends EntityAccess> implements MovementTrackerCache {
+public class EntitySectionStorageMixin implements MovementTrackerCache {
 
     private final Object2ReferenceOpenHashMap<SectionedEntityMovementTracker<?, ?>, SectionedEntityMovementTracker<?, ?>> sectionEntityMovementTrackers = new Object2ReferenceOpenHashMap<>();
 

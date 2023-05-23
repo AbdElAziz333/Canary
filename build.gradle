@@ -90,32 +90,6 @@ repositories {
 dependencies {
     minecraft "net.minecraftforge:forge:${project.forge_version}"
 
-    implementation fg.deobf("curse.maven:ferritecore-429235:4074294") //Ferritecore
-    implementation fg.deobf("curse.maven:fastload-630620:4271605") //Fastload
-    implementation fg.deobf("curse.maven:lazy-dfu-forge-460819:3544496") //Lazy DFU
-    implementation fg.deobf("curse.maven:smooth-boot-reloaded-633412:4162938")
-
-    //compatibility issues
-    implementation fg.deobf("curse.maven:mowzies-mobs-250498:4142172") //Mowzie's Mobs
-    implementation fg.deobf("curse.maven:crackers-wither-storm-mod-621405:4407364") //Cracker's Wither Storm mod
-    implementation fg.deobf("curse.maven:quark-243121:3840125") //Quark
-    implementation fg.deobf("curse.maven:geckolib-388172:4181370") //GeckoLib
-    implementation fg.deobf("curse.maven:autoreglib-250363:3642382")//AutoRegLib
-    implementation fg.deobf("curse.maven:origins-forge-474438:3847281") //Origins (Forge)
-    implementation fg.deobf("curse.maven:caelus-308989:3650485") //Caelus
-
-    // Real mod deobf dependency examples - these get remapped to your current mappings
-    // compileOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}:api") // Adds JEI API as a compile dependency
-    // runtimeOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}") // Adds the full JEI mod as a runtime dependency
-    // implementation fg.deobf("com.tterrag.registrate:Registrate:MC${mc_version}-${registrate_version}") // Adds registrate as a dependency
-
-    // Examples using mod jars from ./libs
-    // implementation fg.deobf("blank:coolmod-${mc_version}:${coolmod_version}")
-
-    // For more info...
-    // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
-    // http://www.gradle.org/docs/current/userguide/dependency_management.html
-
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 

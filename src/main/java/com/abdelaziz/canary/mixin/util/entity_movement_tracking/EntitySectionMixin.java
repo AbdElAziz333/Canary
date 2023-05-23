@@ -19,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.ArrayList;
 
 @Mixin(EntitySection.class)
-public abstract class EntitySectionMixin<T extends EntityAccess> implements EntityMovementTrackerSection, PositionedEntityTrackingSection {
+public abstract class EntitySectionMixin implements EntityMovementTrackerSection, PositionedEntityTrackingSection {
     private final ReferenceOpenHashSet<SectionedEntityMovementTracker<?, ?>> sectionVisibilityListeners = new ReferenceOpenHashSet<>(0);
     @SuppressWarnings("unchecked")
     private final ArrayList<SectionedEntityMovementTracker<?, ?>>[] entityMovementListenersByType = new ArrayList[MovementTrackerHelper.NUM_MOVEMENT_NOTIFYING_CLASSES];

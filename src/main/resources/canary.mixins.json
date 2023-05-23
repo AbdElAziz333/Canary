@@ -94,7 +94,7 @@
     "collections.entity_by_type.ClassInstanceMultiMapMixin",
     "collections.entity_filtering.ClassInstanceMultiMapMixin",
     "collections.entity_ticking.EntityTickListMixin",
-    "collections.fluid_submesion.EntityMixin",
+    "collections.fluid_submersion.EntityMixin",
     "collections.gamerules.GameRulesMixin",
     "collections.goals.GoalSelectorMixin",
     "collections.mob_spawning.MobSpawnSettingsMixin",

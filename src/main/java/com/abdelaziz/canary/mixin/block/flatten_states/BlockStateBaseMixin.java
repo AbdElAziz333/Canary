@@ -1,5 +1,6 @@
 package com.abdelaziz.canary.mixin.block.flatten_states;
 
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
@@ -11,17 +12,15 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.stream.Stream;
+
 /**
  * This patch safely avoids excessive overhead in some hot methods by caching some constant values in the BlockState
  * itself, excluding dynamic dispatch and the pointer dereferences.
  */
 @Mixin(BlockBehaviour.BlockStateBase.class)
 public abstract class BlockStateBaseMixin {
-    @Shadow
-    protected abstract BlockState asState();
-
-    @Shadow
-    public abstract Block getBlock();
+    Stream<TagKey<Block>> tags;
 
     /**
      * The fluid state is constant for any given block state, so it can be safely cached. This notably improves performance
@@ -35,6 +34,12 @@ public abstract class BlockStateBaseMixin {
      */
     private boolean isTickable;
 
+    @Shadow
+    protected abstract BlockState asState();
+
+    @Shadow
+    public abstract Block getBlock();
+
     /**
      * We can't use the ctor as a BlockState will be constructed *before* a Block has fully initialized.
      */
@@ -43,6 +48,8 @@ public abstract class BlockStateBaseMixin {
         //noinspection deprecation
         this.fluidStateCache = this.getBlock().getFluidState(this.asState());
         this.isTickable = this.getBlock().isRandomlyTicking(this.asState());
+        //noinspection deprecation
+        tags = this.getBlock().builtInRegistryHolder().tags();
     }
 
     /**
@@ -66,5 +73,14 @@ public abstract class BlockStateBaseMixin {
     @Overwrite
     public boolean isRandomlyTicking() {
         return this.isTickable;
+    }
+
+    /**
+     * @reason Use cached property
+     * @author AbdElAziz
+     * */
+    @Overwrite
+    public Stream<TagKey<Block>> getTags() {
+        return tags;
     }
 }
