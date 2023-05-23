@@ -33,7 +33,6 @@ public abstract class GoatMixin extends Animal {
             case 59: {
                 this.isLoweringHead = false;
                 break;
-
             }
             default: {
                 super.handleEntityEvent(b);

@@ -54,15 +54,18 @@ public abstract class PlayerMixin extends LivingEntity {
 
         switch(equipmentSlot) {
             case MAINHAND: {
-                this.onEquipItem(equipmentSlot, this.inventory.items.set(this.inventory.selected, itemStack), itemStack);
+                this.equipEventAndSound(itemStack);
+                this.inventory.items.set(this.inventory.selected, itemStack);
                 break;
             }
             case OFFHAND : {
-                this.onEquipItem(equipmentSlot, this.inventory.offhand.set(0, itemStack), itemStack);
+                this.equipEventAndSound(itemStack);
+                this.inventory.offhand.set(0, itemStack);
                 break;
             }
             default : {
-                this.onEquipItem(equipmentSlot, this.inventory.armor.set(equipmentSlot.getIndex(), itemStack), itemStack);
+                this.equipEventAndSound(itemStack);
+                this.inventory.armor.set(equipmentSlot.getIndex(), itemStack);
                 break;
             }
         }
