@@ -73,8 +73,6 @@ public class CanaryConfig {
 
         this.addMixinRule("calc", true);
         this.addMixinRule("calc.if_else", true);
-        this.addMixinRule("calc.if_else.ai", true);
-        this.addMixinRule("calc.if_else.ai.evaluator", true);
         this.addMixinRule("calc.if_else.block_entity", true);
         this.addMixinRule("calc.if_else.block_entity.can_place_item", true);
         this.addMixinRule("calc.if_else.block_entity.can_place_item.brewing_stand", true);

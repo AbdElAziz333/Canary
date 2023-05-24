@@ -53,8 +53,8 @@ public class CanaryMixinPlugin implements IMixinConfigPlugin {
             return false;
         }
 
-        //For now, disable entity.fast_retrieval optimization when Mowzie's Mobs is loaded, until i fix this issue
-        if (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "calc.player_slot") && (FMLLoader.getLoadingModList().getModFileById("inventorio") != null)) {
+        //For now, disable calc.if_else.player_slot optimization when Inventorio is loaded, until i fix this issue
+        if (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "calc.if_else.player_slot") && (FMLLoader.getLoadingModList().getModFileById("inventorio") != null)) {
             return false;
         }
 
