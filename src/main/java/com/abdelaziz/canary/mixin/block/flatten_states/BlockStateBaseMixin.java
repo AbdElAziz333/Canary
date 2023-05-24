@@ -20,8 +20,6 @@ import java.util.stream.Stream;
  */
 @Mixin(BlockBehaviour.BlockStateBase.class)
 public abstract class BlockStateBaseMixin {
-    Stream<TagKey<Block>> tags;
-
     /**
      * The fluid state is constant for any given block state, so it can be safely cached. This notably improves performance
      * when scanning for fluid blocks.
@@ -48,8 +46,6 @@ public abstract class BlockStateBaseMixin {
         //noinspection deprecation
         this.fluidStateCache = this.getBlock().getFluidState(this.asState());
         this.isTickable = this.getBlock().isRandomlyTicking(this.asState());
-        //noinspection deprecation
-        tags = this.getBlock().builtInRegistryHolder().tags();
     }
 
     /**
@@ -73,14 +69,5 @@ public abstract class BlockStateBaseMixin {
     @Overwrite
     public boolean isRandomlyTicking() {
         return this.isTickable;
-    }
-
-    /**
-     * @reason Use cached property
-     * @author AbdElAziz
-     * */
-    @Overwrite
-    public Stream<TagKey<Block>> getTags() {
-        return tags;
     }
 }
