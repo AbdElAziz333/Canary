@@ -19,7 +19,7 @@ import java.util.function.Predicate;
 public class LocateHidingPlaceMixin {
 
     @Redirect(
-            method = "lambda$create$5",//lambda$create$5 - m_257211_
+            method = "m_257211_",//lambda$create$5 - m_257211_
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/entity/ai/village/poi/PoiManager;getRandom(Ljava/util/function/Predicate;Ljava/util/function/Predicate;Lnet/minecraft/world/entity/ai/village/poi/PoiManager$Occupancy;Lnet/minecraft/core/BlockPos;ILnet/minecraft/util/RandomSource;)Ljava/util/Optional;",
