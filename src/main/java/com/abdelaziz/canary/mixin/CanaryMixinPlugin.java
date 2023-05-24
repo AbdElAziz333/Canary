@@ -53,6 +53,11 @@ public class CanaryMixinPlugin implements IMixinConfigPlugin {
             return false;
         }
 
+        //For now, disable entity.fast_retrieval optimization when Mowzie's Mobs is loaded, until i fix this issue
+        if (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "calc.player_slot") && (FMLLoader.getLoadingModList().getModFileById("inventorio") != null)) {
+            return false;
+        }
+
         //Fix: if Forge errors is not empty then disable shapes, math.sine_lut and alloc.blockstate optimizations. (Thanks for malte!)
         if ((mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "shapes") && mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "math.sine_lut") && mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "alloc.blockstate")) && !LoadingModList.get().getErrors().isEmpty()) {
             return false;
