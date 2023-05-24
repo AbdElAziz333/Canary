@@ -85,8 +85,6 @@
     "block.moving_block_shapes.VoxelShapeMixin",
     "block.redstone_wire.RedStoneWireBlockMixin",
     "cached_hashcode.BlockStatePairKeyMixin",
-    "calc.if_else.ai.evaluator.FlyNodeEvaluatorMixin",
-    "calc.if_else.ai.evaluator.WalkNodeEvaluatorMixin",
     "calc.if_else.block_entity.can_place_item.brewing_stand.BrewingStandBlockEntityMixin",
     "calc.if_else.block_entity.composter.ComposterBlockMixin",
     "calc.if_else.block_entity.get_capability.brewing_stand.BrewingStandBlockEntityMixin",
