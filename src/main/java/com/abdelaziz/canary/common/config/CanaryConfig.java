@@ -70,8 +70,6 @@ public class CanaryConfig {
         this.addMixinRule("cached_hashcode", true);
 
         this.addMixinRule("calc", true);
-        this.addMixinRule("calc.dedeuplicate", true);
-        this.addMixinRule("calc.dedeuplicate.player_statistics", true);
         this.addMixinRule("calc.if_else", true);
         this.addMixinRule("calc.if_else.ai", true);
         this.addMixinRule("calc.if_else.ai.evaluator", true);
