@@ -14,29 +14,17 @@ public class NearbyEntityListenerMulti implements NearbyEntityListener {
     private final List<NearbyEntityListener> listeners = new ArrayList<>(4);
     private Range6Int range = null;
 
-    public void addListener(NearbyEntityListener listener) {
-        if (this.range != null) {
-            //throw new IllegalStateException("Cannot add sublisteners after listening range was set!");
-            return;
-        }
-        this.listeners.add(listener);
-    }
-
-    public void removeListener(NearbyEntityListener listener) {
-        this.listeners.remove(listener);
-    }
-
     @Override
     public Range6Int getChunkRange() {
         if (this.range != null) {
             return this.range;
         }
-        return this.calculateRange();
+        return this.range = this.calculateRange();
     }
 
     private Range6Int calculateRange() {
         if (this.listeners.isEmpty()) {
-            return this.range = EMPTY_RANGE;
+            return EMPTY_RANGE;
         }
         int positiveX = -1;
         int positiveY = -1;
@@ -55,7 +43,7 @@ public class NearbyEntityListenerMulti implements NearbyEntityListener {
             negativeZ = Math.max(chunkRange.negativeZ(), negativeZ);
 
         }
-        return this.range = new Range6Int(positiveX, positiveY, positiveZ, negativeX, negativeY, negativeZ);
+        return new Range6Int(positiveX, positiveY, positiveZ, negativeX, negativeY, negativeZ);
     }
 
     @Override

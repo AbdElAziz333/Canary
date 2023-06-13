@@ -23,38 +23,35 @@ import java.util.Random;
 
 @Mixin(LongJumpToRandomPos.class)
 public abstract class LongJumpToRandomPosMixin {
+    private final LongArrayList potentialTargets = new LongArrayList();
+    private final ShortArrayList potentialWeights = new ShortArrayList();
+
     @Shadow
     @Final
     private static int FIND_JUMP_TRIES;
-    private final LongArrayList potentialTargets = new LongArrayList();
-    private final ShortArrayList potentialWeights = new ShortArrayList();
+
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     @Shadow
     private Optional<LongJumpToRandomPos.PossibleJump> chosenJump;
+
     @Shadow
     private int findJumpTries;
+
     @Shadow
     @Final
     private List<LongJumpToRandomPos.PossibleJump> jumpCandidates;
+
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     @Shadow
     private Optional<Vec3> initialPosition;
+
     @Shadow
     @Final
     private int maxLongJumpWidth;
+
     @Shadow
     @Final
     private int maxLongJumpHeight;
-
-    private static int findIndex(ShortArrayList weights, int weightedIndex) {
-        for (int i = 0; i < weights.size(); i++) {
-            weightedIndex -= weights.getShort(i);
-            if (weightedIndex < 0) {
-                return i;
-            }
-        }
-        return -1;
-    }
 
     @Shadow
     protected abstract Optional<Vec3> calculateOptimalJumpVector(Mob entity, Vec3 pos);
@@ -126,5 +123,15 @@ public abstract class LongJumpToRandomPosMixin {
             return Optional.empty();
         }
         return Optional.of(list.get(0));
+    }
+
+    private static int findIndex(ShortArrayList weights, int weightedIndex) {
+        for (int i = 0; i < weights.size(); i++) {
+            weightedIndex -= weights.getShort(i);
+            if (weightedIndex < 0) {
+                return i;
+            }
+        }
+        return -1;
     }
 }

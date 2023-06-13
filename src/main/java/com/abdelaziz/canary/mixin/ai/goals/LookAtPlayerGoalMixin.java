@@ -1,4 +1,4 @@
-package com.abdelaziz.canary.mixin.ai.nearby_entity_tracking.goals;
+package com.abdelaziz.canary.mixin.ai.goals;
 
 import com.abdelaziz.canary.common.entity.nearby_tracker.NearbyEntityListenerProvider;
 import com.abdelaziz.canary.common.entity.nearby_tracker.NearbyEntityTracker;

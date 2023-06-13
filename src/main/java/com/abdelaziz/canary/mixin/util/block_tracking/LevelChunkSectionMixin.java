@@ -1,9 +1,10 @@
-package com.abdelaziz.canary.mixin.util.block_counting;
+package com.abdelaziz.canary.mixin.util.block_tracking;
 
 import com.abdelaziz.canary.common.block.BlockCountingSection;
 import com.abdelaziz.canary.common.block.BlockStateFlagHolder;
 import com.abdelaziz.canary.common.block.BlockStateFlags;
 import com.abdelaziz.canary.common.block.TrackedBlockStatePredicate;
+import net.minecraft.Util;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunkSection;
@@ -75,7 +76,7 @@ public abstract class LevelChunkSectionMixin implements BlockCountingSection {
 
         if (this.countsByFlagFuture == null) {
             PalettedContainer<BlockState> states = this.states;
-            this.countsByFlagFuture = CompletableFuture.supplyAsync(() -> calculateCanaryCounts(states));
+            this.countsByFlagFuture = CompletableFuture.supplyAsync(() -> calculateCanaryCounts(states), Util.backgroundExecutor());
         }
         return false;
     }
