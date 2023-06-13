@@ -22,7 +22,6 @@ public class NearbyEntityTracker<T extends LivingEntity> implements NearbyEntity
     private final LivingEntity self;
 
     private final Reference2LongOpenHashMap<T> nearbyEntities = new Reference2LongOpenHashMap<>(0);
-    private long counter;
     private final Range6Int chunkBoxRadius;
 
     public NearbyEntityTracker(Class<T> clazz, LivingEntity self, Vec3i boxRadius) {
@@ -41,30 +40,6 @@ public class NearbyEntityTracker<T extends LivingEntity> implements NearbyEntity
     @Override
     public Class<? extends Entity> getEntityClass() {
         return this.clazz;
-    }
-
-    @Override
-    public Range6Int getChunkRange() {
-        return this.chunkBoxRadius;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public void onEntityEnteredRange(Entity entity) {
-        if (!this.clazz.isInstance(entity)) {
-            return;
-        }
-
-        this.nearbyEntities.put((T) entity, this.counter++);
-    }
-
-    @Override
-    public void onEntityLeftRange(Entity entity) {
-        if (this.nearbyEntities.isEmpty() || !this.clazz.isInstance(entity)) {
-            return;
-        }
-
-        this.nearbyEntities.removeLong(entity);
     }
 
     /**

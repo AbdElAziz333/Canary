@@ -29,8 +29,7 @@ public class CanaryConfig {
         // You must manually add a rule for any new mixins not covered by an existing package rule.
 
         this.addMixinRule("ai", true);
-        this.addMixinRule("ai.nearby_entity_tracking", false); //Disabled, because mspt increase in normal worlds has been measured consistently
-        this.addMixinRule("ai.nearby_entity_tracking.goals", true);
+        this.addMixinRule("ai.goals", true);
         this.addMixinRule("ai.pathing", true);
         this.addMixinRule("ai.poi", true);
         this.addMixinRule("ai.poi.fast_portals", true);
@@ -63,7 +62,6 @@ public class CanaryConfig {
 
         this.addMixinRule("block", true);
         this.addMixinRule("block.flatten_states", true);
-        this.addMixinRule("block.hopper", true);
         this.addMixinRule("block.moving_block_shapes", true);
         this.addMixinRule("block.redstone_wire", true);
 
@@ -155,23 +153,11 @@ public class CanaryConfig {
         this.addMixinRule("shapes.specialized_shapes", true);
 
         this.addMixinRule("util", true);
-        this.addMixinRule("util.block_entity_retrieval", true);
         this.addMixinRule("util.block_tracking", true);
         this.addMixinRule("util.chunk_access", true);
-        this.addMixinRule("util.entity_movement_tracking", true);
-        this.addMixinRule("util.entity_section_position", true);
-        this.addMixinRule("util.inventory_change_listening", true);
-        this.addMixinRule("util.inventory_comparator_tracking", true);
         this.addMixinRule("util.world_border_listener", false); //Disabled due to memory leak
 
         this.addMixinRule("world", true);
-        this.addMixinRule("world.block_entity_ticking", true);
-        this.addMixinRule("world.block_entity_ticking.sleeping", true);
-        this.addMixinRule("world.block_entity_ticking.sleeping.brewing_stand", true);
-        this.addMixinRule("world.block_entity_ticking.sleeping.campfire", true);
-        this.addMixinRule("world.block_entity_ticking.sleeping.furnace", true);
-        this.addMixinRule("world.block_entity_ticking.sleeping.hopper", true);
-        this.addMixinRule("world.block_entity_ticking.sleeping.shulker_box", true);
         this.addMixinRule("world.block_entity_ticking.support_cache", false); //have to check whether the cached state bugfix fixes any detectable vanilla bugs first
         this.addMixinRule("world.block_entity_ticking.world_border", true);
         this.addMixinRule("world.chunk_access", true);
