@@ -31,8 +31,7 @@ public class CanaryConfig {
         // You must manually add a rule for any new mixins not covered by an existing package rule.
 
         this.addMixinRule("ai", true);
-        this.addMixinRule("ai.nearby_entity_tracking", false);
-        this.addMixinRule("ai.nearby_entity_tracking.goals", true);
+        this.addMixinRule("ai.goals", true);
         this.addMixinRule("ai.pathing", true);
         this.addMixinRule("ai.poi", true);
         this.addMixinRule("ai.poi.fast_portals", true);
@@ -65,7 +64,6 @@ public class CanaryConfig {
 
         this.addMixinRule("block", true);
         this.addMixinRule("block.flatten_states", true);
-        this.addMixinRule("block.hopper", true);
         this.addMixinRule("block.moving_block_shapes", true);
         this.addMixinRule("block.redstone_wire", true);
 
@@ -148,7 +146,6 @@ public class CanaryConfig {
 
         this.addMixinRule("profiler", true);
 
-
         this.addMixinRule("shapes", true);
         this.addMixinRule("shapes.blockstate_cache", true);
         this.addMixinRule("shapes.lazy_shape_context", true);
@@ -158,23 +155,11 @@ public class CanaryConfig {
         this.addMixinRule("shapes.specialized_shapes", true);
 
         this.addMixinRule("util", true);
-        this.addMixinRule("util.block_counting", true);
-        this.addMixinRule("util.block_entity_retrieval", true);
+        this.addMixinRule("util.block_tracking", true);
         this.addMixinRule("util.chunk_access", true);
-        this.addMixinRule("util.entity_movement_tracking", true);
-        this.addMixinRule("util.entity_section_position", true);
         this.addMixinRule("util.world_border_listener", true);
-        this.addMixinRule("util.inventory_change_listening", true);
-        this.addMixinRule("util.inventory_comparator_tracking", true);
 
         this.addMixinRule("world", true);
-        this.addMixinRule("world.block_entity_ticking", true);
-        this.addMixinRule("world.block_entity_ticking.sleeping", true);
-        this.addMixinRule("world.block_entity_ticking.sleeping.brewing_stand", true);
-        this.addMixinRule("world.block_entity_ticking.sleeping.campfire", true);
-        this.addMixinRule("world.block_entity_ticking.sleeping.furnace", true);
-        this.addMixinRule("world.block_entity_ticking.sleeping.hopper", true);
-        this.addMixinRule("world.block_entity_ticking.sleeping.shulker_box", true);
         this.addMixinRule("world.block_entity_ticking.support_cache", false); //have to check whether the cached state bugfix fixes any detectable vanilla bugs first
         this.addMixinRule("world.block_entity_ticking.world_border", true);
         this.addMixinRule("world.chunk_access", true);
@@ -186,15 +171,6 @@ public class CanaryConfig {
         this.addMixinRule("world.player_chunk_tick", true);
         this.addMixinRule("world.tick_scheduler", true);
 
-        this.addRuleDependency("ai.nearby_entity_tracking", "util", true);
-        this.addRuleDependency("ai.nearby_entity_tracking", "util.entity_section_position", true);
-        this.addRuleDependency("block.hopper", "util", true);
-        this.addRuleDependency("block.hopper", "util.entity_movement_tracking", true);
-        this.addRuleDependency("block.hopper", "world", true);
-        this.addRuleDependency("block.hopper", "util.block_entity_retrieval", true);
-        this.addRuleDependency("block.hopper", "util.inventory_change_listening", true);
-        this.addRuleDependency("util.inventory_comparator_tracking", "util.block_entity_retrieval", true);
-        this.addRuleDependency("util.entity_movement_tracking", "util.entity_section_position", true);
         this.addRuleDependency("entity.collisions.unpushable_cramming", "chunk.entity_class_groups", true);
         this.addRuleDependency("world.block_entity_ticking.world_border", "util.world_border_listener", true);
 
