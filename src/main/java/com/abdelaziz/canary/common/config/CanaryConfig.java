@@ -29,7 +29,6 @@ public class CanaryConfig {
     private CanaryConfig() {
         // Defines the default rules which can be configured by the user or other mods.
         // You must manually add a rule for any new mixins not covered by an existing package rule.
-
         this.addMixinRule("ai", true);
         this.addMixinRule("ai.goals", true);
         this.addMixinRule("ai.pathing", true);
@@ -136,8 +135,6 @@ public class CanaryConfig {
         this.addMixinRule("gen", true);
         this.addMixinRule("gen.cached_generator_settings", false);
         this.addMixinRule("gen.chunk_region", true);
-
-        this.addMixinRule("item", true);
 
         this.addMixinRule("math", true);
         this.addMixinRule("math.fast_blockpos", true);

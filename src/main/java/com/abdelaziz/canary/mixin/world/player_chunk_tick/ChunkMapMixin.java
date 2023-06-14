@@ -76,7 +76,7 @@ public abstract class ChunkMapMixin {
 
         // We can only send chunks if the world matches. This hoists a check that
         // would otherwise be performed every time we try to send a chunk over.
-        if (player.level == this.level) {
+        if (player.level() == this.level) {
             this.sendChunks(oldPos, player);
         }
     }

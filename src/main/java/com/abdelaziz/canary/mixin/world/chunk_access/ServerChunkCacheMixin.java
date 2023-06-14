@@ -178,7 +178,7 @@ public abstract class ServerChunkCacheMixin {
 
         // Create a future to load the chunk if none exists
         if (loadFuture == null) {
-            if (ChunkHolder.getStatus(holder.getTicketLevel()).isOrAfter(status)) {
+            if (ChunkLevel.generationStatus(holder.getTicketLevel()).isOrAfter(status)) {
                 // Create a new future which upgrades the chunk from the previous status level to the desired one
                 CompletableFuture<Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure>> mergedFuture = this.chunkMap.schedule(holder, status);
 

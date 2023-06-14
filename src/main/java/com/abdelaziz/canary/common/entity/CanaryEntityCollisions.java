@@ -113,7 +113,7 @@ public class CanaryEntityCollisions {
                                 //get the world border at the end
                                 if (includeWorldBorder && !this.consumedWorldBorder) {
                                     this.consumedWorldBorder = true;
-                                    WorldBorder worldBorder = entity.level.getWorldBorder();
+                                    WorldBorder worldBorder = entity.level().getWorldBorder();
                                     if (!isWithinWorldBorder(worldBorder, box) && isWithinWorldBorder(worldBorder, entity.getBoundingBox())) {
                                         return worldBorder.getCollisionShape();
                                     }
