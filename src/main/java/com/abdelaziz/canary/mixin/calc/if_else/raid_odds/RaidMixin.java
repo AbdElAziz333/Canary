@@ -5,7 +5,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
-@Mixin(Raid.class)
+@Mixin(value = Raid.class, priority = 999)
 public abstract class RaidMixin {
     @Shadow public abstract int getBadOmenLevel();
 

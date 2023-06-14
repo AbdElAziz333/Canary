@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
-@Mixin(LivingEntity.class)
+@Mixin(value = LivingEntity.class, priority = 999)
 public abstract class LivingEntityMixin extends Entity {
     @Shadow public abstract ItemStack getItemBySlot(EquipmentSlot p_21127_);
 

@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
-@Mixin(AbstractFurnaceBlockEntity.class)
+@Mixin(value = AbstractFurnaceBlockEntity.class, priority = 999)
 public class AbstractFurnaceBlockEntityMixin {
 
     @Shadow @Final private static int[] SLOTS_FOR_DOWN;

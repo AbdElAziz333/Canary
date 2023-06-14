@@ -9,8 +9,6 @@
   "minVersion": "0.8.2",
   "refmap": "canary.refmap.json",
   "mixins": [
-    "ai.goals.AvoidEntityGoalMixin",
-    "ai.goals.LookAtPlayerGoalMixin",
     "ai.pathing.BlockStateBaseMixin",
     "ai.pathing.FlyNodeEvaluatorMixin",
     "ai.pathing.PathNavigationRegionMixin",
@@ -65,6 +63,7 @@
     "calc.if_else.entity.handle_entity_event.villager.VillagerMixin",
     "calc.if_else.entity.handle_entity_event.warden.WardenMixin",
     "calc.if_else.entity.handle_entity_event.wolf.WolfMixin",
+    "calc.if_else.entity.living_entity.LivingEntityMixin",
     "calc.if_else.player_slot.PlayerMixin",
     "calc.if_else.raid_odds.RaidMixin",
     "chunk.entity_class_groups.ClassInstanceMultiMapMixin",

@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.Shadow;
 
 import static net.minecraft.world.entity.EquipmentSlot.Type.ARMOR;
 
-@Mixin(Player.class)
+@Mixin(value = Player.class, priority = 999)
 public abstract class PlayerMixin extends LivingEntity {
 
     @Shadow public abstract boolean isSwimming();

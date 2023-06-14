@@ -53,13 +53,16 @@ public class CanaryMixinPlugin implements IMixinConfigPlugin {
             return false;
         }
 
-        //For now, disable calc.if_else.player_slot optimization when Inventorio is loaded, until i fix this issue
-        if (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "calc.if_else.player_slot") && (FMLLoader.getLoadingModList().getModFileById("inventorio") != null)) {
+        //Fix: if Forge errors is not empty then disable shapes, math.sine_lut and alloc.blockstate optimizations. (Thanks for malte!)
+        if (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "shapes") && !LoadingModList.get().getErrors().isEmpty()) {
             return false;
         }
 
-        //Fix: if Forge errors is not empty then disable shapes, math.sine_lut and alloc.blockstate optimizations. (Thanks for malte!)
-        if ((mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "shapes") && mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "math.sine_lut") && mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "alloc.blockstate")) && !LoadingModList.get().getErrors().isEmpty()) {
+        if (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "math.sine_lut") && !LoadingModList.get().getErrors().isEmpty()) {
+            return false;
+        }
+
+        if (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "alloc.blockstate") && !LoadingModList.get().getErrors().isEmpty()) {
             return false;
         }
 

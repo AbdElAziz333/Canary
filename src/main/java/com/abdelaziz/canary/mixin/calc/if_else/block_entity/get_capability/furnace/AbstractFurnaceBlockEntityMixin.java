@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.Shadow;
 
 import javax.annotation.Nullable;
 
-@Mixin(AbstractFurnaceBlockEntity.class)
+@Mixin(value = AbstractFurnaceBlockEntity.class, priority = 999)
 public abstract class AbstractFurnaceBlockEntityMixin extends BaseContainerBlockEntity {
 
     @Shadow

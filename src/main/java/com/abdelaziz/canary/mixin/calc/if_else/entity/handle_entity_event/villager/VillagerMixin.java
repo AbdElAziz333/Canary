@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
-@Mixin(Villager.class)
+@Mixin(value = Villager.class, priority = 999)
 public abstract class VillagerMixin extends AbstractVillager {
 
     @Shadow protected abstract Brain.Provider<Villager> brainProvider();

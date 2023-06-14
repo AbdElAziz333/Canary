@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
-@Mixin(PointedDripstoneBlock.class)
+@Mixin(value = PointedDripstoneBlock.class, priority = 999)
 public class PointedDripstoneBlockMixin {
     @Shadow @Final public static EnumProperty<DripstoneThickness> THICKNESS;
 

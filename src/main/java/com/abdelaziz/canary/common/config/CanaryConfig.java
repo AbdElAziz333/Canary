@@ -29,7 +29,6 @@ public class CanaryConfig {
         // You must manually add a rule for any new mixins not covered by an existing package rule.
 
         this.addMixinRule("ai", true);
-        this.addMixinRule("ai.goals", true);
         this.addMixinRule("ai.pathing", true);
         this.addMixinRule("ai.poi", true);
         this.addMixinRule("ai.poi.fast_portals", true);
@@ -169,18 +168,8 @@ public class CanaryConfig {
         this.addMixinRule("world.player_chunk_tick", true);
         this.addMixinRule("world.tick_scheduler", true);
 
-        this.addRuleDependency("ai.nearby_entity_tracking", "util", true);
-        this.addRuleDependency("ai.nearby_entity_tracking", "util.entity_section_position", true);
-        this.addRuleDependency("block.hopper", "util", true);
-        this.addRuleDependency("block.hopper", "util.entity_movement_tracking", true);
-        this.addRuleDependency("block.hopper", "world", true);
-        this.addRuleDependency("block.hopper", "util.block_entity_retrieval", true);
-        this.addRuleDependency("block.hopper", "util.inventory_change_listening", true);
-        this.addRuleDependency("util.inventory_comparator_tracking", "util.block_entity_retrieval", true);
-        this.addRuleDependency("util.entity_movement_tracking", "util.entity_section_position", true);
         this.addRuleDependency("entity.collisions.unpushable_cramming", "chunk.entity_class_groups", true);
         this.addRuleDependency("world.block_entity_ticking.world_border", "util.world_border_listener", true);
-
     }
 
     /**

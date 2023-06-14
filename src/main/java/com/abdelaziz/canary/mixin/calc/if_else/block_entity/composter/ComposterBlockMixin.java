@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
-@Mixin(ComposterBlock.class)
+@Mixin(value = ComposterBlock.class, priority = 999)
 public class ComposterBlockMixin {
     @Shadow @Final public static IntegerProperty LEVEL;
 
