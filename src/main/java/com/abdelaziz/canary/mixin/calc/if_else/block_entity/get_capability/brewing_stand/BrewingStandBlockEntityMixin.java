@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.Shadow;
 
 import javax.annotation.Nullable;
 
-@Mixin(BrewingStandBlockEntity.class)
+@Mixin(value = BrewingStandBlockEntity.class, priority = 999)
 public abstract class BrewingStandBlockEntityMixin extends BaseContainerBlockEntity {
 
     @Shadow

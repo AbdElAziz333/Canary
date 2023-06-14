@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
-@Mixin(Wolf.class)
+@Mixin(value = Wolf.class, priority = 999)
 public abstract class WolfMixin extends TamableAnimal {
 
     @Shadow private boolean isShaking;
