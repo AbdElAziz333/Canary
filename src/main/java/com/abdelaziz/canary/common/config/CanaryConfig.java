@@ -31,7 +31,6 @@ public class CanaryConfig {
         // You must manually add a rule for any new mixins not covered by an existing package rule.
 
         this.addMixinRule("ai", true);
-        this.addMixinRule("ai.goals", true);
         this.addMixinRule("ai.pathing", true);
         this.addMixinRule("ai.poi", true);
         this.addMixinRule("ai.poi.fast_portals", true);
@@ -173,7 +172,6 @@ public class CanaryConfig {
 
         this.addRuleDependency("entity.collisions.unpushable_cramming", "chunk.entity_class_groups", true);
         this.addRuleDependency("world.block_entity_ticking.world_border", "util.world_border_listener", true);
-
     }
 
     /**

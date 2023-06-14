@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
-@Mixin(Ocelot.class)
+@Mixin(value = Ocelot.class, priority = 999)
 public abstract class OcelotMixin extends Animal {
     @Shadow protected abstract void spawnTrustingParticles(boolean p_29048_);
 

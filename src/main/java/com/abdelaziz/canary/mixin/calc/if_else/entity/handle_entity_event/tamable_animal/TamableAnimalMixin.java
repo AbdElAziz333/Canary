@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
-@Mixin(TamableAnimal.class)
+@Mixin(value = TamableAnimal.class, priority = 999)
 public abstract class TamableAnimalMixin extends Animal {
 
     @Shadow protected abstract void spawnTamingParticles(boolean p_21835_);

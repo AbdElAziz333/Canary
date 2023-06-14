@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
-@Mixin(IronGolem.class)
+@Mixin(value = IronGolem.class, priority = 999)
 public abstract class IronGolemMixin extends AbstractGolem {
 
     @Shadow private int attackAnimationTick;

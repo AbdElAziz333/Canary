@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
-@Mixin(Goat.class)
+@Mixin(value = Goat.class, priority = 999)
 public abstract class GoatMixin extends Animal {
     @Shadow private boolean isLoweringHead;
 
