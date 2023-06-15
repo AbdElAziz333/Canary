@@ -13,7 +13,6 @@
     "ai.pathing.FlyNodeEvaluatorMixin",
     "ai.pathing.PathNavigationRegionMixin",
     "ai.pathing.WalkNodeEvaluatorMixin",
-    "ai.poi.fast_portals.PortalForcerMixin",
     "ai.poi.tasks.LocateHidingPlaceMixin",
     "ai.poi.tasks.RaiderMoveThroughVillageGoalMixin",
     "ai.raid.RaiderMixin",
