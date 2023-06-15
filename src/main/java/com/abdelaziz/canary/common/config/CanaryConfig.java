@@ -27,11 +27,9 @@ public class CanaryConfig {
     private CanaryConfig() {
         // Defines the default rules which can be configured by the user or other mods.
         // You must manually add a rule for any new mixins not covered by an existing package rule.
-
         this.addMixinRule("ai", true);
         this.addMixinRule("ai.pathing", true);
         this.addMixinRule("ai.poi", true);
-        this.addMixinRule("ai.poi.fast_portals", true);
         this.addMixinRule("ai.poi.tasks", true);
         this.addMixinRule("ai.raid", true);
         this.addMixinRule("ai.sensor", true);
