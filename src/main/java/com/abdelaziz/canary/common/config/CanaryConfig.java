@@ -34,7 +34,6 @@ public class CanaryConfig {
         this.addMixinRule("ai.goals", true);
         this.addMixinRule("ai.pathing", true);
         this.addMixinRule("ai.poi", true);
-        this.addMixinRule("ai.poi.fast_portals", true);
         this.addMixinRule("ai.poi.tasks", true);
         this.addMixinRule("ai.raid", true);
         this.addMixinRule("ai.sensor", true);
