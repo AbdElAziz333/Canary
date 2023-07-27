@@ -38,6 +38,7 @@ public abstract class GateBehaviorMixin<E extends LivingEntity> {
         boolean hasOneTaskRunning = false;
         for (BehaviorControl<? super E> task : WeightedListIterable.cast(this.behaviors)) {
             if (task.getStatus() == Behavior.Status.RUNNING) {
+                task.tickOrStop(world, entity, time);
                 hasOneTaskRunning |= task.getStatus() == Behavior.Status.RUNNING;
             }
         }
