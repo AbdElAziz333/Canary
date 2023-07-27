@@ -48,6 +48,10 @@ public class CanaryMixinPlugin implements IMixinConfigPlugin {
             return false;
         }
 
+        if (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "item") && (FMLLoader.getLoadingModList().getModFileById("modernfix") != null)) {
+            return false;
+        }
+
         //For now, disable optimizations to fix some mod compatibilities.
         if (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "entity.fast_retrieval") && (FMLLoader.getLoadingModList().getModFileById("mowziesmobs") != null)) {
             return false;
