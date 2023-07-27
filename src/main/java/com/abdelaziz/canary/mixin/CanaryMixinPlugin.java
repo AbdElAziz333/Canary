@@ -53,6 +53,10 @@ public class CanaryMixinPlugin implements IMixinConfigPlugin {
             return false;
         }
 
+        if (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "item") && (FMLLoader.getLoadingModList().getModFileById("modernfix") != null)) {
+            return false;
+        }
+
         //Fix: if Forge errors is not empty then disable shapes, math.sine_lut and alloc.blockstate optimizations. (Thanks for malte!)
         if (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "shapes") && !LoadingModList.get().getErrors().isEmpty()) {
             return false;
