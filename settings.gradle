@@ -5,4 +5,4 @@ pluginManagement {
     }
 }
 
-rootProject.name = 'Fastload'
+rootProject.name = 'Canary'
