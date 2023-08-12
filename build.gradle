@@ -12,7 +12,8 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.minecraftforge.gradle' version '[6.0,6.2)'}
+    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
+}
 
 apply plugin: 'org.spongepowered.mixin'
 
@@ -71,14 +72,7 @@ mixin {
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
-repositories {
-    maven {
-        url "https://cursemaven.com"
-        content {
-            includeGroup "curse.maven"
-        }
-    }
-}
+repositories {}
 
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
