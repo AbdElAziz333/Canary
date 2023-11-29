@@ -64,3 +64,13 @@ Much like Lithium, Canary is licensed under GNU LGPLv3, a free and open-source l
 
 ### Issues and Feature Requests
 If you'd like to get help with the mod, feel free to open an issue here on GitHub, and if you want to propose new features or otherwise contribute to the mod, i will gladly accept pull requests, as well!
+
+
+#
+<img src="https://www.yourkit.com/images/yklogo.png">
+YourKit supports open source projects with innovative and intelligent tools
+for monitoring and profiling Java and .NET applications.
+YourKit is the creator of <a href="https://www.yourkit.com/java/profiler/">YourKit Java Profiler</a>,
+<a href="https://www.yourkit.com/dotnet-profiler/">YourKit .NET Profiler</a>,
+and <a href="https://www.yourkit.com/youmonitor/">YourKit YouMonitor</a>.
+Thanks to YourKit for providing a free license for this project.
