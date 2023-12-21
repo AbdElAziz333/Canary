@@ -26,9 +26,9 @@ public class CanaryConfig {
     private final Set<Option> optionsWithDependencies = new ObjectLinkedOpenHashSet<>();
 
     private void applyCanaryCompat() {
-        Option option = this.options.get("mixin.block.hopper.worldedit_compat");
+        Option option = this.options.get("mixin.block.hopper.world_edit_compat");
         if (!option.isEnabled() && WorldEditCompat.WORLD_EDIT_PRESENT) {
-            option.addModOverride(true, "lithium-fabric");
+            option.addModOverride(true, "canary");
         }
     }
 
