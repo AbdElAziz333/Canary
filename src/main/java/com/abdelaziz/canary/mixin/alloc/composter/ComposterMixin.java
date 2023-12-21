@@ -1,6 +1,6 @@
 package com.abdelaziz.canary.mixin.alloc.composter;
 
-import com.abdelaziz.canary.common.util.constants.ArrayConstants;
+import com.abdelaziz.canary.common.util.ArrayConstants;
 import net.minecraft.core.Direction;
 import net.minecraft.world.WorldlyContainer;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,7 +16,7 @@ public class ComposterMixin {
          */
         @Overwrite
         public int[] getSlotsForFace(Direction side) {
-            return side == Direction.UP ? ArrayConstants.ZERO_ARRAY : ArrayConstants.EMPTY_ARRAY;
+            return side == Direction.UP ? ArrayConstants.ZERO : ArrayConstants.EMPTY;
         }
     }
 
@@ -28,7 +28,7 @@ public class ComposterMixin {
          */
         @Overwrite
         public int[] getSlotsForFace(Direction side) {
-            return ArrayConstants.EMPTY_ARRAY;
+            return ArrayConstants.EMPTY;
         }
     }
 
@@ -40,7 +40,7 @@ public class ComposterMixin {
          */
         @Overwrite
         public int[] getSlotsForFace(Direction side) {
-            return side == Direction.DOWN ? ArrayConstants.ZERO_ARRAY : ArrayConstants.EMPTY_ARRAY;
+            return side == Direction.DOWN ? ArrayConstants.ZERO : ArrayConstants.EMPTY;
         }
     }
 }
