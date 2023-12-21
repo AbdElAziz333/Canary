@@ -11,7 +11,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(FlyNodeEvaluator.class)
 public class FlyNodeEvaluatorMixin {
-
     /**
      * @reason Use optimized implementation which avoids scanning blocks for dangers where possible
      * @author JellySquid, 2No2Name
