@@ -17,6 +17,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  */
 @Mixin(BlockBehaviour.BlockStateBase.class)
 public abstract class BlockStateBaseMixin {
+    @Shadow
+    protected abstract BlockState asState();
+
+    @Shadow
+    public abstract Block getBlock();
+
     /**
      * The fluid state is constant for any given block state, so it can be safely cached. This notably improves performance
      * when scanning for fluid blocks.
@@ -28,12 +34,6 @@ public abstract class BlockStateBaseMixin {
      * and random block ticking is a frequent process during chunk ticking, in theory this is a very good change.
      */
     private boolean isTickable;
-
-    @Shadow
-    protected abstract BlockState asState();
-
-    @Shadow
-    public abstract Block getBlock();
 
     /**
      * We can't use the ctor as a BlockState will be constructed *before* a Block has fully initialized.

@@ -1,7 +1,6 @@
 package com.abdelaziz.canary.mixin.util.chunk_access;
 
 import com.abdelaziz.canary.common.world.ChunkView;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.PathNavigationRegion;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import org.jetbrains.annotations.Nullable;

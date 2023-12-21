@@ -2,6 +2,7 @@ package com.abdelaziz.canary.mixin.entity.collisions.intersection;
 
 import com.abdelaziz.canary.common.entity.CanaryEntityCollisions;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.CollisionGetter;
 import net.minecraft.world.level.EntityGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -18,6 +19,7 @@ public abstract class LevelMixin implements LevelAccessor {
     /**
      * Checks whether the area is empty from blocks, hard entities and the world border.
      * Only access relevant entity classes, use more efficient block access
+     *
      * @author 2No2Name
      */
     @Override

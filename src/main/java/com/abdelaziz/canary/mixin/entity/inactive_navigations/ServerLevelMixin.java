@@ -61,8 +61,8 @@ public abstract class ServerLevelMixin extends Level implements ServerWorldExten
 
     private ReferenceOpenHashSet<PathNavigation> activeNavigations;
 
-    protected ServerLevelMixin(WritableLevelData properties, ResourceKey<Level> registryRef, Holder<DimensionType> dimension, Supplier<ProfilerFiller> supplier, boolean isClient, boolean debugWorld, long seed, int maxChainedNeighborUpdates) {
-        super(properties, registryRef, dimension, supplier, isClient, debugWorld, seed, maxChainedNeighborUpdates);
+    protected ServerLevelMixin(WritableLevelData p_220352_, ResourceKey<Level> p_220353_, Holder<DimensionType> p_220354_, Supplier<ProfilerFiller> p_220355_, boolean p_220356_, boolean p_220357_, long p_220358_, int p_220359_) {
+        super(p_220352_, p_220353_, p_220354_, p_220355_, p_220356_, p_220357_, p_220358_, p_220359_);
     }
 
 
@@ -82,9 +82,8 @@ public abstract class ServerLevelMixin extends Level implements ServerWorldExten
         return Collections.emptyIterator();
     }
 
-    @SuppressWarnings("rawtypes")
     @Inject(method = "<init>", at = @At("TAIL"))
-    private void init(MinecraftServer server, Executor workerExecutor, LevelStorageSource.LevelStorageAccess session, ServerLevelData properties, ResourceKey<Level> worldKey, LevelStem dimensionOptions, ChunkProgressListener worldGenerationProgressListener, boolean debugWorld, long seed, List spawners, boolean shouldTickTime, CallbackInfo ci) {
+    private void init(MinecraftServer p_214999_, Executor p_215000_, LevelStorageSource.LevelStorageAccess p_215001_, ServerLevelData p_215002_, ResourceKey<?> p_215003_, LevelStem p_215004_, ChunkProgressListener p_215005_, boolean p_215006_, long p_215007_, List<?> p_215008_, boolean p_215009_, CallbackInfo ci) {
         this.navigatingMobs = new ReferenceOpenHashSet<>(this.navigatingMobs);
         this.activeNavigations = new ReferenceOpenHashSet<>();
     }

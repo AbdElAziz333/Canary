@@ -60,11 +60,11 @@ public class EntityCollisionContextMixin {
         @Inject(
                 method = "<init>(Lnet/minecraft/world/entity/Entity;)V",
                 at = @At("RETURN")
-                /* at = @At(
+                 /*at = @At(
                         value = "INVOKE",
                         target = "Lnet/minecraft/block/EntityShapeContext;<init>(ZDLnet/minecraft/item/ItemStack;Ljava/util/function/Predicate;Lnet/minecraft/entity/Entity;)V",
                         shift = At.Shift.AFTER
-                ) */
+                )*/
         )
         private void initFields(Entity entity, CallbackInfo ci) {
             this.heldItem = null;

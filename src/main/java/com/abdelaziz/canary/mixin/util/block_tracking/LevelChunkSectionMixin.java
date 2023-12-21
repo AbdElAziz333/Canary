@@ -1,9 +1,8 @@
 package com.abdelaziz.canary.mixin.util.block_tracking;
 
-import com.abdelaziz.canary.common.block.BlockCountingSection;
-import com.abdelaziz.canary.common.block.BlockStateFlagHolder;
-import com.abdelaziz.canary.common.block.BlockStateFlags;
-import com.abdelaziz.canary.common.block.TrackedBlockStatePredicate;
+import com.abdelaziz.canary.common.block.*;
+import com.abdelaziz.canary.common.entity.block_tracking.ChunkSectionChangeCallback;
+import com.abdelaziz.canary.common.entity.block_tracking.SectionedBlockChangeTracker;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunkSection;
@@ -11,18 +10,12 @@ import net.minecraft.world.level.chunk.PalettedContainer;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
-
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 /**
  * Keep track of how many blocks that meet certain criteria are in this chunk section.
@@ -31,53 +24,33 @@ import java.util.concurrent.Future;
  * @author 2No2Name
  */
 @Mixin(LevelChunkSection.class)
-public abstract class LevelChunkSectionMixin implements BlockCountingSection {
+public abstract class LevelChunkSectionMixin implements BlockCountingSection, BlockListeningSection {
+    private short[] countsByFlag = null;
+    private ChunkSectionChangeCallback changeListener;
+    private short listeningMask;
 
     @Shadow
     @Final
     private PalettedContainer<BlockState> states;
-    @Unique
-    private short[] countsByFlag = null;
-    private CompletableFuture<short[]> countsByFlagFuture;
 
     @Override
-    public boolean anyMatch(TrackedBlockStatePredicate trackedBlockStatePredicate, boolean fallback) {
+    public boolean mayContainAny(TrackedBlockStatePredicate trackedBlockStatePredicate) {
         if (this.countsByFlag == null) {
-            if (!tryInitializeCountsByFlag()) {
-                return fallback;
-            }
+            fastInitClientCounts();
         }
+
         return this.countsByFlag[trackedBlockStatePredicate.getIndex()] != (short) 0;
     }
 
-    private static short[] calculateCanaryCounts(PalettedContainer<BlockState> states) {
-        short[] countsByFlag = new short[BlockStateFlags.NUM_FLAGS];
-        states.count((BlockState state, int count) -> addToFlagCount(countsByFlag, state, count));
-        return countsByFlag;
-    }
-
-    /**
-     * Compute the block state counts using a future using a thread pool to avoid lagging the rendering thread.
-     * Before modifying the block data, we join the future or discard it.
-     *
-     * @return Whether the block counts short array is initialized.
-     */
-    private boolean tryInitializeCountsByFlag() {
-        Future<short[]> countsByFlagFuture = this.countsByFlagFuture;
-        if (countsByFlagFuture != null && countsByFlagFuture.isDone()) {
-            try {
-                this.countsByFlag = countsByFlagFuture.get();
-                return true;
-            } catch (InterruptedException | ExecutionException | CancellationException e) {
-                this.countsByFlagFuture = null;
+    private void fastInitClientCounts() {
+        this.countsByFlag = new short[BlockStateFlags.NUM_TRACKED_FLAGS];
+        for (TrackedBlockStatePredicate trackedBlockStatePredicate : BlockStateFlags.TRACKED_FLAGS) {
+            if (this.states.maybeHas(trackedBlockStatePredicate)) {
+                //We haven't counted, so we just set the count so high that it never incorrectly reaches 0.
+                //For most situations, this overestimation does not hurt client performance compared to correct counting,
+                this.countsByFlag[trackedBlockStatePredicate.getIndex()] = 16 * 16 * 16;
             }
         }
-
-        if (this.countsByFlagFuture == null) {
-            PalettedContainer<BlockState> states = this.states;
-            this.countsByFlagFuture = CompletableFuture.supplyAsync(() -> calculateCanaryCounts(states));
-        }
-        return false;
     }
 
     @Redirect(
@@ -106,18 +79,7 @@ public abstract class LevelChunkSectionMixin implements BlockCountingSection {
 
     @Inject(method = "recalcBlockCounts()V", at = @At("HEAD"))
     private void createFlagCounters(CallbackInfo ci) {
-        this.countsByFlag = new short[BlockStateFlags.NUM_FLAGS];
-    }
-
-    @Inject(
-            method = "setBlockState(IIILnet/minecraft/world/level/block/state/BlockState;Z)Lnet/minecraft/world/level/block/state/BlockState;",
-            at = @At(value = "HEAD")
-    )
-    private void joinFuture(int x, int y, int z, BlockState state, boolean lock, CallbackInfoReturnable<BlockState> cir) {
-        if (this.countsByFlagFuture != null) {
-            this.countsByFlag = this.countsByFlagFuture.join();
-            this.countsByFlagFuture = null;
-        }
+        this.countsByFlag = new short[BlockStateFlags.NUM_TRACKED_FLAGS];
     }
 
     @Inject(
@@ -126,9 +88,7 @@ public abstract class LevelChunkSectionMixin implements BlockCountingSection {
     )
     private void resetData(FriendlyByteBuf buf, CallbackInfo ci) {
         this.countsByFlag = null;
-        this.countsByFlagFuture = null;
     }
-
 
     @Inject(
             method = "setBlockState(IIILnet/minecraft/world/level/block/state/BlockState;Z)Lnet/minecraft/world/level/block/state/BlockState;",
@@ -157,4 +117,69 @@ public abstract class LevelChunkSectionMixin implements BlockCountingSection {
             flagsXOR &= ~(1 << i);
         }
     }
+
+    @Override
+    public void addToCallback(ListeningBlockStatePredicate blockGroup, SectionedBlockChangeTracker tracker) {
+        if (this.changeListener == null) {
+            this.changeListener = new ChunkSectionChangeCallback();
+        }
+
+        this.listeningMask = this.changeListener.addTracker(tracker, blockGroup);
+    }
+
+    @Override
+    public void removeFromCallback(ListeningBlockStatePredicate blockGroup, SectionedBlockChangeTracker tracker) {
+        if (this.changeListener != null) {
+            this.listeningMask = this.changeListener.removeTracker(tracker, blockGroup);
+        }
+    }
+
+    private boolean isListening(ListeningBlockStatePredicate blockGroup) {
+        return (this.listeningMask & (1 << blockGroup.getIndex())) != 0;
+    }
+
+    public void invalidateSection() {
+        //TODO on section unload, unregister all kinds of stuff
+    }
+
+    /*private static short[] calculateCanaryCounts(PalettedContainer<BlockState> states) {
+        short[] countsByFlag = new short[BlockStateFlags.NUM_FLAGS];
+        states.count((BlockState state, int count) -> addToFlagCount(countsByFlag, state, count));
+        return countsByFlag;
+    }
+*/
+    /**
+     * Compute the block state counts using a future using a thread pool to avoid lagging the rendering thread.
+     * Before modifying the block data, we join the future or discard it.
+     *
+     * @return Whether the block counts short array is initialized.
+     */
+    /*private boolean tryInitializeCountsByFlag() {
+        Future<short[]> countsByFlagFuture = this.countsByFlagFuture;
+        if (countsByFlagFuture != null && countsByFlagFuture.isDone()) {
+            try {
+                this.countsByFlag = countsByFlagFuture.get();
+                return true;
+            } catch (InterruptedException | ExecutionException | CancellationException e) {
+                this.countsByFlagFuture = null;
+            }
+        }
+
+        if (this.countsByFlagFuture == null) {
+            PalettedContainer<BlockState> states = this.states;
+            this.countsByFlagFuture = CompletableFuture.supplyAsync(() -> calculateCanaryCounts(states));
+        }
+        return false;
+    }
+
+    @Inject(
+            method = "setBlockState(IIILnet/minecraft/world/level/block/state/BlockState;Z)Lnet/minecraft/world/level/block/state/BlockState;",
+            at = @At(value = "HEAD")
+    )
+    private void joinFuture(int x, int y, int z, BlockState state, boolean lock, CallbackInfoReturnable<BlockState> cir) {
+        if (this.countsByFlagFuture != null) {
+            this.countsByFlag = this.countsByFlagFuture.join();
+            this.countsByFlagFuture = null;
+        }
+    }*/
 }

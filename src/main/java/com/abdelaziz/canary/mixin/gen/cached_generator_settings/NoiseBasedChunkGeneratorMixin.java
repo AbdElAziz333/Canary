@@ -5,8 +5,6 @@ import net.minecraft.core.Registry;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
-import net.minecraft.world.level.levelgen.structure.StructureSet;
-import net.minecraft.world.level.levelgen.synth.NormalNoise;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -21,7 +19,6 @@ public class NoiseBasedChunkGeneratorMixin {
     @Shadow
     @Final
     protected Holder<NoiseGeneratorSettings> settings;
-
     private int cachedSeaLevel;
 
     /**
@@ -45,7 +42,7 @@ public class NoiseBasedChunkGeneratorMixin {
                     value = "TAIL"
             )
     )
-    private void hookConstructor(Registry<StructureSet> registry, Registry<NormalNoise.NoiseParameters> registry1, BiomeSource biomeSource, Holder<NoiseGeneratorSettings> settings, CallbackInfo ci) {
+    private void hookConstructor(Registry<?> registry1, Registry<?> registry2, BiomeSource biomeSource, Holder<?> holder, CallbackInfo ci) {
         this.cachedSeaLevel = this.settings.value().seaLevel();
     }
 }

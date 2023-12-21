@@ -14,6 +14,8 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Mixin(Entity.class)
@@ -58,6 +60,7 @@ public class EntityMixin {
         double velZ = movement.z;
         boolean isVerticalOnly = velX == 0 && velZ == 0;
         AABB movementSpace;
+
         if (isVerticalOnly) {
             if (velY < 0) {
                 //Check block directly below center of entity first

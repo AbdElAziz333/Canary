@@ -43,7 +43,7 @@ public abstract class PathNodeCache {
         }
 
         if (BlockStateFlags.ENABLED) {
-            return !((BlockCountingSection) section).anyMatch(BlockStateFlags.PATH_NOT_OPEN, true);
+            return !((BlockCountingSection) section).mayContainAny(BlockStateFlags.PATH_NOT_OPEN);
         }
         return !isChunkSectionDangerousNeighbor(section);
     }
@@ -61,7 +61,9 @@ public abstract class PathNodeCache {
             // If the y-coordinate is within bounds, we can cache the chunk section. Otherwise, the if statement to check
             // if the cached chunk section was initialized will early-exit.
             if (!world.isOutsideBuildHeight(y)) {
+                // This cast is always safe and is necessary to obtain direct references to chunk sections.
                 ChunkAccess chunk = chunkView.getLoadedChunk(Pos.ChunkCoord.fromBlockCoord(x), Pos.ChunkCoord.fromBlockCoord(z));
+
                 // If the chunk is absent, the cached section above will remain null, as there is no chunk section anyways.
                 // An empty chunk or section will never pose any danger sources, which will be caught later.
                 if (chunk != null) {

@@ -1,32 +1,30 @@
-modLoader="javafml"
-loaderVersion="[43,)"
-license = "LGPL-3.0-only"
+modLoader = "javafml"
+loaderVersion = "${loader_version_range}"
+license = "${mod_license}"
+
 issueTrackerURL = "https://github.com/AbdElAziz333/Canary/issues"
+
 [[mods]]
-modId = "canary"
-version = "${file.jarVersion}"
-displayName = "Canary"
+modId = "${mod_id}"
+version = "${mod_version}"
+displayName = "${mod_name}"
 updateJSONURL = "https://github.com/AbdElAziz333/Canary/raw/mc1.19.2/dev/updates.json"
 displayURL = "https://www.curseforge.com/minecraft/mc-mods/canary"
 logoFile = "logo.png"
-credits = "AbdElAziz, JellySquid, 2No2Name"
-authors = "AbdElAziz"
-displayTest = "MATCH_VERSION"
+credits = "${mod_credits}"
+authors = "${mod_authors}"
+description = '''${mod_description}'''
 
-description = '''
-Canary is a free and open-source optimization mod for Minecraft which makes a wide range of performance improvements to the game.
-'''
-
-[[dependencies.canary]]
+[[dependencies.${mod_id}]]
 modId = "forge"
 mandatory = true
-versionRange = "[43,)"
+versionRange = "${forge_version_range}"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.canary]]
+[[dependencies.${mod_id}]]
 modId = "minecraft"
 mandatory = true
-versionRange = "[1.19.2,1.20)"
+versionRange = "${minecraft_version_range}"
 ordering = "NONE"
 side = "BOTH"

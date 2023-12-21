@@ -59,8 +59,8 @@ public class RedStoneWireBlockMixin extends Block {
     private static final int MAX = 15;           // largest possible power value
     private static final int MAX_WIRE = MAX - 1; // largest possible power a wire can receive from another wire
 
-    public RedStoneWireBlockMixin(Properties properties) {
-        super(properties);
+    public RedStoneWireBlockMixin(Properties settings) {
+        super(settings);
     }
 
     @Inject(
