@@ -1,5 +1,6 @@
 package com.abdelaziz.canary.common.config;
 
+import com.abdelaziz.canary.common.compat.WorldEditCompat;
 import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
 import net.minecraftforge.fml.loading.LoadingModList;
 import net.minecraftforge.fml.loading.moddiscovery.ModInfo;
@@ -15,7 +16,7 @@ import java.util.Properties;
 import java.util.Set;
 
 /**
- * Documentation of these options: <a href="https://github.com/AbdElAziz333/Canary/wiki/Configuration-File">...</a>
+ * Documentation of these options: https://github.com/AbdElAziz333/Canary/wiki/Configuration-File
  */
 @SuppressWarnings("CanBeFinal")
 public class CanaryConfig {
@@ -24,12 +25,23 @@ public class CanaryConfig {
     private final Map<String, Option> options = new HashMap<>();
     private final Set<Option> optionsWithDependencies = new ObjectLinkedOpenHashSet<>();
 
+    private void applyCanaryCompat() {
+        Option option = this.options.get("mixin.block.hopper.worldedit_compat");
+        if (!option.isEnabled() && WorldEditCompat.WORLD_EDIT_PRESENT) {
+            option.addModOverride(true, "lithium-fabric");
+        }
+    }
+
     private CanaryConfig() {
         // Defines the default rules which can be configured by the user or other mods.
         // You must manually add a rule for any new mixins not covered by an existing package rule.
+
         this.addMixinRule("ai", true);
+        this.addMixinRule("ai.nearby_entity_tracking", true);
+        this.addMixinRule("ai.nearby_entity_tracking.goals", true);
         this.addMixinRule("ai.pathing", true);
         this.addMixinRule("ai.poi", true);
+        this.addMixinRule("ai.poi.fast_portals", true);
         this.addMixinRule("ai.poi.tasks", true);
         this.addMixinRule("ai.raid", true);
         this.addMixinRule("ai.sensor", true);
@@ -45,9 +57,6 @@ public class CanaryConfig {
         this.addMixinRule("alloc.chunk_ticking", true);
         this.addMixinRule("alloc.composter", true);
         this.addMixinRule("alloc.deep_passengers", true);
-        this.addMixinRule("alloc.empty_chunk", true);
-        this.addMixinRule("alloc.empty_iterator", true);
-        this.addMixinRule("alloc.empty_list", true);
         this.addMixinRule("alloc.entity_tracker", true);
         this.addMixinRule("alloc.enum_values", true);
         this.addMixinRule("alloc.enum_values.living_entity", true);
@@ -59,39 +68,14 @@ public class CanaryConfig {
 
         this.addMixinRule("block", true);
         this.addMixinRule("block.flatten_states", true);
+        this.addMixinRule("block.hopper", true);
+        this.addMixinRule("block.hopper.world_edit_compat", true);
         this.addMixinRule("block.moving_block_shapes", true);
         this.addMixinRule("block.redstone_wire", true);
 
         this.addMixinRule("cached_hashcode", true);
 
-        this.addMixinRule("calc", true);
-        this.addMixinRule("calc.if_else", true);
-        this.addMixinRule("calc.if_else.block_entity", true);
-        this.addMixinRule("calc.if_else.block_entity.can_place_item", true);
-        this.addMixinRule("calc.if_else.block_entity.can_place_item.brewing_stand", true);
-        this.addMixinRule("calc.if_else.block_entity.composter", true);
-        this.addMixinRule("calc.if_else.block_entity.get_capability", true);
-        this.addMixinRule("calc.if_else.block_entity.get_capability.brewing_stand", true);
-        this.addMixinRule("calc.if_else.block_entity.get_capability.furnace", true);
-        this.addMixinRule("calc.if_else.block_entity.get_slots_for_face", true);
-        this.addMixinRule("calc.if_else.block_entity.get_slots_for_face.brewing_stand", true);
-        this.addMixinRule("calc.if_else.block_entity.get_slots_for_face.furnace", true);
-        this.addMixinRule("calc.if_else.entity", true);
-        this.addMixinRule("calc.if_else.entity.handle_entity_event", true);
-        this.addMixinRule("calc.if_else.entity.handle_entity_event.goat", true);
-        this.addMixinRule("calc.if_else.entity.handle_entity_event.horse", true);
-        this.addMixinRule("calc.if_else.entity.handle_entity_event.iron_golem", true);
-        this.addMixinRule("calc.if_else.entity.handle_entity_event.ocelot", true);
-        this.addMixinRule("calc.if_else.entity.handle_entity_event.player", true);
-        this.addMixinRule("calc.if_else.entity.handle_entity_event.tamable_animal", true);
-        this.addMixinRule("calc.if_else.entity.handle_entity_event.villager", true);
-        this.addMixinRule("calc.if_else.entity.handle_entity_event.warden", true);
-        this.addMixinRule("calc.if_else.entity.handle_entity_event.wolf", true);
-        this.addMixinRule("calc.if_else.player_slot", true);
-        this.addMixinRule("calc.if_else.raid_odds", true);
-
         this.addMixinRule("chunk", true);
-        this.addMixinRule("chunk.block_counting", true);
         this.addMixinRule("chunk.entity_class_groups", true);
         this.addMixinRule("chunk.no_locking", true);
         this.addMixinRule("chunk.no_validation", true);
@@ -100,7 +84,6 @@ public class CanaryConfig {
 
         this.addMixinRule("collections", true);
         this.addMixinRule("collections.attributes", true);
-        this.addMixinRule("collections.block_entity_tickers", true);
         this.addMixinRule("collections.brain", true);
         this.addMixinRule("collections.entity_by_type", true);
         this.addMixinRule("collections.entity_filtering", true);
@@ -112,8 +95,8 @@ public class CanaryConfig {
 
         this.addMixinRule("entity", true);
         this.addMixinRule("entity.collisions", true);
-        this.addMixinRule("entity.collisions.intersection", false);
-        this.addMixinRule("entity.collisions.movement", false);
+        this.addMixinRule("entity.collisions.intersection", true);
+        this.addMixinRule("entity.collisions.movement", true);
         this.addMixinRule("entity.collisions.suffocation", true);
         this.addMixinRule("entity.collisions.unpushable_cramming", true);
         this.addMixinRule("entity.data_tracker", true);
@@ -123,6 +106,7 @@ public class CanaryConfig {
         this.addMixinRule("entity.fast_hand_swing", true);
         this.addMixinRule("entity.fast_powder_snow_check", true);
         this.addMixinRule("entity.fast_retrieval", true);
+        this.addMixinRule("entity.hopper_minecart", true);
         this.addMixinRule("entity.inactive_navigations", true);
         this.addMixinRule("entity.replace_entitytype_predicates", true);
         this.addMixinRule("entity.skip_equipment_change_check", true);
@@ -150,24 +134,45 @@ public class CanaryConfig {
         this.addMixinRule("shapes.specialized_shapes", true);
 
         this.addMixinRule("util", true);
+        this.addMixinRule("util.accessors", true);
+        this.addMixinRule("util.block_entity_retrieval", true);
         this.addMixinRule("util.block_tracking", true);
         this.addMixinRule("util.chunk_access", true);
-        this.addMixinRule("util.world_border_listener", false); //Disabled due to memory leak
+        this.addMixinRule("util.entity_movement_tracking", true);
+        this.addMixinRule("util.entity_section_position", true);
+        this.addMixinRule("util.inventory_change_listening", true);
+        this.addMixinRule("util.inventory_comparator_tracking", true);
+        this.addMixinRule("util.world_border_listener", true);
 
         this.addMixinRule("world", true);
+        this.addMixinRule("world.block_entity_ticking", true);
+        this.addMixinRule("world.block_entity_ticking.sleeping", true);
+        this.addMixinRule("world.block_entity_ticking.sleeping.brewing_stand", true);
+        this.addMixinRule("world.block_entity_ticking.sleeping.campfire", true);
+        this.addMixinRule("world.block_entity_ticking.sleeping.furnace", true);
+        this.addMixinRule("world.block_entity_ticking.sleeping.hopper", true);
+        this.addMixinRule("world.block_entity_ticking.sleeping.shulker_box", true);
         this.addMixinRule("world.block_entity_ticking.support_cache", false); //have to check whether the cached state bugfix fixes any detectable vanilla bugs first
         this.addMixinRule("world.block_entity_ticking.world_border", true);
         this.addMixinRule("world.chunk_access", true);
         this.addMixinRule("world.chunk_tickets", true);
+        this.addMixinRule("world.chunk_ticking", true);
         this.addMixinRule("world.combined_heightmap_update", true);
         this.addMixinRule("world.explosions", true);
         this.addMixinRule("world.inline_block_access", true);
         this.addMixinRule("world.inline_height", true);
-        this.addMixinRule("world.player_chunk_tick", true);
         this.addMixinRule("world.tick_scheduler", true);
 
+        this.addRuleDependency("ai.nearby_entity_tracking", "util.accessors", true);
+        this.addRuleDependency("ai.nearby_entity_tracking", "util.entity_section_position", true);
+        this.addRuleDependency("block.hopper", "util.entity_movement_tracking", true);
+        this.addRuleDependency("block.hopper", "util.block_entity_retrieval", true);
+        this.addRuleDependency("block.hopper", "util.inventory_change_listening", true);
+        this.addRuleDependency("util.inventory_comparator_tracking", "util.block_entity_retrieval", true);
+        this.addRuleDependency("util.entity_movement_tracking", "util.entity_section_position", true);
         this.addRuleDependency("entity.collisions.unpushable_cramming", "chunk.entity_class_groups", true);
         this.addRuleDependency("world.block_entity_ticking.world_border", "util.world_border_listener", true);
+
     }
 
     /**
@@ -195,6 +200,7 @@ public class CanaryConfig {
             }
         }
 
+        config.applyCanaryCompat();
         config.applyModOverrides();
 
         // Check dependencies several times, because one iteration may disable a rule required by another rule
