@@ -38,8 +38,7 @@ public abstract class BoundTickingBlockEntityMixin implements WorldBorderListene
         if (this.isInsideWorldBorder()) {
             Level world = this.this$0.getLevel();
             if (world instanceof ServerLevel serverWorld) {
-                return this.this$0.getFullStatus().isOrAfter(FullChunkStatus.BLOCK_TICKING)
-                        && serverWorld.areEntitiesLoaded(ChunkPos.asLong(pos));
+                return this.this$0.getFullStatus().isOrAfter(FullChunkStatus.BLOCK_TICKING) && serverWorld.areEntitiesLoaded(ChunkPos.asLong(pos));
             }
             return true;
         } else {

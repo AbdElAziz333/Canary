@@ -9,8 +9,6 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 
-import javax.swing.text.html.BlockView;
-
 /**
  * Implement the interface members of {@link LevelReader} and {@link CollisionGetter} directly to avoid complicated
  * method invocations between interface boundaries, helping the JVM to inline and optimize code.

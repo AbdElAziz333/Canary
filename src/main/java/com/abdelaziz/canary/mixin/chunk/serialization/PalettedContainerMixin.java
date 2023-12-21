@@ -70,6 +70,7 @@ public abstract class PalettedContainerMixin<T> {
 
         final Palette<T> palette = this.data.palette();
         final BitStorage storage = this.data.storage();
+
         if (storage instanceof ZeroBitStorage || palette.getSize() == 1) {
             // If the palette only contains one entry, don't attempt to repack it.
             elements = List.of(palette.valueFor(0));

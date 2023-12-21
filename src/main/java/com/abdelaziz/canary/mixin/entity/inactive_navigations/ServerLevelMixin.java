@@ -22,7 +22,6 @@ import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraft.world.level.storage.WritableLevelData;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
@@ -63,10 +62,10 @@ public abstract class ServerLevelMixin extends Level implements ServerWorldExten
     Set<Mob> navigatingMobs;
 
     private ReferenceOpenHashSet<PathNavigation> activeNavigations;
-    protected ServerLevelMixin(WritableLevelData properties, ResourceKey<Level> resourceKey, RegistryAccess registryAccess, Holder<DimensionType> holder, Supplier<ProfilerFiller> profiler, boolean isClient, boolean debugWorld, long biomeAccess, int maxChainedNeighborUpdates) {
-        super(properties, resourceKey, registryAccess, holder, profiler, isClient, debugWorld, biomeAccess, maxChainedNeighborUpdates);
-    }
 
+    protected ServerLevelMixin(WritableLevelData p_270739_, ResourceKey<Level> p_270683_, RegistryAccess p_270200_, Holder<DimensionType> p_270240_, Supplier<ProfilerFiller> p_270692_, boolean p_270904_, boolean p_270470_, long p_270248_, int p_270466_) {
+        super(p_270739_, p_270683_, p_270200_, p_270240_, p_270692_, p_270904_, p_270470_, p_270248_, p_270466_);
+    }
 
     /**
      * Optimization: Only update listeners that may care about the update. Listeners which have no path
@@ -84,9 +83,8 @@ public abstract class ServerLevelMixin extends Level implements ServerWorldExten
         return Collections.emptyIterator();
     }
 
-    @SuppressWarnings("rawtypes")
     @Inject(method = "<init>", at = @At("TAIL"))
-    private void init(MinecraftServer server, Executor workerExecutor, LevelStorageSource.LevelStorageAccess session, ServerLevelData properties, ResourceKey<Level> worldKey, LevelStem dimensionOptions, ChunkProgressListener worldGenerationProgressListener, boolean debugWorld, long seed, List spawners, boolean shouldTickTime, @Nullable RandomSequences randomSequences, CallbackInfo ci) {
+    private void init(MinecraftServer p_214999_, Executor p_215000_, LevelStorageSource.LevelStorageAccess p_215001_, ServerLevelData p_215002_, ResourceKey p_215003_, LevelStem p_215004_, ChunkProgressListener p_215005_, boolean p_215006_, long p_215007_, List p_215008_, boolean p_215009_, RandomSequences p_288977_, CallbackInfo ci) {
         this.navigatingMobs = new ReferenceOpenHashSet<>(this.navigatingMobs);
         this.activeNavigations = new ReferenceOpenHashSet<>();
     }

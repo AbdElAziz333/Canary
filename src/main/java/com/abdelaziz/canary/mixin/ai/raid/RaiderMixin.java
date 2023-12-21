@@ -17,11 +17,12 @@ import java.util.function.Predicate;
 public class RaiderMixin {
     // The call to Raid#getLeaderBannerInstance() is very expensive, so cache it and re-use it during AI ticking
     private static final ItemStack CACHED_OMINOUS_BANNER = Raid.getLeaderBannerInstance();
+
     @Mutable
     @Shadow
     @Final
     static Predicate<ItemEntity> ALLOWED_ITEMS;
-
+//TODO: optimizations 1- redirect in pickup method, 2- cache the value in interface
     static {
         ALLOWED_ITEMS = (itemEntity) -> !itemEntity.hasPickUpDelay() && itemEntity.isAlive() && ItemStack.matches(itemEntity.getItem(), CACHED_OMINOUS_BANNER);
     }

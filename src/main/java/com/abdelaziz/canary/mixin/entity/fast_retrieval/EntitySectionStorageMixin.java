@@ -14,6 +14,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
+import java.util.function.Consumer;
+
 @Mixin(EntitySectionStorage.class)
 public abstract class EntitySectionStorageMixin<T extends EntityAccess> {
     @Shadow
@@ -24,6 +26,7 @@ public abstract class EntitySectionStorageMixin<T extends EntityAccess> {
      * @author 2No2Name
      * @reason avoid iterating through LongAVLTreeSet, possibly iterating over hundreds of irrelevant longs to save up to 8 hash set gets
      */
+    @SuppressWarnings("InvalidInjectorMethodSignature")
     @Inject(
             method = "forEachAccessibleNonEmptySection",
             at = @At(
@@ -35,7 +38,7 @@ public abstract class EntitySectionStorageMixin<T extends EntityAccess> {
             locals = LocalCapture.CAPTURE_FAILHARD,
             cancellable = true
     )
-    public void forEachInBox(AABB box, AbortableIterationConsumer<EntitySection<T>> action, CallbackInfo ci, int i, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+    public void forEachInBox(AABB box, AbortableIterationConsumer<EntitySection<T>> action, CallbackInfo ci, int  minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
         if (maxX >= minX + 4 || maxZ >= minZ + 4) {
             return; // Vanilla is likely more optimized when shooting entities with TNT cannons over huge distances.
             // Choosing a cutoff of 4 chunk size, as it becomes more likely that these entity sections do not exist when
@@ -68,6 +71,7 @@ public abstract class EntitySectionStorageMixin<T extends EntityAccess> {
 
     private AbortableIterationConsumer.Continuation forEachInColumn(int x, int minY, int maxY, int z, AbortableIterationConsumer<EntitySection<T>> action) {
         AbortableIterationConsumer.Continuation ret = AbortableIterationConsumer.Continuation.CONTINUE;
+
         //y from negative to positive, but y is treated as unsigned
         for (int y = Math.max(minY, 0); y <= maxY; y++) {
             if ((ret = this.consumeSection(SectionPos.asLong(x, y, z), action)).shouldAbort()) {
@@ -86,7 +90,7 @@ public abstract class EntitySectionStorageMixin<T extends EntityAccess> {
     private AbortableIterationConsumer.Continuation consumeSection(long pos, AbortableIterationConsumer<EntitySection<T>> action) {
         EntitySection<T> section = this.getSection(pos);
         if (section != null && 0 != section.size() && section.getStatus().isAccessible()) {
-            return action.accept(section);
+            action.accept(section);
         }
 
         return AbortableIterationConsumer.Continuation.CONTINUE;

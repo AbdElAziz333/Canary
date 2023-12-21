@@ -14,15 +14,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(FluidState.class)
 public abstract class FluidStateMixin {
-    boolean isEmpty;
-
     @Shadow
     public abstract Fluid getType();
+
+    private boolean isEmptyCache;
 
     @Inject(method = "<init>(Lnet/minecraft/world/level/material/Fluid;Lcom/google/common/collect/ImmutableMap;Lcom/mojang/serialization/MapCodec;)V", at = @At("RETURN"))
     private void initFluidCache(Fluid fluid, ImmutableMap<Property<?>, Comparable<?>> propertyMap,
                                 MapCodec<FluidState> codec, CallbackInfo ci) {
-        isEmpty = this.getType().isEmpty();
+        this.isEmptyCache = this.getType().isEmpty();
     }
 
     /**
@@ -31,6 +31,6 @@ public abstract class FluidStateMixin {
      */
     @Overwrite
     public boolean isEmpty() {
-        return isEmpty;
+        return this.isEmptyCache;
     }
 }

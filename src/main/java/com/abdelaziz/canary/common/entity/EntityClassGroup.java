@@ -1,13 +1,13 @@
 package com.abdelaziz.canary.common.entity;
 
+import cpw.mods.modlauncher.api.INameMappingService;
 import it.unimi.dsi.fastutil.objects.Reference2ByteOpenHashMap;
 import com.abdelaziz.canary.common.reflection.ReflectionUtil;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.monster.Shulker;
 import net.minecraft.world.entity.vehicle.Minecart;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 
 import java.util.Objects;
 import java.util.function.Predicate;
@@ -25,7 +25,7 @@ public class EntityClassGroup {
     public static final EntityClassGroup MINECART_BOAT_LIKE_COLLISION; //aka entities that will attempt to collide with all other entities when moving
 
     static {
-        String remapped_method_30949 = "m_7337_";//canCollideWith - m_7337_
+        String remapped_method_30949 = ObfuscationReflectionHelper.remapName(INameMappingService.Domain.METHOD, "m_7337_");
         MINECART_BOAT_LIKE_COLLISION = new EntityClassGroup(
                 (Class<?> entityClass) -> ReflectionUtil.hasMethodOverride(entityClass, Entity.class, true, remapped_method_30949, Entity.class));
 
@@ -87,7 +87,8 @@ public class EntityClassGroup {
         public static final NoDragonClassGroup BOAT_SHULKER_LIKE_COLLISION; //aka entities that other entities will do block-like collisions with when moving
 
         static {
-            String remapped_method_30948 = "m_5829_";//canBeCollidedWith - m_5829_
+            //TODO: better handler here
+            String remapped_method_30948 = ObfuscationReflectionHelper.remapName(INameMappingService.Domain.METHOD, "m_5829_");
             BOAT_SHULKER_LIKE_COLLISION = new NoDragonClassGroup(
                     (Class<?> entityClass) -> ReflectionUtil.hasMethodOverride(entityClass, Entity.class, true, remapped_method_30948));
 

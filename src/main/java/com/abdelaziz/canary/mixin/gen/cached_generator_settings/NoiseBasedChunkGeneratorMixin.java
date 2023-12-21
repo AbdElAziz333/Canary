@@ -1,6 +1,7 @@
 package com.abdelaziz.canary.mixin.gen.cached_generator_settings;
 
 import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
@@ -17,8 +18,7 @@ public class NoiseBasedChunkGeneratorMixin {
 
     @Shadow
     @Final
-    private Holder<NoiseGeneratorSettings> settings;
-
+    protected Holder<NoiseGeneratorSettings> settings;
     private int cachedSeaLevel;
 
     /**
@@ -42,7 +42,7 @@ public class NoiseBasedChunkGeneratorMixin {
                     value = "TAIL"
             )
     )
-    private void hookConstructor(BiomeSource biomeSource, Holder<NoiseGeneratorSettings> holder, CallbackInfo ci) {
+    private void hookConstructor(Registry<?> registry1, Registry<?> registry2, BiomeSource biomeSource, Holder<?> holder, CallbackInfo ci) {
         this.cachedSeaLevel = this.settings.value().seaLevel();
     }
 }

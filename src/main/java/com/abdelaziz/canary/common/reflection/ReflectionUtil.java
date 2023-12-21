@@ -4,16 +4,23 @@ import cpw.mods.modlauncher.api.INameMappingService;
 import net.minecraft.CrashReport;
 import net.minecraft.CrashReportCategory;
 import net.minecraft.ReportedException;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import static net.minecraftforge.fml.util.ObfuscationReflectionHelper.remapName;
+import java.util.WeakHashMap;
 
 public class ReflectionUtil {
     public static boolean hasMethodOverride(Class<?> clazz, Class<?> superclass, boolean fallbackResult, String methodName, Class<?>... methodArgs) {
         while (clazz != null && clazz != superclass && superclass.isAssignableFrom(clazz)) {
             try {
-                clazz.getDeclaredMethod(remapName(INameMappingService.Domain.METHOD, methodName), methodArgs);
+                clazz.getDeclaredMethod(methodName, methodArgs);
                 return true;
             } catch (NoSuchMethodException e) {
                 clazz = clazz.getSuperclass();
@@ -40,5 +47,19 @@ public class ReflectionUtil {
             }
         }
         return false;
+    }
+
+    private static final String REMAPPED_ON_ENTITY_COLLISION = ObfuscationReflectionHelper.remapName(INameMappingService.Domain.METHOD, "m_7892_");//FabricLoader.getInstance().getMappingResolver().mapMethodName("intermediary", "net.minecraft.class_4970", "method_9548", "(Lnet/minecraft/class_2680;Lnet/minecraft/class_1937;Lnet/minecraft/class_2338;Lnet/minecraft/class_1297;)V");
+    private static final WeakHashMap<Class<?>, Boolean> CACHED_IS_ENTITY_TOUCHABLE = new WeakHashMap<>();
+    public static boolean isBlockStateEntityTouchable(BlockState operand) {
+        Class<? extends Block> blockClazz = operand.getBlock().getClass();
+        //Caching results in hashmap as this calculation takes over a second for all blocks together
+        Boolean result = CACHED_IS_ENTITY_TOUCHABLE.get(blockClazz);
+        if (result != null) {
+            return result;
+        }
+        boolean res = ReflectionUtil.hasMethodOverride(blockClazz, BlockBehaviour.class, true, REMAPPED_ON_ENTITY_COLLISION, BlockState.class, Level.class, BlockPos.class, Entity.class);
+        CACHED_IS_ENTITY_TOUCHABLE.put(blockClazz, res);
+        return res;
     }
 }

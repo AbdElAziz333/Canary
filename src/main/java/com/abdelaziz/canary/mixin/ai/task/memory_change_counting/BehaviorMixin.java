@@ -7,7 +7,6 @@ import com.abdelaziz.canary.common.ai.MemoryModificationCounter;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.Brain;
 import net.minecraft.world.entity.ai.behavior.Behavior;
-import net.minecraft.world.entity.ai.behavior.BehaviorControl;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.memory.MemoryStatus;
 import org.spongepowered.asm.mixin.*;
@@ -30,7 +29,7 @@ public class BehaviorMixin<E extends LivingEntity> {
     private boolean cachedHasRequiredMemoryState;
 
     @Inject(method = "<init>(Ljava/util/Map;II)V", at = @At("RETURN"))
-    private void init(Map<MemoryModuleType<?>, MemoryStatus> map, int int_1, int int_2, CallbackInfo ci) {
+    public void init(Map<MemoryModuleType<?>, MemoryStatus> map, int int_1, int int_2, CallbackInfo ci) {
         this.entryCondition = new Reference2ObjectOpenHashMap<>(map);
     }
 

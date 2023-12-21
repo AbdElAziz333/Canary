@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import java.util.Set;
 
 @Mixin(GateBehavior.class)
-public abstract class GateBehaviorMixin<E extends LivingEntity> {
+public class GateBehaviorMixin<E extends LivingEntity> {
     @Shadow
     @Final
     private ShufflingList<BehaviorControl<? super E>> behaviors;

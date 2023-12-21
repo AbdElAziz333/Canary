@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public class PistonBaseBlockMixin {
 
     @Redirect(
-            method = "getNeighborSignal(Lnet/minecraft/world/level/SignalGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction;)Z",
+            method = "getNeighborSignal",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/core/Direction;values()[Lnet/minecraft/core/Direction;"

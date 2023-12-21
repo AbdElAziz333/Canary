@@ -2,7 +2,6 @@ package com.abdelaziz.canary.common.entity.movement;
 
 import com.abdelaziz.canary.common.block.BlockCountingSection;
 import com.abdelaziz.canary.common.block.BlockStateFlags;
-import com.abdelaziz.canary.common.entity.CanaryEntityCollisions;
 import com.abdelaziz.canary.common.shapes.VoxelShapeCaster;
 import com.abdelaziz.canary.common.util.Pos;
 import com.google.common.collect.AbstractIterator;
@@ -24,6 +23,8 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.abdelaziz.canary.common.entity.CanaryEntityCollisions.EPSILON;
 
 /**
  * ChunkAwareBlockCollisionSweeper iterates over blocks in one chunk section at a time. Together with the chunk
@@ -75,12 +76,12 @@ public class ChunkAwareBlockCollisionSweeper extends AbstractIterator<VoxelShape
         this.context = entity == null ? CollisionContext.empty() : CollisionContext.of(entity);
         this.level = level;
 
-        this.minX = Mth.floor(box.minX - CanaryEntityCollisions.EPSILON);
-        this.maxX = Mth.floor(box.maxX + CanaryEntityCollisions.EPSILON);
-        this.minY = Mth.clamp(Mth.floor(box.minY - CanaryEntityCollisions.EPSILON), Pos.BlockCoord.getMinY(this.level), Pos.BlockCoord.getMaxYInclusive(this.level));
-        this.maxY = Mth.clamp(Mth.floor(box.maxY + CanaryEntityCollisions.EPSILON), Pos.BlockCoord.getMinY(this.level), Pos.BlockCoord.getMaxYInclusive(this.level));
-        this.minZ = Mth.floor(box.minZ - CanaryEntityCollisions.EPSILON);
-        this.maxZ = Mth.floor(box.maxZ + CanaryEntityCollisions.EPSILON);
+        this.minX = Mth.floor(box.minX - EPSILON);
+        this.maxX = Mth.floor(box.maxX + EPSILON);
+        this.minY = Mth.clamp(Mth.floor(box.minY - EPSILON), Pos.BlockCoord.getMinY(this.level), Pos.BlockCoord.getMaxYInclusive(this.level));
+        this.maxY = Mth.clamp(Mth.floor(box.maxY + EPSILON), Pos.BlockCoord.getMinY(this.level), Pos.BlockCoord.getMaxYInclusive(this.level));
+        this.minZ = Mth.floor(box.minZ - EPSILON);
+        this.maxZ = Mth.floor(box.maxZ + EPSILON);
 
         this.maxHitX = Integer.MIN_VALUE;
         this.maxHitY = Integer.MIN_VALUE;
@@ -96,65 +97,6 @@ public class ChunkAwareBlockCollisionSweeper extends AbstractIterator<VoxelShape
 
         //decrement as first nextSection call will increment it again
         this.chunkX--;
-    }
-
-    /**
-     * This is an artifact from vanilla which is used to avoid testing shapes in the extended portion of a volume
-     * unless they are a shape which exceeds their voxel. Pistons must be special-cased here.
-     *
-     * @return True if the shape can be interacted with at the given edge boundary
-     */
-    private static boolean canInteractWithBlock(BlockState state, int edgesHit) {
-        return (edgesHit != 1 || state.hasLargeCollisionShape()) && (edgesHit != 2 || state.getBlock() == Blocks.MOVING_PISTON);
-    }
-
-    /**
-     * Checks if the {@param entityShape} or {@param entityBox} intersects the given {@param shape} which is translated
-     * to the given position. This is a very specialized implementation which tries to avoid going through VoxelShape
-     * for full-cube shapes.
-     *
-     * @return A {@link VoxelShape} which contains the shape representing that which was collided with, otherwise null
-     */
-    private static VoxelShape getCollidedShape(AABB entityBox, VoxelShape entityShape, VoxelShape shape, int x, int y, int z) {
-        if (shape == Shapes.block()) {
-            return entityBox.intersects(x, y, z, x + 1.0, y + 1.0, z + 1.0) ? shape.move(x, y, z) : null;
-        }
-        if (shape instanceof VoxelShapeCaster) {
-            if (((VoxelShapeCaster) shape).intersects(entityBox, x, y, z)) {
-                return shape.move(x, y, z);
-            } else {
-                return null;
-            }
-        }
-
-        shape = shape.move(x, y, z);
-
-        if (Shapes.joinIsNotEmpty(shape, entityShape, BooleanOp.AND)) {
-            return shape;
-        }
-
-        return null;
-    }
-
-    /**
-     * Checks the cached information whether the {@param chunkY} section of the {@param chunk} has oversized blocks.
-     *
-     * @return Whether there are any oversized blocks in the chunk section.
-     */
-    private static boolean hasChunkSectionOversizedBlocks(ChunkAccess chunk, int chunkY) {
-        if (BlockStateFlags.ENABLED) {
-            LevelChunkSection section = chunk.getSections()[chunkY];
-            return section != null && ((BlockCountingSection) section).anyMatch(BlockStateFlags.OVERSIZED_SHAPE, true);
-        }
-        return true; //like vanilla, assume that a chunk section has oversized blocks, when the section mixin isn't loaded
-    }
-
-    private static int expandMin(int coord) {
-        return coord - 1;
-    }
-
-    private static int expandMax(int coord) {
-        return coord + 1;
     }
 
     private boolean nextSection() {
@@ -297,6 +239,65 @@ public class ChunkAwareBlockCollisionSweeper extends AbstractIterator<VoxelShape
         }
 
         return this.endOfData();
+    }
+
+    /**
+     * This is an artifact from vanilla which is used to avoid testing shapes in the extended portion of a volume
+     * unless they are a shape which exceeds their voxel. Pistons must be special-cased here.
+     *
+     * @return True if the shape can be interacted with at the given edge boundary
+     */
+    private static boolean canInteractWithBlock(BlockState state, int edgesHit) {
+        return (edgesHit != 1 || state.hasLargeCollisionShape()) && (edgesHit != 2 || state.getBlock() == Blocks.MOVING_PISTON);
+    }
+
+    /**
+     * Checks if the {@param entityShape} or {@param entityBox} intersects the given {@param shape} which is translated
+     * to the given position. This is a very specialized implementation which tries to avoid going through VoxelShape
+     * for full-cube shapes.
+     *
+     * @return A {@link VoxelShape} which contains the shape representing that which was collided with, otherwise null
+     */
+    private static VoxelShape getCollidedShape(AABB entityBox, VoxelShape entityShape, VoxelShape shape, int x, int y, int z) {
+        if (shape == Shapes.block()) {
+            return entityBox.intersects(x, y, z, x + 1.0, y + 1.0, z + 1.0) ? shape.move(x, y, z) : null;
+        }
+        if (shape instanceof VoxelShapeCaster) {
+            if (((VoxelShapeCaster) shape).intersects(entityBox, x, y, z)) {
+                return shape.move(x, y, z);
+            } else {
+                return null;
+            }
+        }
+
+        shape = shape.move(x, y, z);
+
+        if (Shapes.joinIsNotEmpty(shape, entityShape, BooleanOp.AND)) {
+            return shape;
+        }
+
+        return null;
+    }
+
+    private static int expandMin(int coord) {
+        return coord - 1;
+    }
+
+    private static int expandMax(int coord) {
+        return coord + 1;
+    }
+
+    /**
+     * Checks the cached information whether the {@param chunkY} section of the {@param chunk} has oversized blocks.
+     *
+     * @return Whether there are any oversized blocks in the chunk section.
+     */
+    private static boolean hasChunkSectionOversizedBlocks(ChunkAccess chunk, int chunkY) {
+        if (BlockStateFlags.ENABLED) {
+            LevelChunkSection section = chunk.getSections()[chunkY];
+            return section != null && ((BlockCountingSection) section).mayContainAny(BlockStateFlags.OVERSIZED_SHAPE);
+        }
+        return true; //like vanilla, assume that a chunk section has oversized blocks, when the section mixin isn't loaded
     }
 
     public List<VoxelShape> collectAll() {

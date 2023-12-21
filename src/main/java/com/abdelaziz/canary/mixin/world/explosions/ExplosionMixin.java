@@ -25,9 +25,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Optimizations for Explosions: Reduce allocations and getChunk/getBlockState calls
@@ -310,5 +308,4 @@ public abstract class ExplosionMixin {
 
         return totalResistance;
     }
-
 }
