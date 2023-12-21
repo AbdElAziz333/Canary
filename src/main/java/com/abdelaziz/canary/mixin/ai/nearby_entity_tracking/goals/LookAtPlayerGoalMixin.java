@@ -26,13 +26,15 @@ import java.util.function.Predicate;
 
 @Mixin(LookAtPlayerGoal.class)
 public class LookAtPlayerGoalMixin {
+    private NearbyEntityTracker<? extends LivingEntity> tracker;
+
     @Shadow
     @Final
     protected Mob mob;
+
     @Shadow
     @Final
     protected float lookDistance;
-    private NearbyEntityTracker<? extends LivingEntity> tracker;
 
     @Inject(method = "<init>(Lnet/minecraft/world/entity/Mob;Ljava/lang/Class;FFZ)V", at = @At("RETURN"))
     private void init(Mob mob, Class<? extends LivingEntity> targetType, float lookDistance, float chance, boolean b, CallbackInfo ci) {

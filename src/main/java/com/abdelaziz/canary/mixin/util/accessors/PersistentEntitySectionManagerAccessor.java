@@ -1,4 +1,4 @@
-package com.abdelaziz.canary.mixin.chunk.entity_class_groups;
+package com.abdelaziz.canary.mixin.util.accessors;
 
 import net.minecraft.world.level.entity.EntityAccess;
 import net.minecraft.world.level.entity.EntitySectionStorage;

@@ -38,9 +38,11 @@ public interface SleepingBlockEntity {
         }
 
         RebindableTickingBlockEntityWrapperAccessor tickWrapper = this.getTickWrapper();
+
         if (tickWrapper == null) {
             return false;
         }
+
         this.setSleepingTicker(tickWrapper.getTicker());
         tickWrapper.callRebind(SleepingBlockEntity.SLEEPING_BLOCK_ENTITY_TICKER);
         return true;
@@ -49,9 +51,11 @@ public interface SleepingBlockEntity {
     default void sleepOnlyCurrentTick() {
         TickingBlockEntity sleepingTicker = this.getSleepingTicker();
         RebindableTickingBlockEntityWrapperAccessor tickWrapper = this.getTickWrapper();
+
         if (sleepingTicker == null) {
             sleepingTicker = tickWrapper.getTicker();
         }
+
         Level world = ((BlockEntity) this).getLevel();
         tickWrapper.callRebind(new SleepUntilTimeBlockEntityTickInvoker((BlockEntity) this, world.getGameTime() + 1, sleepingTicker));
         this.setSleepingTicker(null);
@@ -59,18 +63,22 @@ public interface SleepingBlockEntity {
 
     default void wakeUpNow() {
         TickingBlockEntity sleepingTicker = this.getSleepingTicker();
+
         if (sleepingTicker == null) {
             return;
         }
+
         this.setTicker(sleepingTicker);
         this.setSleepingTicker(null);
     }
 
     default void setTicker(TickingBlockEntity delegate) {
         RebindableTickingBlockEntityWrapperAccessor tickWrapper = this.getTickWrapper();
+
         if (tickWrapper == null) {
             return;
         }
+
         tickWrapper.callRebind(delegate);
     }
 

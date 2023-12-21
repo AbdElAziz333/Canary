@@ -12,7 +12,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class ComparatorTracking {
-
     public static void notifyNearbyBlockEntitiesAboutNewComparator(Level world, BlockPos pos) {
         BlockPos.MutableBlockPos searchPos = new BlockPos.MutableBlockPos();
         for (Direction searchDirection : DirectionConstants.HORIZONTAL) {

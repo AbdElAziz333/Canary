@@ -25,6 +25,8 @@ import java.util.function.Predicate;
 
 @Mixin(AvoidEntityGoal.class)
 public class AvoidEntityGoalMixin<T extends LivingEntity> {
+    private NearbyEntityTracker<T> tracker;
+
     @Shadow
     @Final
     protected PathfinderMob mob;
@@ -32,8 +34,6 @@ public class AvoidEntityGoalMixin<T extends LivingEntity> {
     @Shadow
     @Final
     protected float maxDist;
-
-    private NearbyEntityTracker<T> tracker;
 
     @Inject(method = "<init>(Lnet/minecraft/world/entity/PathfinderMob;Ljava/lang/Class;Ljava/util/function/Predicate;FDDLjava/util/function/Predicate;)V", at = @At("RETURN"))
     private void init(PathfinderMob mob, Class<T> fleeFromType, Predicate<LivingEntity> predicate, float distance, double slowSpeed, double fastSpeed, Predicate<LivingEntity> predicate2, CallbackInfo ci) {

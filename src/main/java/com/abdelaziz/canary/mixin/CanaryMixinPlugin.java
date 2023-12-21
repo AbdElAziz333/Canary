@@ -48,29 +48,12 @@ public class CanaryMixinPlugin implements IMixinConfigPlugin {
             return false;
         }
 
-        //For now, disable optimizations to fix some mod compatibilities.
-        if (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "entity.fast_retrieval") && (FMLLoader.getLoadingModList().getModFileById("mowziesmobs") != null)) {
+        //For now disable this until running some tests
+        if (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "shapes.lazy_shape_context") && (FMLLoader.getLoadingModList().getModFileById("the_bumblezone") != null)) {
             return false;
         }
 
-        if (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "block.hopper") && (FMLLoader.getLoadingModList().getModFileById("quark") != null)) {
-            return false;
-        }
-
-        if (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "ai.nearby_entity_tracking") && (FMLLoader.getLoadingModList().getModFileById("witherstormmod") != null)) {
-            return false;
-        }
-
-        //Fix: if Forge errors is not empty then disable shapes, math.sine_lut and alloc.blockstate optimizations. (Thanks for malte!)
-        if (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "shapes") && !LoadingModList.get().getErrors().isEmpty()) {
-            return false;
-        }
-
-        if (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "math.sine_lut") && !LoadingModList.get().getErrors().isEmpty()) {
-            return false;
-        }
-
-        if (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "alloc.blockstate") && !LoadingModList.get().getErrors().isEmpty()) {
+        if ((mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "shapes") || (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "math.sine_lut")) || (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "alloc.block_state"))) && !LoadingModList.get().getErrors().isEmpty()) {
             return false;
         }
 

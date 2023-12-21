@@ -1,4 +1,4 @@
-package com.abdelaziz.canary.mixin.util.block_counting;
+package com.abdelaziz.canary.mixin.util.block_tracking;
 
 import com.abdelaziz.canary.common.block.BlockStateFlagHolder;
 import com.abdelaziz.canary.common.block.BlockStateFlags;
@@ -24,8 +24,8 @@ public class BlockStateBaseMixin implements BlockStateFlagHolder {
 
         int flags = 0;
 
-        for (int i = 0; i < BlockStateFlags.ALL_FLAGS.length; i++) {
-            if (BlockStateFlags.ALL_FLAGS[i].test((BlockState) (Object) this)) {
+        for (int i = 0; i < BlockStateFlags.FLAGS.length; i++) {
+            if (BlockStateFlags.FLAGS[i].test((BlockState) (Object) this)) {
                 flags |= 1 << i;
             }
         }

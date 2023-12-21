@@ -21,16 +21,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(EntitySection.class)
 public abstract class EntitySectionMixin<T extends EntityAccess> implements NearbyEntityListenerSection, PositionedEntityTrackingSection {
+    private final ReferenceOpenHashSet<NearbyEntityListener> nearbyEntityListeners = new ReferenceOpenHashSet<>(0);
+
     @Shadow
     private Visibility chunkStatus;
+
     @Shadow
     @Final
     private ClassInstanceMultiMap<T> storage;
 
     @Shadow
     public abstract boolean isEmpty();
-
-    private final ReferenceOpenHashSet<NearbyEntityListener> nearbyEntityListeners = new ReferenceOpenHashSet<>(0);
 
     @Override
     public void addListener(NearbyEntityListener listener) {
@@ -43,9 +44,11 @@ public abstract class EntitySectionMixin<T extends EntityAccess> implements Near
     @Override
     public void removeListener(EntitySectionStorage<?> sectionedEntityCache, NearbyEntityListener listener) {
         boolean removed = this.nearbyEntityListeners.remove(listener);
+
         if (this.chunkStatus.isAccessible() && removed) {
             listener.onSectionLeftRange(this, this.storage);
         }
+
         if (this.isEmpty()) {
             sectionedEntityCache.remove(this.getPos());
         }
@@ -63,6 +66,7 @@ public abstract class EntitySectionMixin<T extends EntityAccess> implements Near
         if (!this.chunkStatus.isAccessible() || this.nearbyEntityListeners.isEmpty()) {
             return;
         }
+
         if (entityLike instanceof Entity entity) {
             for (NearbyEntityListener nearbyEntityListener : this.nearbyEntityListeners) {
                 nearbyEntityListener.onEntityEnteredRange(entity);

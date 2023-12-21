@@ -16,15 +16,15 @@ public interface NearbyEntityListener {
     /**
      * Calls the callbacks for the chunk coordinates that this listener is leaving and entering
      */
-    default void forEachChunkInRangeChange(EntitySectionStorage<? extends EntityAccess> entityCache, SectionPos prevCenterPos, SectionPos newCenterPos) {
-        Range6Int chunkRange = this.getChunkRange();
-        if (chunkRange == EMPTY_RANGE) {
+    default void updateChunkRegistrations(EntitySectionStorage<? extends EntityAccess> entityCache, SectionPos prevCenterPos, Range6Int prevChunkRange, SectionPos newCenterPos, Range6Int newChunkRange) {
+        if (prevChunkRange == EMPTY_RANGE && newChunkRange == EMPTY_RANGE) {
             return;
         }
+
         BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 
-        BoundingBox after = newCenterPos == null ? null : new BoundingBox(newCenterPos.getX() - chunkRange.negativeX(), newCenterPos.getY() - chunkRange.negativeY(), newCenterPos.getZ() - chunkRange.negativeZ(), newCenterPos.getX() + chunkRange.positiveX(), newCenterPos.getY() + chunkRange.positiveY(), newCenterPos.getZ() + chunkRange.positiveZ());
-        BoundingBox before = prevCenterPos == null ? null : new BoundingBox(prevCenterPos.getX() - chunkRange.negativeX(), prevCenterPos.getY() - chunkRange.negativeY(), prevCenterPos.getZ() - chunkRange.negativeZ(), prevCenterPos.getX() + chunkRange.positiveX(), prevCenterPos.getY() + chunkRange.positiveY(), prevCenterPos.getZ() + chunkRange.positiveZ());
+        BoundingBox after = newCenterPos == null ? null : new BoundingBox(newCenterPos.getX() - newChunkRange.negativeX(), newCenterPos.getY() - newChunkRange.negativeY(), newCenterPos.getZ() - newChunkRange.negativeZ(), newCenterPos.getX() + newChunkRange.positiveX(), newCenterPos.getY() + newChunkRange.positiveY(), newCenterPos.getZ() + newChunkRange.positiveZ());
+        BoundingBox before = prevCenterPos == null ? null : new BoundingBox(prevCenterPos.getX() - prevChunkRange.negativeX(), prevCenterPos.getY() - prevChunkRange.negativeY(), prevCenterPos.getZ() - prevChunkRange.negativeZ(), prevCenterPos.getX() + prevChunkRange.positiveX(), prevCenterPos.getY() + prevChunkRange.positiveY(), prevCenterPos.getZ() + prevChunkRange.positiveZ());
         if (before != null) {
             for (int x = before.minX(); x <= before.maxX(); x++) {
                 for (int y = before.minY(); y <= before.maxY(); y++) {
@@ -53,6 +53,14 @@ public interface NearbyEntityListener {
             }
         }
     }
+    default void removeFromAllChunksInRange(EntitySectionStorage<? extends EntityAccess> entityCache, SectionPos prevCenterPos) {
+        this.updateChunkRegistrations(entityCache, prevCenterPos, this.getChunkRange(), null, EMPTY_RANGE);
+    }
+
+    default void addToAllChunksInRange(EntitySectionStorage<? extends EntityAccess> entityCache, SectionPos newCenterPos) {
+        this.updateChunkRegistrations(entityCache, null, EMPTY_RANGE, newCenterPos, this.getChunkRange());
+    }
+
     Range6Int getChunkRange();
 
     /**

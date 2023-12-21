@@ -2,6 +2,8 @@ package com.abdelaziz.canary.mixin.ai.nearby_entity_tracking;
 
 import com.abdelaziz.canary.common.entity.nearby_tracker.NearbyEntityListenerMulti;
 import com.abdelaziz.canary.common.entity.nearby_tracker.NearbyEntityListenerProvider;
+import com.abdelaziz.canary.common.util.tuples.Range6Int;
+import com.abdelaziz.canary.mixin.util.accessors.PersistentEntitySectionManagerAccessor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.world.entity.Entity;
@@ -28,26 +30,8 @@ public class PersistentEntitySectionManagerCallbackMixin<T extends EntityAccess>
     @Final
     private T entity;
 
-    //@Shadow
-    //private EntitySection<T> currentSection;
-
     @Shadow
     private long currentSectionKey;
-
-    /*private int notificationMask;
-
-    @Inject(method = "<init>", at = @At("RETURN"))
-    private void init(PersistentEntitySectionManager<?> outer, T entityLike, long l, EntitySection<T> entityTrackingSection, CallbackInfo ci) {
-        this.notificationMask = MovementTrackerHelper.getNotificationMask(this.entity.getClass());
-
-        //Fix #284 Summoned inventory minecarts do not immediately notify hoppers of their presence when created using summon command
-        this.notifyMovementListeners();
-    }
-
-    @Inject(method = "onMove()V", at = @At("RETURN"))
-    private void updateMovementTrackerHelper(CallbackInfo ci) {
-        this.notifyMovementListeners();
-    } */
 
     @Inject(
             method = "onMove()V",
@@ -61,14 +45,16 @@ public class PersistentEntitySectionManagerCallbackMixin<T extends EntityAccess>
     private void onAddEntity(CallbackInfo ci, BlockPos blockPos, long newPos, Visibility entityTrackingStatus, EntitySection<T> entityTrackingSection) {
         NearbyEntityListenerMulti listener = ((NearbyEntityListenerProvider) this.entity).getListener();
         if (listener != null) {
+            Range6Int chunkRange = listener.getChunkRange();
+
             //noinspection unchecked
-            listener.forEachChunkInRangeChange(
-                    ((PersistentEntitySectionManagerAccessor<T>) this.this$0).getSectionStorage(),
+            listener.updateChunkRegistrations(
+                    ((PersistentEntitySectionManagerAccessor<T>)this.this$0).getSectionStorage(),
                     SectionPos.of(this.currentSectionKey),
-                    SectionPos.of(newPos)
+                    chunkRange,
+                    SectionPos.of(newPos), chunkRange
             );
         }
-        //this.notifyMovementListeners();
     }
 
     @Inject(
@@ -80,26 +66,12 @@ public class PersistentEntitySectionManagerCallbackMixin<T extends EntityAccess>
     private void onRemoveEntity(Entity.RemovalReason reason, CallbackInfo ci) {
         NearbyEntityListenerMulti listener = ((NearbyEntityListenerProvider) this.entity).getListener();
         if (listener != null) {
+
             //noinspection unchecked
-            listener.forEachChunkInRangeChange(
+            listener.removeFromAllChunksInRange(
                     ((PersistentEntitySectionManagerAccessor<T>) this.this$0).getSectionStorage(),
-                    SectionPos.of(this.currentSectionKey),
-                    null
+                    SectionPos.of(this.currentSectionKey)
             );
         }
-        /* this.notifyMovementListeners();
-    }
-
-    private void notifyMovementListeners() {
-        if (this.notificationMask != 0) {
-            ((EntityTrackerSection) this.currentSection).trackEntityMovement(this.notificationMask, ((Entity) this.entity).getCommandSenderWorld().getGameTime());
-        }
-    }
-
-    @Override
-    public int setNotificationMask(int notificationMask) {
-        int oldNotificationMask = this.notificationMask;
-        this.notificationMask = notificationMask;
-        return oldNotificationMask; */
     }
 }

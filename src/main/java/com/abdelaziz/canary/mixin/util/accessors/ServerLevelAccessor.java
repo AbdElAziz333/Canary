@@ -1,4 +1,4 @@
-package com.abdelaziz.canary.mixin.ai.nearby_entity_tracking;
+package com.abdelaziz.canary.mixin.util.accessors;
 
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;

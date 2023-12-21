@@ -2,12 +2,14 @@ package com.abdelaziz.canary.common.entity.pushable;
 
 import com.abdelaziz.canary.common.entity.EntityClassGroup;
 import com.abdelaziz.canary.common.reflection.ReflectionUtil;
+import cpw.mods.modlauncher.api.INameMappingService;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ambient.Bat;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 
 public class PushableEntityClassGroup {
 
@@ -27,8 +29,8 @@ public class PushableEntityClassGroup {
     public static final EntityClassGroup MAYBE_PUSHABLE;
 
     static {
-        String remapped_isClimbing = "m_6147_";
-        String remapped_isPushable = "m_6094_";
+        String remapped_isClimbing = ObfuscationReflectionHelper.remapName(INameMappingService.Domain.METHOD, "m_6147_");
+        String remapped_isPushable = ObfuscationReflectionHelper.remapName(INameMappingService.Domain.METHOD, "m_6094_");
         CACHABLE_UNPUSHABILITY = new EntityClassGroup(
                 (Class<?> entityClass) -> {
                     if (LivingEntity.class.isAssignableFrom(entityClass) && !Player.class.isAssignableFrom(entityClass)) {

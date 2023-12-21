@@ -12,6 +12,7 @@ public record SleepUntilTimeBlockEntityTickInvoker(BlockEntity sleepingBlockEnti
     public void tick() {
         //noinspection ConstantConditions
         long tickTime = this.sleepingBlockEntity.getLevel().getGameTime();
+
         if (tickTime >= this.sleepUntilTickExclusive) {
             ((SleepingBlockEntity) this.sleepingBlockEntity).setTicker(this.delegate);
             this.delegate.tick();

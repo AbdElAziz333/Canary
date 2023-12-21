@@ -17,7 +17,10 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 public class LevelChunkMixin {
 
     @Inject(
-            method = "m_187960_",//lambda$updateBlockEntityTicker$7 - m_187960_
+            method = {
+                    "m_187960_",
+                    "lambda$updateBlockEntityTicker$7"
+            },
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addBlockEntityTicker(Lnet/minecraft/world/level/block/entity/TickingBlockEntity;)V"),
             locals = LocalCapture.CAPTURE_FAILHARD
     )
@@ -28,7 +31,10 @@ public class LevelChunkMixin {
     }
 
     @Inject(
-            method = "m_187960_",
+            method = {
+                    "m_187960_",
+                    "lambda$updateBlockEntityTicker$7"
+            },
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/chunk/LevelChunk$RebindableTickingBlockEntityWrapper;rebind(Lnet/minecraft/world/level/block/entity/TickingBlockEntity;)V"),
             locals = LocalCapture.CAPTURE_FAILHARD
     )

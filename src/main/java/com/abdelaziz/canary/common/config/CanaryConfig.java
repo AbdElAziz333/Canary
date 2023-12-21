@@ -1,5 +1,6 @@
 package com.abdelaziz.canary.common.config;
 
+import com.abdelaziz.canary.common.compat.WorldEditCompat;
 import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
 import net.minecraftforge.fml.loading.LoadingModList;
 import net.minecraftforge.fml.loading.moddiscovery.ModInfo;
@@ -24,6 +25,13 @@ public class CanaryConfig {
     private final Map<String, Option> options = new HashMap<>();
     private final Set<Option> optionsWithDependencies = new ObjectLinkedOpenHashSet<>();
 
+    private void applyCanaryCompat() {
+        Option option = this.options.get("mixin.block.hopper.worldedit_compat");
+        if (!option.isEnabled() && WorldEditCompat.WORLD_EDIT_PRESENT) {
+            option.addModOverride(true, "lithium-fabric");
+        }
+    }
+
     private CanaryConfig() {
         // Defines the default rules which can be configured by the user or other mods.
         // You must manually add a rule for any new mixins not covered by an existing package rule.
@@ -39,6 +47,7 @@ public class CanaryConfig {
         this.addMixinRule("ai.sensor", true);
         this.addMixinRule("ai.sensor.secondary_poi", true);
         this.addMixinRule("ai.task", true);
+        this.addMixinRule("ai.task.goat_jump", true);
         this.addMixinRule("ai.task.launch", true);
         this.addMixinRule("ai.task.memory_change_counting", true);
         this.addMixinRule("ai.task.replace_streams", true);
@@ -68,7 +77,6 @@ public class CanaryConfig {
         this.addMixinRule("cached_hashcode", true);
 
         this.addMixinRule("chunk", true);
-        this.addMixinRule("chunk.block_counting", true);
         this.addMixinRule("chunk.entity_class_groups", true);
         this.addMixinRule("chunk.no_locking", true);
         this.addMixinRule("chunk.no_validation", true);
@@ -77,11 +85,11 @@ public class CanaryConfig {
 
         this.addMixinRule("collections", true);
         this.addMixinRule("collections.attributes", true);
-        this.addMixinRule("collections.block_entity_tickers", true);
         this.addMixinRule("collections.brain", true);
         this.addMixinRule("collections.entity_by_type", true);
         this.addMixinRule("collections.entity_filtering", true);
         this.addMixinRule("collections.entity_ticking", true);
+        this.addMixinRule("collections.fluid_submersion", true);
         this.addMixinRule("collections.gamerules", true);
         this.addMixinRule("collections.goals", true);
         this.addMixinRule("collections.mob_spawning", true);
@@ -99,6 +107,7 @@ public class CanaryConfig {
         this.addMixinRule("entity.fast_hand_swing", true);
         this.addMixinRule("entity.fast_powder_snow_check", true);
         this.addMixinRule("entity.fast_retrieval", true);
+        this.addMixinRule("entity.hopper_minecart", true);
         this.addMixinRule("entity.inactive_navigations", true);
         this.addMixinRule("entity.replace_entitytype_predicates", true);
         this.addMixinRule("entity.skip_equipment_change_check", true);
@@ -126,16 +135,17 @@ public class CanaryConfig {
         this.addMixinRule("shapes.specialized_shapes", true);
 
         this.addMixinRule("util", true);
+        this.addMixinRule("util.accessors", true);
         this.addMixinRule("util.block_entity_retrieval", true);
         this.addMixinRule("util.block_tracking", true);
+        this.addMixinRule("util.chunk_access", true);
         this.addMixinRule("util.entity_movement_tracking", true);
         this.addMixinRule("util.entity_section_position", true);
-        this.addMixinRule("util.world_border_listener", true);
         this.addMixinRule("util.inventory_change_listening", true);
         this.addMixinRule("util.inventory_comparator_tracking", true);
+        this.addMixinRule("util.world_border_listener", true);
 
         this.addMixinRule("world", true);
-        this.addMixinRule("world.block_entity_retrieval", true);
         this.addMixinRule("world.block_entity_ticking", true);
         this.addMixinRule("world.block_entity_ticking.sleeping", true);
         this.addMixinRule("world.block_entity_ticking.sleeping.brewing_stand", true);
@@ -147,18 +157,16 @@ public class CanaryConfig {
         this.addMixinRule("world.block_entity_ticking.world_border", true);
         this.addMixinRule("world.chunk_access", true);
         this.addMixinRule("world.chunk_tickets", true);
+        this.addMixinRule("world.chunk_ticking", true);
         this.addMixinRule("world.combined_heightmap_update", true);
         this.addMixinRule("world.explosions", true);
         this.addMixinRule("world.inline_block_access", true);
         this.addMixinRule("world.inline_height", true);
-        this.addMixinRule("world.player_chunk_tick", true);
         this.addMixinRule("world.tick_scheduler", true);
 
-        this.addRuleDependency("ai.nearby_entity_tracking", "util", true);
+        this.addRuleDependency("ai.nearby_entity_tracking", "util.accessors", true);
         this.addRuleDependency("ai.nearby_entity_tracking", "util.entity_section_position", true);
-        this.addRuleDependency("block.hopper", "util", true);
         this.addRuleDependency("block.hopper", "util.entity_movement_tracking", true);
-        this.addRuleDependency("block.hopper", "world", true);
         this.addRuleDependency("block.hopper", "util.block_entity_retrieval", true);
         this.addRuleDependency("block.hopper", "util.inventory_change_listening", true);
         this.addRuleDependency("util.inventory_comparator_tracking", "util.block_entity_retrieval", true);
@@ -193,6 +201,7 @@ public class CanaryConfig {
             }
         }
 
+        config.applyCanaryCompat();
         config.applyModOverrides();
 
         // Check dependencies several times, because one iteration may disable a rule required by another rule

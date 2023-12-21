@@ -29,11 +29,11 @@ public abstract class LevelMixin implements LevelAccessor {
         // If no blocks were collided with, try to check for entity collisions if we can read entities
         if (ret && this instanceof EntityGetter) {
             //needs to include world border collision
-            ret = !CanaryEntityCollisions.doesBoxCollideWithHardEntities((EntityGetter) this, entity, box);
+            ret = !CanaryEntityCollisions.doesBoxCollideWithHardEntities(this, entity, box);
         }
 
         if (ret && entity != null) {
-            ret = !CanaryEntityCollisions.doesEntityCollideWithWorldBorder((CollisionGetter) this, entity);
+            ret = !CanaryEntityCollisions.doesEntityCollideWithWorldBorder(this, entity);
         }
         return ret;
     }

@@ -60,6 +60,7 @@ public class EntityMixin {
         double velZ = movement.z;
         boolean isVerticalOnly = velX == 0 && velZ == 0;
         AABB movementSpace;
+
         if (isVerticalOnly) {
             if (velY < 0) {
                 //Check block directly below center of entity first

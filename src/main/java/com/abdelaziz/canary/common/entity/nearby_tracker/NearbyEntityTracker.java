@@ -19,16 +19,17 @@ import java.util.List;
  */
 public class NearbyEntityTracker<T extends LivingEntity> implements NearbyEntityListener {
     private final Class<T> clazz;
-    private final LivingEntity self;
+    private final LivingEntity entity;
 
     private final Reference2LongOpenHashMap<T> nearbyEntities = new Reference2LongOpenHashMap<>(0);
     private long counter;
     private final Range6Int chunkBoxRadius;
 
-    public NearbyEntityTracker(Class<T> clazz, LivingEntity self, Vec3i boxRadius) {
+    public NearbyEntityTracker(Class<T> clazz, LivingEntity entity, Vec3i boxRadius) {
         this.clazz = clazz;
-        this.self = self;
+        this.entity = entity;
         this.chunkBoxRadius = new Range6Int(
+                //TODO: lithium needs to be seen
                 1 + SectionPos.blockToSectionCoord(boxRadius.getX()),
                 1 + SectionPos.blockToSectionCoord(boxRadius.getY()),
                 1 + SectionPos.blockToSectionCoord(boxRadius.getZ()),
@@ -88,7 +89,7 @@ public class NearbyEntityTracker<T extends LivingEntity> implements NearbyEntity
             if (
                     (box == null || box.intersects(entity.getBoundingBox())) &&
                             (distance = entity.distanceToSqr(x, y, z)) <= nearestDistance &&
-                            targetPredicate.test(this.self, entity)
+                            targetPredicate.test(this.entity, entity)
             ) {
                 if (distance == nearestDistance) {
                     nearest = this.getFirst(nearest, entity);
@@ -111,7 +112,7 @@ public class NearbyEntityTracker<T extends LivingEntity> implements NearbyEntity
     private T getFirst(T entity1, T entity2) {
         if (this.getEntityClass() == Player.class) {
             //Get first in player list
-            List<? extends Player> players = this.self.getCommandSenderWorld().players();
+            List<? extends Player> players = this.entity.getCommandSenderWorld().players();
             return players.indexOf((Player) entity1) < players.indexOf((Player) entity2) ? entity1 : entity2;
         } else {
             //Get first sorted by chunk section pos as long, then sorted by first added to the chunk section
@@ -136,6 +137,10 @@ public class NearbyEntityTracker<T extends LivingEntity> implements NearbyEntity
 
     @Override
     public String toString() {
-        return super.toString() + " for entity class: " + this.clazz.getName() + ", around entity: " + this.self.toString() + " with NBT: " + this.self.saveWithoutId(new CompoundTag());
+        return super.toString() + " for entity class: " + this.clazz.getName() + ", around entity: " + this.entity.toString() + " with NBT: " + this.entity.saveWithoutId(new CompoundTag());
+    }
+
+    LivingEntity getEntity() {
+        return entity;
     }
 }

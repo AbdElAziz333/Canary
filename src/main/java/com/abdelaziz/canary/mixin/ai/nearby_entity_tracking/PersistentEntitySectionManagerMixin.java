@@ -30,9 +30,8 @@ public abstract class PersistentEntitySectionManagerMixin<T extends EntityAccess
     private void onAddEntity(T entity, boolean existing, CallbackInfoReturnable<Boolean> cir) {
         NearbyEntityListenerMulti listener = ((NearbyEntityListenerProvider) entity).getListener();
         if (listener != null) {
-            listener.forEachChunkInRangeChange(
+            listener.addToAllChunksInRange(
                     this.sectionStorage,
-                    null,
                     SectionPos.of(entity.blockPosition())
             );
         }

@@ -1,7 +1,13 @@
 package com.abdelaziz.canary.common.entity.nearby_tracker;
 
 import com.abdelaziz.canary.common.util.tuples.Range6Int;
+import com.abdelaziz.canary.mixin.util.accessors.PersistentEntitySectionManagerAccessor;
+import com.abdelaziz.canary.mixin.util.accessors.ServerLevelAccessor;
+import net.minecraft.core.SectionPos;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.entity.EntityAccess;
+import net.minecraft.world.level.entity.EntitySectionStorage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,16 +20,30 @@ public class NearbyEntityListenerMulti implements NearbyEntityListener {
     private final List<NearbyEntityListener> listeners = new ArrayList<>(4);
     private Range6Int range = null;
 
-    public void addListener(NearbyEntityListener listener) {
-        if (this.range != null) {
-            //throw new IllegalStateException("Cannot add sublisteners after listening range was set!");
-            return;
-        }
-        this.listeners.add(listener);
+    public <T extends LivingEntity> void addListener(NearbyEntityTracker<T> tracker) {
+        this.listeners.add(tracker);
+        this.updateRange(tracker);
     }
 
-    public void removeListener(NearbyEntityListener listener) {
-        this.listeners.remove(listener);
+    public <T extends LivingEntity> void removeListener(NearbyEntityTracker<T> tracker) {
+        this.listeners.remove(tracker);
+        this.updateRange(tracker);
+    }
+
+    private <S extends EntityAccess, T extends LivingEntity> void updateRange(NearbyEntityTracker<T> tracker) {
+        if (this.range == null) {
+            return;
+        }
+
+        Range6Int updatedRange = this.calculateRange();
+        if (!this.range.equals(updatedRange)) {
+            this.range = updatedRange;
+
+            //noinspection unchecked
+            EntitySectionStorage<S> entityCache = ((PersistentEntitySectionManagerAccessor<S>)((ServerLevelAccessor) tracker.getEntity().getLevel()).getEntityManager()).getSectionStorage();
+            SectionPos chunkPos = SectionPos.of(tracker.getEntity().blockPosition());
+            this.updateChunkRegistrations(entityCache, chunkPos, this.range, chunkPos, updatedRange);
+        }
     }
 
     @Override
@@ -31,6 +51,7 @@ public class NearbyEntityListenerMulti implements NearbyEntityListener {
         if (this.range != null) {
             return this.range;
         }
+
         return this.calculateRange();
     }
 
