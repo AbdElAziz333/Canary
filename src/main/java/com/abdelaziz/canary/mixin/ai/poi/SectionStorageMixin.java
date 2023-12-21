@@ -9,6 +9,7 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import com.abdelaziz.canary.common.util.Pos;
 import com.abdelaziz.canary.common.util.collections.ListeningLong2ObjectOpenHashMap;
 import com.abdelaziz.canary.common.world.interests.RegionBasedStorageSectionExtended;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.SectionPos;
 import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.level.ChunkPos;
@@ -48,7 +49,7 @@ public abstract class SectionStorageMixin<R> implements RegionBasedStorageSectio
     protected abstract void readColumn(ChunkPos pos);
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void init(Path path, Function<Runnable, Codec<R>> codecFactory, Function<Runnable, R> factory, DataFixer dataFixer, DataFixTypes dataFixTypes, boolean dsync, LevelHeightAccessor world, CallbackInfo ci) {
+    private void init(Path p_223509_, Function p_223510_, Function p_223511_, DataFixer p_223512_, DataFixTypes p_223513_, boolean p_223514_, RegistryAccess p_223515_, LevelHeightAccessor p_223516_, CallbackInfo ci) {
         this.columns = new Long2ObjectOpenHashMap<>();
         this.storage = new ListeningLong2ObjectOpenHashMap<>(this::onEntryAdded, this::onEntryRemoved);
     }

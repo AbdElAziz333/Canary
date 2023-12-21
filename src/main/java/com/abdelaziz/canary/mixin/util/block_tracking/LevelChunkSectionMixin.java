@@ -108,13 +108,25 @@ public abstract class LevelChunkSectionMixin implements BlockCountingSection, Bl
         int prevFlags = ((BlockStateFlagHolder) oldState).getAllFlags();
         int flags = ((BlockStateFlagHolder) newState).getAllFlags();
 
-        //no need to update indices that did not change
         int flagsXOR = prevFlags ^ flags;
-        int i;
-        while ((i = Integer.numberOfTrailingZeros(flagsXOR)) < 32) {
+        //we need to iterate over indices that changed or are in the listeningMask
+        //Some Listening Flags are sensitive to both the previous and the new block. Others are only sensitive to
+        //blocks that are different according to the predicate (XOR). For XOR, the block counting needs to be updated
+        //as well.
+        int iterateFlags = (~BlockStateFlags.LISTENING_MASK_OR & flagsXOR) |
+                (BlockStateFlags.LISTENING_MASK_OR & this.listeningMask & (prevFlags | flags));
+        int flagIndex;
+
+        while ((flagIndex = Integer.numberOfTrailingZeros(iterateFlags)) < 32 && flagIndex < countsByFlag.length) {
+            int flagBit = 1 << flagIndex;
             //either count up by one (prevFlag not set) or down by one (prevFlag set)
-            countsByFlag[i] += 1 - (((prevFlags >>> i) & 1) << 1);
-            flagsXOR &= ~(1 << i);
+            if ((flagsXOR & flagBit) != 0) {
+                countsByFlag[flagIndex] += 1 - (((prevFlags >>> flagIndex) & 1) << 1);
+            }
+            if ((this.listeningMask & flagBit) != 0) {
+                this.listeningMask = this.changeListener.onBlockChange(flagIndex, this);
+            }
+            iterateFlags &= ~flagBit;
         }
     }
 

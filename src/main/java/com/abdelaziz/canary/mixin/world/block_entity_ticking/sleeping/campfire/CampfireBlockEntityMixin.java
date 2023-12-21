@@ -4,6 +4,7 @@ import com.abdelaziz.canary.common.block.entity.SleepingBlockEntity;
 import com.abdelaziz.canary.mixin.world.block_entity_ticking.sleeping.RebindableTickingBlockEntityWrapperAccessor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -54,7 +55,7 @@ public class CampfireBlockEntityMixin extends BlockEntity implements SleepingBlo
             method = "placeFood",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/core/NonNullList;set(ILjava/lang/Object;)Ljava/lang/Object;")
     )
-    private void wakeUpOnAddItem(ItemStack stack, int cookTime, CallbackInfoReturnable<Boolean> cir) {
+    private void wakeUpOnAddItem(Entity p_238285_, ItemStack p_238286_, int p_238287_, CallbackInfoReturnable<Boolean> cir) {
         this.wakeUpNow();
     }
 
