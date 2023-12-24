@@ -136,7 +136,7 @@ public class CanaryConfig {
         this.addMixinRule("util", true);
         this.addMixinRule("util.accessors", true);
         this.addMixinRule("util.block_entity_retrieval", true);
-        this.addMixinRule("util.block_tracking", true);
+        this.addMixinRule("util.block_tracking", false);
         this.addMixinRule("util.chunk_access", true);
         this.addMixinRule("util.entity_movement_tracking", true);
         this.addMixinRule("util.entity_section_position", true);
