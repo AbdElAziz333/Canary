@@ -3,22 +3,21 @@ package com.abdelaziz.canary.common.world.listeners;
 import net.minecraft.world.level.border.BorderChangeListener;
 import net.minecraft.world.level.border.WorldBorder;
 
-import java.util.ArrayList;
+import java.util.WeakHashMap;
 
 public class WorldBorderListenerOnceMulti implements BorderChangeListener {
-
-    private final ArrayList<WorldBorderListenerOnce> delegate;
+    private final WeakHashMap<WorldBorderListenerOnce, Object> delegate;
 
     public WorldBorderListenerOnceMulti() {
-        this.delegate = new ArrayList<>();
+        this.delegate = new WeakHashMap<>();
     }
 
     public void add(WorldBorderListenerOnce listener) {
-        this.delegate.add(listener);
+        this.delegate.put(listener, null);
     }
 
     public void onAreaReplaced(WorldBorder border) {
-        for (WorldBorderListenerOnce listener : this.delegate) {
+        for (WorldBorderListenerOnce listener : this.delegate.keySet()) {
             listener.onAreaReplaced(border);
         }
         this.delegate.clear();
@@ -26,7 +25,7 @@ public class WorldBorderListenerOnceMulti implements BorderChangeListener {
 
     @Override
     public void onBorderSizeSet(WorldBorder border, double size) {
-        for (WorldBorderListenerOnce listener : this.delegate) {
+        for (WorldBorderListenerOnce listener : this.delegate.keySet()) {
             listener.onBorderSizeSet(border, size);
         }
         this.delegate.clear();
@@ -34,7 +33,7 @@ public class WorldBorderListenerOnceMulti implements BorderChangeListener {
 
     @Override
     public void onBorderSizeLerping(WorldBorder border, double fromSize, double toSize, long time) {
-        for (WorldBorderListenerOnce listener : this.delegate) {
+        for (WorldBorderListenerOnce listener : this.delegate.keySet()) {
             listener.onBorderSizeLerping(border, fromSize, toSize, time);
         }
         this.delegate.clear();
@@ -42,7 +41,7 @@ public class WorldBorderListenerOnceMulti implements BorderChangeListener {
 
     @Override
     public void onBorderCenterSet(WorldBorder border, double centerX, double centerZ) {
-        for (WorldBorderListenerOnce listener : this.delegate) {
+        for (WorldBorderListenerOnce listener : this.delegate.keySet()) {
             listener.onBorderCenterSet(border, centerX, centerZ);
         }
         this.delegate.clear();
@@ -50,7 +49,7 @@ public class WorldBorderListenerOnceMulti implements BorderChangeListener {
 
     @Override
     public void onBorderSetWarningTime(WorldBorder border, int warningTime) {
-        for (WorldBorderListenerOnce listener : this.delegate) {
+        for (WorldBorderListenerOnce listener : this.delegate.keySet()) {
             listener.onBorderSetWarningTime(border, warningTime);
         }
         this.delegate.clear();
@@ -58,7 +57,7 @@ public class WorldBorderListenerOnceMulti implements BorderChangeListener {
 
     @Override
     public void onBorderSetWarningBlocks(WorldBorder border, int warningBlockDistance) {
-        for (WorldBorderListenerOnce listener : this.delegate) {
+        for (WorldBorderListenerOnce listener : this.delegate.keySet()) {
             listener.onBorderSetWarningBlocks(border, warningBlockDistance);
         }
         this.delegate.clear();
@@ -66,7 +65,7 @@ public class WorldBorderListenerOnceMulti implements BorderChangeListener {
 
     @Override
     public void onBorderSetDamagePerBlock(WorldBorder border, double damagePerBlock) {
-        for (WorldBorderListenerOnce listener : this.delegate) {
+        for (WorldBorderListenerOnce listener : this.delegate.keySet()) {
             listener.onBorderSetDamagePerBlock(border, damagePerBlock);
         }
         this.delegate.clear();
@@ -74,7 +73,7 @@ public class WorldBorderListenerOnceMulti implements BorderChangeListener {
 
     @Override
     public void onBorderSetDamageSafeZOne(WorldBorder border, double safeZoneRadius) {
-        for (WorldBorderListenerOnce listener : this.delegate) {
+        for (WorldBorderListenerOnce listener : this.delegate.keySet()) {
             listener.onBorderSetDamageSafeZOne(border, safeZoneRadius);
         }
         this.delegate.clear();

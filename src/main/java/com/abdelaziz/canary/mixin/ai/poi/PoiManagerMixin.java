@@ -40,7 +40,7 @@ import java.util.stream.StreamSupport;
 
 @Mixin(PoiManager.class)
 public abstract class PoiManagerMixin extends SectionStorage<PoiSection>
-        implements PointOfInterestStorageExtended, PoiTypeHelper.EnabledMarker {
+        implements PointOfInterestStorageExtended {
 
     public PoiManagerMixin(Path path, Function<Runnable, Codec<PoiSection>> codecFactory, Function<Runnable, PoiSection> factory, DataFixer dataFixer, DataFixTypes dataFixTypes, boolean dsync, RegistryAccess registry, LevelHeightAccessor world) {
         super(path, codecFactory, factory, dataFixer, dataFixTypes, dsync, registry, world);

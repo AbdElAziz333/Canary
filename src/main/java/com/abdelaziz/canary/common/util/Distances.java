@@ -1,13 +1,14 @@
 package com.abdelaziz.canary.common.util;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.SectionPos;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 
 public class Distances {
 
     public static double getMinChunkToBlockDistanceL2Sq(BlockPos origin, int chunkX, int chunkZ) {
-        int chunkMinX = LevelChunkSection.getBottomBlockY(chunkX);
-        int chunkMinZ = LevelChunkSection.getBottomBlockY(chunkZ);
+        int chunkMinX = SectionPos.sectionToBlockCoord(chunkX);
+        int chunkMinZ = SectionPos.sectionToBlockCoord(chunkZ);
 
         int xDistance = origin.getX() - chunkMinX;
         if (xDistance > 0) {
