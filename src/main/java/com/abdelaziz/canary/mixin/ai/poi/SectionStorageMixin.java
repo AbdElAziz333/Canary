@@ -31,6 +31,8 @@ import java.util.stream.Stream;
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType") // We don't get a choice, this is Minecraft's doing!
 @Mixin(SectionStorage.class)
 public abstract class SectionStorageMixin<R> implements RegionBasedStorageSectionExtended<R> {
+    private Long2ObjectOpenHashMap<RegionBasedStorageColumn> columns;
+
     @Shadow
     @Final
     protected LevelHeightAccessor levelHeightAccessor;
@@ -42,8 +44,6 @@ public abstract class SectionStorageMixin<R> implements RegionBasedStorageSectio
 
     @Shadow
     protected abstract Optional<R> get(long pos);
-
-    private Long2ObjectOpenHashMap<RegionBasedStorageColumn> columns;
 
     @Shadow
     protected abstract void readColumn(ChunkPos pos);

@@ -116,8 +116,6 @@ public class CanaryConfig {
         this.addMixinRule("gen.cached_generator_settings", false);
         this.addMixinRule("gen.chunk_region", true);
 
-        this.addMixinRule("item", true);
-
         this.addMixinRule("math", true);
         this.addMixinRule("math.fast_blockpos", true);
         this.addMixinRule("math.fast_util", true);
