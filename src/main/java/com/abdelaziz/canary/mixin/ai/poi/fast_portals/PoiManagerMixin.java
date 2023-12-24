@@ -1,7 +1,6 @@
 package com.abdelaziz.canary.mixin.ai.poi.fast_portals;
 
 import com.mojang.datafixers.DataFixer;
-import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
@@ -34,8 +33,8 @@ public abstract class PoiManagerMixin extends SectionStorage<PoiSection> {
 
     private int preloadRadius = 0;
 
-    public PoiManagerMixin(Path p_196968_, Function<Runnable, Codec<PoiSection>> p_196969_, Function<Runnable, PoiSection> p_196970_, DataFixer p_196971_, DataFixTypes p_196972_, boolean p_196973_, LevelHeightAccessor p_196974_) {
-        super(p_196968_, p_196969_, p_196970_, p_196971_, p_196972_, p_196973_, p_196974_);
+    public PoiManagerMixin(Path path, Function<Runnable, Codec<PoiSection>> codecFactory, Function<Runnable, PoiSection> factory, DataFixer dataFixer, DataFixTypes dataFixTypes, boolean dsync, LevelHeightAccessor world) {
+        super(path, codecFactory, factory, dataFixer, dataFixTypes, dsync, world);
     }
 
     /**
@@ -84,7 +83,7 @@ public abstract class PoiManagerMixin extends SectionStorage<PoiSection> {
         if (this.loadedChunks.contains(longChunkPos)) return;
 
         for (int y = minSubChunk; y <= maxSubChunk; y++) {
-            Optional<PoiSection> section = this.get(SectionPos.asLong(x, y, z));
+            Optional<PoiSection> section = this.getOrLoad(SectionPos.asLong(x, y, z));
             if (section.isPresent()) {
                 boolean result = section.get().isValid();
                 if (result) {

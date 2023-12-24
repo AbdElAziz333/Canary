@@ -7,7 +7,6 @@ import com.abdelaziz.canary.common.world.interests.RegionBasedStorageSectionExte
 import com.abdelaziz.canary.common.world.interests.iterator.NearbyPointOfInterestStream;
 import com.abdelaziz.canary.common.world.interests.iterator.SinglePointOfInterestTypeFilter;
 import com.abdelaziz.canary.common.world.interests.iterator.SphereChunkOrderedPoiSetSpliterator;
-import com.abdelaziz.canary.common.world.interests.types.PoiTypeHelper;
 import com.mojang.datafixers.DataFixer;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
@@ -38,7 +37,7 @@ import java.util.stream.StreamSupport;
 
 @Mixin(PoiManager.class)
 public abstract class PoiManagerMixin extends SectionStorage<PoiSection>
-        implements PointOfInterestStorageExtended, PoiTypeHelper.EnabledMarker {
+        implements PointOfInterestStorageExtended {
 
     public PoiManagerMixin(Path path, Function<Runnable, Codec<PoiSection>> codecFactory, Function<Runnable, PoiSection> factory, DataFixer dataFixer, DataFixTypes dataFixTypes, boolean dsync, LevelHeightAccessor world) {
         super(path, codecFactory, factory, dataFixer, dataFixTypes, dsync, world);
@@ -71,9 +70,7 @@ public abstract class PoiManagerMixin extends SectionStorage<PoiSection>
                                         Random rand) {
         ArrayList<PoiRecord> list = this.withinSphereChunkSectionSorted(typePredicate, pos, radius, status);
 
-        int size = list.size();
-
-        for (int i = size - 1; i >= 0; i--) {
+        for (int i = list.size() - 1; i >= 0; i--) {
             //shuffle by swapping randomly
             PoiRecord currentPOI = list.set(rand.nextInt(i + 1), list.get(i));
             list.set(i, currentPOI); //Move to the end of the unconsumed part of the list
@@ -165,10 +162,8 @@ public abstract class PoiManagerMixin extends SectionStorage<PoiSection>
                                                                    int radius, PoiManager.Occupancy status) {
         double radiusSq = radius * radius;
 
-
         // noinspection unchecked
         RegionBasedStorageSectionExtended<PoiSection> storage = (RegionBasedStorageSectionExtended<PoiSection>) this;
-
 
         Stream<Stream<PoiSection>> stream = StreamSupport.stream(new SphereChunkOrderedPoiSetSpliterator(radius, origin, storage), false);
 

@@ -5,9 +5,6 @@ import net.minecraft.world.ticks.ScheduledTick;
 
 import java.util.*;
 
-/**
- *
- */
 public class OrderedTickQueue<T> extends AbstractQueue<ScheduledTick<T>> {
     private static final int INITIAL_CAPACITY = 16;
     private static final Comparator<ScheduledTick<?>> COMPARATOR = Comparator.comparingLong(ScheduledTick::subTickOrder);
