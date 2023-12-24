@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 
-@Mod.EventBusSubscriber(modid = Canary.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
+//@Mod.EventBusSubscriber(modid = Canary.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class PoiTypeHelper {
     private static Set<BlockState> TYPES;
 
@@ -24,7 +24,7 @@ public class PoiTypeHelper {
         return section.maybeHas(TYPES::contains);
     }
 
-    @SubscribeEvent
+    //@SubscribeEvent
     public static void setup(FMLCommonSetupEvent ev) {
         if (!EnabledMarker.class.isAssignableFrom(PoiManager.class)) {
             return;
