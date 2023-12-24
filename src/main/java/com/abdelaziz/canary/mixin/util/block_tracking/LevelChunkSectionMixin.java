@@ -153,45 +153,4 @@ public abstract class LevelChunkSectionMixin implements BlockCountingSection, Bl
     public void invalidateSection() {
         //TODO on section unload, unregister all kinds of stuff
     }
-
-    /*private static short[] calculateCanaryCounts(PalettedContainer<BlockState> states) {
-        short[] countsByFlag = new short[BlockStateFlags.NUM_FLAGS];
-        states.count((BlockState state, int count) -> addToFlagCount(countsByFlag, state, count));
-        return countsByFlag;
-    }
-*/
-    /**
-     * Compute the block state counts using a future using a thread pool to avoid lagging the rendering thread.
-     * Before modifying the block data, we join the future or discard it.
-     *
-     * @return Whether the block counts short array is initialized.
-     */
-    /*private boolean tryInitializeCountsByFlag() {
-        Future<short[]> countsByFlagFuture = this.countsByFlagFuture;
-        if (countsByFlagFuture != null && countsByFlagFuture.isDone()) {
-            try {
-                this.countsByFlag = countsByFlagFuture.get();
-                return true;
-            } catch (InterruptedException | ExecutionException | CancellationException e) {
-                this.countsByFlagFuture = null;
-            }
-        }
-
-        if (this.countsByFlagFuture == null) {
-            PalettedContainer<BlockState> states = this.states;
-            this.countsByFlagFuture = CompletableFuture.supplyAsync(() -> calculateCanaryCounts(states));
-        }
-        return false;
-    }
-
-    @Inject(
-            method = "setBlockState(IIILnet/minecraft/world/level/block/state/BlockState;Z)Lnet/minecraft/world/level/block/state/BlockState;",
-            at = @At(value = "HEAD")
-    )
-    private void joinFuture(int x, int y, int z, BlockState state, boolean lock, CallbackInfoReturnable<BlockState> cir) {
-        if (this.countsByFlagFuture != null) {
-            this.countsByFlag = this.countsByFlagFuture.join();
-            this.countsByFlagFuture = null;
-        }
-    }*/
 }

@@ -3,6 +3,7 @@ package com.abdelaziz.canary.mixin.ai.poi.fast_portals;
 import com.mojang.datafixers.DataFixer;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
@@ -29,6 +30,8 @@ public abstract class PoiManagerMixin extends SectionStorage<PoiSection> {
     @Final
     private LongSet loadedChunks;
 
+    private final LongSet preloadedCenterChunks = new LongOpenHashSet();
+
     private int preloadRadius = 0;
 
     public PoiManagerMixin(Path p_196968_, Function<Runnable, Codec<PoiSection>> p_196969_, Function<Runnable, PoiSection> p_196970_, DataFixer p_196971_, DataFixTypes p_196972_, boolean p_196973_, LevelHeightAccessor p_196974_) {
@@ -45,11 +48,15 @@ public abstract class PoiManagerMixin extends SectionStorage<PoiSection> {
     @Overwrite
     public void ensureLoadedAndValid(LevelReader worldView, BlockPos pos, int radius) {
         if (this.preloadRadius != radius) {
-            loadedChunks.clear();
+            //Usually there is only one preload radius per PointOfInterestStorage. Just in case another mod adjusts it dynamically, we avoid
+            //assuming its value.
+            preloadedCenterChunks.clear();
             preloadRadius = radius;
         }
+
         long chunkPos = ChunkPos.asLong(pos);
-        if (this.loadedChunks.contains(chunkPos)) {
+
+        if (this.preloadedCenterChunks.contains(chunkPos)) {
             return;
         }
 
@@ -58,7 +65,7 @@ public abstract class PoiManagerMixin extends SectionStorage<PoiSection> {
         int chunkZ = SectionPos.blockToSectionCoord(pos.getZ());
 
         int chunkRadius = Math.floorDiv(radius, 16);
-        int maxHeight = this.levelHeightAccessor.getMaxBuildHeight() - 1;
+        int maxHeight = this.levelHeightAccessor.getMaxSection() - 1;
         int minHeight = this.levelHeightAccessor.getMinSection();
 
         for (int x = chunkX - chunkRadius, xMax = chunkX + chunkRadius; x <= xMax; x++) {
@@ -67,7 +74,7 @@ public abstract class PoiManagerMixin extends SectionStorage<PoiSection> {
             }
         }
 
-        this.loadedChunks.add(chunkPos);
+        this.preloadedCenterChunks.add(chunkPos);
     }
 
     private void preloadChunkIfAnySubChunkContainsPOI(LevelReader worldView, int x, int z, int minSubChunk, int maxSubChunk) {
