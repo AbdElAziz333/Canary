@@ -1,7 +1,6 @@
 package com.abdelaziz.canary.mixin.ai.poi.fast_portals;
 
 import com.mojang.datafixers.DataFixer;
-import com.mojang.serialization.Codec;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.core.BlockPos;
@@ -22,7 +21,6 @@ import org.spongepowered.asm.mixin.Shadow;
 
 import java.nio.file.Path;
 import java.util.Optional;
-import java.util.function.Function;
 
 @Mixin(PoiManager.class)
 public abstract class PoiManagerMixin extends SectionStorage<PoiSection> {
@@ -34,8 +32,8 @@ public abstract class PoiManagerMixin extends SectionStorage<PoiSection> {
 
     private int preloadRadius = 0;
 
-    public PoiManagerMixin(Path path, Function<Runnable, Codec<PoiSection>> codecFactory, Function<Runnable, PoiSection> factory, DataFixer dataFixer, DataFixTypes dataFixTypes, boolean dsync, RegistryAccess dynamicRegistryManager, LevelHeightAccessor world) {
-        super(path, codecFactory, factory, dataFixer, dataFixTypes, dsync, dynamicRegistryManager, world);
+    public PoiManagerMixin(Path path, DataFixer dataFixer, boolean dsync, RegistryAccess dynamicRegistryManager, LevelHeightAccessor world) {
+        super(path, PoiSection::codec, PoiSection::new, dataFixer, DataFixTypes.POI_CHUNK, dsync, dynamicRegistryManager, world);
     }
 
     /**
@@ -60,7 +58,6 @@ public abstract class PoiManagerMixin extends SectionStorage<PoiSection> {
             return;
         }
 
-        //TODO: needs to be tchecked
         int chunkX = SectionPos.blockToSectionCoord(pos.getX());
         int chunkZ = SectionPos.blockToSectionCoord(pos.getZ());
 
