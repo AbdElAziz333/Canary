@@ -20,6 +20,7 @@
     "ai.pathing.PathNavigationRegionMixin",
     "ai.pathing.WalkNodeEvaluatorMixin",
     "ai.poi.PoiManagerMixin",
+    "ai.poi.PoiSectionMixin",
     "ai.poi.PoiTypeMixin",
     "ai.poi.SectionStorageMixin",
     "ai.poi.fast_portals.PoiManagerMixin",
