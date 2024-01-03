@@ -1,10 +1,10 @@
 package com.abdelaziz.canary.mixin.world.inline_block_access;
 
+import com.abdelaziz.canary.common.util.constants.BlockConstants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelHeightAccessor;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
@@ -16,9 +16,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(Level.class)
 public abstract class LevelMixin implements LevelHeightAccessor {
-    private static final BlockState OUTSIDE_WORLD_BLOCK = Blocks.VOID_AIR.defaultBlockState();
-    private static final BlockState INSIDE_WORLD_DEFAULT_BLOCK = Blocks.AIR.defaultBlockState();
-
     @Shadow
     public abstract LevelChunk getChunk(int i, int j);
 
@@ -36,12 +33,12 @@ public abstract class LevelMixin implements LevelHeightAccessor {
 
         int chunkY = this.getSectionIndex(y);
         if (chunkY < 0 || chunkY >= sections.length) {
-            return OUTSIDE_WORLD_BLOCK;
+            return BlockConstants.VOID_DEFAULT_BLOCKSTATE; //outside world
         }
 
         LevelChunkSection section = sections[chunkY];
         if (section == null || section.hasOnlyAir()) {
-            return INSIDE_WORLD_DEFAULT_BLOCK;
+            return BlockConstants.DEFAULT_BLOCKSTATE; //inside world
         }
         return section.getBlockState(x & 15, y & 15, z & 15);
         //This code path is slower than with the extra world height limit check. Tradeoff in favor of the default path.
