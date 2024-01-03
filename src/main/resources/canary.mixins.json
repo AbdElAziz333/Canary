@@ -179,6 +179,7 @@
     "world.block_entity_ticking.sleeping.LevelChunkMixin",
     "world.block_entity_ticking.sleeping.LevelMixin",
     "world.block_entity_ticking.sleeping.RebindableTickingBlockEntityWrapperAccessor",
+    "world.block_entity_ticking.sleeping.ServerLevelMixin",
     "world.block_entity_ticking.sleeping.brewing_stand.BrewingStandBlockEntityMixin",
     "world.block_entity_ticking.sleeping.campfire.CampfireBlockEntityMixin",
     "world.block_entity_ticking.sleeping.furnace.AbstractFurnaceBlockEntityMixin",
