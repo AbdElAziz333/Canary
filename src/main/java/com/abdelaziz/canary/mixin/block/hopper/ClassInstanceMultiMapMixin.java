@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(value = ClassInstanceMultiMap.class, priority = 1010)
-public class ClassInstanceMultiMapMixin<T> {
+public class ClassInstanceMultiMapMixin {
     //require = 0 due to the overwrite in the other TypeFilterableListMixin
     @Redirect(
             method = "find(Ljava/lang/Class;)Ljava/util/Collection;",

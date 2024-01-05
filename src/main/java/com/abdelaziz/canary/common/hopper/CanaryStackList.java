@@ -2,6 +2,7 @@ package com.abdelaziz.canary.common.hopper;
 
 import com.abdelaziz.canary.api.inventory.CanaryDefaultedList;
 import com.abdelaziz.canary.common.block.entity.inventory_change_tracking.InventoryChangeTracker;
+import com.abdelaziz.canary.common.entity.item.ItemStackSubscriber;
 import com.abdelaziz.canary.mixin.block.hopper.NonNullListAccessor;
 import net.minecraft.core.NonNullList;
 import net.minecraft.util.Mth;
@@ -10,7 +11,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.NotNull;
 
-public class CanaryStackList extends NonNullList<ItemStack> implements CanaryDefaultedList {
+public class CanaryStackList extends NonNullList<ItemStack> implements CanaryDefaultedList, ItemStackSubscriber {
     final int maxCountPerStack;
 
     protected int cachedSignalStrength;
@@ -47,7 +48,7 @@ public class CanaryStackList extends NonNullList<ItemStack> implements CanaryDef
                     this.fullSlots++;
                 }
                 //noinspection ConstantConditions
-                ((StorableItemStack) (Object) stack).registerToInventory(this, i);
+                ((NotifyingItemStack) (Object) stack).canary$subscribeWithIndex(this, i);
             }
         }
 
@@ -82,25 +83,26 @@ public class CanaryStackList extends NonNullList<ItemStack> implements CanaryDef
                     this.fullSlots++;
                 }
                 //noinspection ConstantConditions
-                ((StorableItemStack) (Object) stack).unregisterFromInventory(this);
+                ((NotifyingItemStack) (Object) stack).canary$unsubscribe(this);
             }
         }
         for (int i = 0; i < size; i++) {
             ItemStack stack = this.get(i);
             if (!stack.isEmpty()) {
                 //noinspection ConstantConditions
-                ((StorableItemStack) (Object) stack).registerToInventory(this, i);
+                ((NotifyingItemStack) (Object) stack).canary$subscribeWithIndex(this, i);
             }
         }
 
     }
 
-    public void beforeSlotCountChange(int slot, int newCount) {
+    @Override
+    public void notifyBeforeCountChange(int slot, int newCount) {
         ItemStack stack = this.get(slot);
         int count = stack.getCount();
         if (newCount <= 0) {
             //noinspection ConstantConditions
-            ((StorableItemStack) (Object) stack).unregisterFromInventory(this, slot);
+            ((NotifyingItemStack) (Object) stack).canary$unsubscribeWithIndex(this, slot);
         }
         int maxCount = stack.getMaxStackSize();
         this.occupiedSlots -= newCount <= 0 ? 1 : 0;
@@ -130,10 +132,10 @@ public class CanaryStackList extends NonNullList<ItemStack> implements CanaryDef
         ItemStack previous = super.set(index, element);
         if (previous != element) {
             //noinspection ConstantConditions
-            ((StorableItemStack) (Object) previous).unregisterFromInventory(this, index);
+            ((NotifyingItemStack) (Object) previous).canary$unsubscribeWithIndex(this, index);
             if (!element.isEmpty()) {
                 //noinspection ConstantConditions
-                ((StorableItemStack) (Object) element).registerToInventory(this, index);
+                ((NotifyingItemStack) (Object) element).canary$subscribeWithIndex(this, index);
             }
 
             this.occupiedSlots += (previous.isEmpty() ? 1 : 0) - (element.isEmpty() ? 1 : 0);
@@ -149,7 +151,7 @@ public class CanaryStackList extends NonNullList<ItemStack> implements CanaryDef
         super.add(slot, element);
         if (!element.isEmpty()) {
             //noinspection ConstantConditions
-            ((StorableItemStack) (Object) element).registerToInventory(this, this.indexOf(element));
+            ((NotifyingItemStack) (Object) element).canary$subscribeWithIndex(this, this.indexOf(element));
         }
         this.changedALot();
     }
@@ -158,7 +160,7 @@ public class CanaryStackList extends NonNullList<ItemStack> implements CanaryDef
     public ItemStack remove(int index) {
         ItemStack previous = super.remove(index);
         //noinspection ConstantConditions
-        ((StorableItemStack) (Object) previous).unregisterFromInventory(this, index);
+        ((NotifyingItemStack) (Object) previous).canary$unsubscribeWithIndex(this, index);
         this.changedALot();
         return previous;
     }
@@ -170,7 +172,7 @@ public class CanaryStackList extends NonNullList<ItemStack> implements CanaryDef
             ItemStack stack = this.get(i);
             if (!stack.isEmpty()) {
                 //noinspection ConstantConditions
-                ((StorableItemStack) (Object) stack).unregisterFromInventory(this, i);
+                ((NotifyingItemStack) (Object) stack).canary$unsubscribeWithIndex(this, i);
             }
         }
         super.clear();
