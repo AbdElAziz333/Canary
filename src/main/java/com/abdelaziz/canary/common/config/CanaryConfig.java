@@ -81,6 +81,7 @@ public class CanaryConfig {
         this.addMixinRule("chunk.no_validation", true);
         this.addMixinRule("chunk.palette", true);
         this.addMixinRule("chunk.serialization", true);
+        this.addMixinRule("chunk.replace_streams", true);
 
         this.addMixinRule("collections", true);
         this.addMixinRule("collections.attributes", true);
