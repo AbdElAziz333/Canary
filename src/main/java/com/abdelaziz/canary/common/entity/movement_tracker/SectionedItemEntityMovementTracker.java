@@ -4,7 +4,7 @@ import com.abdelaziz.canary.common.util.collections.BucketedList;
 import com.abdelaziz.canary.common.util.tuples.WorldSectionBox;
 import com.abdelaziz.canary.mixin.util.entity_movement_tracking.PersistentEntitySectionManagerAccessor;
 import com.abdelaziz.canary.mixin.util.entity_movement_tracking.ServerLevelAccessor;
-import com.abdelaziz.canary.mixin.block.hopper.EntitySectionAccessor;
+import com.abdelaziz.canary.mixin.util.accessors.EntitySectionAccessor;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.ClassInstanceMultiMap;
 import net.minecraft.world.entity.Entity;
