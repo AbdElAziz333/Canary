@@ -140,6 +140,7 @@ public class CanaryConfig {
         this.addMixinRule("util.entity_section_position", true);
         this.addMixinRule("util.inventory_change_listening", true);
         this.addMixinRule("util.inventory_comparator_tracking", true);
+        this.addMixinRule("util.item_stack_tracking", true);
         this.addMixinRule("util.world_border_listener", true);
 
         this.addMixinRule("world", true);
