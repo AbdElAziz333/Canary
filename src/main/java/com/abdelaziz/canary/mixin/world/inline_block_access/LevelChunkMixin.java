@@ -1,11 +1,11 @@
 package com.abdelaziz.canary.mixin.world.inline_block_access;
 
+import com.abdelaziz.canary.common.util.constants.BlockConstants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunk;
@@ -13,16 +13,12 @@ import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.UpgradeData;
 import net.minecraft.world.level.levelgen.blending.BlendingData;
 import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.level.material.Fluids;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 
 @Mixin(value = LevelChunk.class, priority = 500)
 public abstract class LevelChunkMixin extends ChunkAccess {
-    private static final BlockState DEFAULT_BLOCK_STATE = Blocks.AIR.defaultBlockState();
-    private static final FluidState DEFAULT_FLUID_STATE = Fluids.EMPTY.defaultFluidState();
-
     public LevelChunkMixin(ChunkPos pos, UpgradeData upgradeData, LevelHeightAccessor heightLimitView, Registry<Biome> biome, long inhabitedTime, @Nullable LevelChunkSection[] sectionArrayInitializer, @Nullable BlendingData blendingData) {
         super(pos, upgradeData, heightLimitView, biome, inhabitedTime, sectionArrayInitializer, blendingData);
     }
@@ -49,7 +45,7 @@ public abstract class LevelChunkMixin extends ChunkAccess {
             }
         }
 
-        return DEFAULT_BLOCK_STATE;
+        return BlockConstants.DEFAULT_BLOCKSTATE;
     }
 
     /**
@@ -65,6 +61,6 @@ public abstract class LevelChunkMixin extends ChunkAccess {
             return section.getFluidState(x & 15, y & 15, z & 15);
         }
 
-        return DEFAULT_FLUID_STATE;
+        return BlockConstants.DEFAULT_FLUIDSTATE;
     }
 }

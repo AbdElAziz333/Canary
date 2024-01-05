@@ -81,6 +81,7 @@ public class CanaryConfig {
         this.addMixinRule("chunk.no_validation", true);
         this.addMixinRule("chunk.palette", true);
         this.addMixinRule("chunk.serialization", true);
+        this.addMixinRule("chunk.replace_streams", true);
 
         this.addMixinRule("collections", true);
         this.addMixinRule("collections.attributes", true);
@@ -142,6 +143,7 @@ public class CanaryConfig {
         this.addMixinRule("util.entity_section_position", true);
         this.addMixinRule("util.inventory_change_listening", true);
         this.addMixinRule("util.inventory_comparator_tracking", true);
+        this.addMixinRule("util.item_stack_tracking", true);
         this.addMixinRule("util.world_border_listener", true);
 
         this.addMixinRule("world", true);
