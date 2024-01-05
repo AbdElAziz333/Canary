@@ -26,6 +26,7 @@ import net.minecraft.world.level.block.entity.Hopper;
 import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.fml.loading.LoadingModList;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Intrinsic;
@@ -106,7 +107,7 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
     protected abstract boolean isOnCooldown();
 
     @Shadow
-    protected static native boolean canTakeItemFromContainer(Container p_273433_, Container p_273542_, ItemStack p_273400_, int p_273519_, Direction p_273088_);
+    private static native boolean canTakeItemFromContainer(Container toInventory, Container fromInventory, ItemStack stack, int slot, Direction facing);
 
     public HopperBlockEntityMixin(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -266,9 +267,13 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
             )
     )
     private static boolean canaryHopperIsFull(HopperBlockEntity hopperBlockEntity) {
-        //noinspection ConstantConditions
-        CanaryStackList canaryStackList = InventoryHelper.getCanaryStackList((HopperBlockEntityMixin) (Object) hopperBlockEntity);
-        return canaryStackList.getFullSlots() == canaryStackList.size();
+        if (FMLLoader.getLoadingModList().getModFileById("easyvillagers") == null) {
+            //noinspection ConstantConditions
+            CanaryStackList canaryStackList = InventoryHelper.getCanaryStackList((HopperBlockEntityMixin) (Object) hopperBlockEntity);
+            return canaryStackList.getFullSlots() == canaryStackList.size();
+        } else {
+            return false;
+        }
     }
 
     @Redirect(
@@ -279,9 +284,13 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
             )
     )
     private static boolean canaryHopperIsEmpty(HopperBlockEntity hopperBlockEntity) {
-        //noinspection ConstantConditions
-        CanaryStackList canaryStackList = InventoryHelper.getCanaryStackList((HopperBlockEntityMixin) (Object) hopperBlockEntity);
-        return canaryStackList.getOccupiedSlots() == 0;
+        if (FMLLoader.getLoadingModList().getModFileById("easyvillagers") == null) {
+            //noinspection ConstantConditions
+            CanaryStackList canaryStackList = InventoryHelper.getCanaryStackList((HopperBlockEntityMixin) (Object) hopperBlockEntity);
+            return canaryStackList.getOccupiedSlots() == 0;
+        } else {
+            return false;
+        }
     }
 
     @Override
@@ -768,7 +777,7 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
         }
     }
 
-    @Inject(
+    /*@Inject(
             method = "pushItemsTick",
             at = @At(
                     value = "INVOKE",
@@ -778,7 +787,7 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
     )
     private static void checkSleepingConditions(Level world, BlockPos pos, BlockState state, HopperBlockEntity blockEntity, CallbackInfo ci) {
         ((HopperBlockEntityMixin) (Object) blockEntity).checkSleepingConditions();
-    }
+    }*/
 
     private void checkSleepingConditions() {
         if (this.isOnCooldown()) {
