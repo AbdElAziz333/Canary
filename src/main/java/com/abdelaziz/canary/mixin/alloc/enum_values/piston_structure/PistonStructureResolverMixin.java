@@ -1,6 +1,6 @@
 package com.abdelaziz.canary.mixin.alloc.enum_values.piston_structure;
 
-import com.abdelaziz.canary.common.util.DirectionConstants;
+import com.abdelaziz.canary.common.util.constants.DirectionConstants;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.piston.PistonStructureResolver;
 import org.spongepowered.asm.mixin.Mixin;

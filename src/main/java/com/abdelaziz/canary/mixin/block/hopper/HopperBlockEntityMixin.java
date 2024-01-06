@@ -57,8 +57,6 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
     //item pickup bounding boxes in order. The last box in the array is the box that encompasses all of the others
     private AABB[] collectItemEntityBoxes;
 
-    @Shadow
-    private long tickedGameTime;
     private long collectItemEntityAttemptTime;
 
     private long myModCountAtLastInsert, myModCountAtLastExtract, myModCountAtLastItemCollect;
@@ -89,6 +87,9 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
     private boolean shouldCheckSleep;
 
     private SectionedInventoryEntityMovementTracker<Container> insertInventoryEntityTracker;
+
+    @Shadow
+    private long tickedGameTime;
 
     @Shadow
     @Nullable
@@ -267,13 +268,9 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
             )
     )
     private static boolean canaryHopperIsFull(HopperBlockEntity hopperBlockEntity) {
-        if (FMLLoader.getLoadingModList().getModFileById("easyvillagers") == null) {
-            //noinspection ConstantConditions
-            CanaryStackList canaryStackList = InventoryHelper.getCanaryStackList((HopperBlockEntityMixin) (Object) hopperBlockEntity);
-            return canaryStackList.getFullSlots() == canaryStackList.size();
-        } else {
-            return false;
-        }
+        //noinspection ConstantConditions
+        CanaryStackList canaryStackList = InventoryHelper.getCanaryStackList((HopperBlockEntityMixin) (Object) hopperBlockEntity);
+        return canaryStackList.getFullSlots() == canaryStackList.size();
     }
 
     @Redirect(
@@ -284,13 +281,9 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
             )
     )
     private static boolean canaryHopperIsEmpty(HopperBlockEntity hopperBlockEntity) {
-        if (FMLLoader.getLoadingModList().getModFileById("easyvillagers") == null) {
-            //noinspection ConstantConditions
-            CanaryStackList canaryStackList = InventoryHelper.getCanaryStackList((HopperBlockEntityMixin) (Object) hopperBlockEntity);
-            return canaryStackList.getOccupiedSlots() == 0;
-        } else {
-            return false;
-        }
+        //noinspection ConstantConditions
+        CanaryStackList canaryStackList = InventoryHelper.getCanaryStackList((HopperBlockEntityMixin) (Object) hopperBlockEntity);
+        return canaryStackList.getOccupiedSlots() == 0;
     }
 
     @Override
@@ -777,7 +770,7 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
         }
     }
 
-    /*@Inject(
+    @Inject(
             method = "pushItemsTick",
             at = @At(
                     value = "INVOKE",
@@ -787,7 +780,7 @@ public abstract class HopperBlockEntityMixin extends BlockEntity implements Hopp
     )
     private static void checkSleepingConditions(Level world, BlockPos pos, BlockState state, HopperBlockEntity blockEntity, CallbackInfo ci) {
         ((HopperBlockEntityMixin) (Object) blockEntity).checkSleepingConditions();
-    }*/
+    }
 
     private void checkSleepingConditions() {
         if (this.isOnCooldown()) {

@@ -1,8 +1,8 @@
 package com.abdelaziz.canary.common.entity.movement_tracker;
 
 import com.abdelaziz.canary.common.util.tuples.WorldSectionBox;
-import com.abdelaziz.canary.mixin.util.entity_movement_tracking.PersistentEntitySectionManagerAccessor;
-import com.abdelaziz.canary.mixin.util.entity_movement_tracking.ServerLevelAccessor;
+import com.abdelaziz.canary.mixin.util.accessors.PersistentEntitySectionManagerAccessor;
+import com.abdelaziz.canary.mixin.util.accessors.ServerLevelAccessor;
 import com.abdelaziz.canary.mixin.util.accessors.EntitySectionAccessor;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.ClassInstanceMultiMap;

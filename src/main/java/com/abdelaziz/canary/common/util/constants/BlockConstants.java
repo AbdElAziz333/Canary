@@ -5,6 +5,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 
+/**
+ * Pre-initialized constants to avoid unnecessary allocations.
+ */
 public interface BlockConstants {
     BlockState DEFAULT_BLOCKSTATE = Blocks.AIR.defaultBlockState();
     BlockState VOID_DEFAULT_BLOCKSTATE = Blocks.VOID_AIR.defaultBlockState();
