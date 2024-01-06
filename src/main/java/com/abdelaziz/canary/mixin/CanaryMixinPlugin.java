@@ -53,6 +53,10 @@ public class CanaryMixinPlugin implements IMixinConfigPlugin {
             return false;
         }
 
+        if (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "block.hopper") && (FMLLoader.getLoadingModList().getModFileById("easyvillagers")) != null) {
+            return false;
+        }
+
         if ((mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "shapes") || (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "math.sine_lut")) || (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "alloc.block_state"))) && !LoadingModList.get().getErrors().isEmpty()) {
             return false;
         }
