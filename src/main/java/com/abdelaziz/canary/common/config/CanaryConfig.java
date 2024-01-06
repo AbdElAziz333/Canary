@@ -83,6 +83,7 @@ public class CanaryConfig {
         this.addMixinRule("chunk.palette", true);
         this.addMixinRule("chunk.serialization", true);
         this.addMixinRule("chunk.replace_streams", true);
+        this.addMixinRule("chunk.replace_streams.servercore_compat", true);
 
         this.addMixinRule("collections", true);
         this.addMixinRule("collections.attributes", true);

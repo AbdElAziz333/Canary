@@ -24,7 +24,6 @@ import java.util.Map;
  */
 @Mixin(CompoundTag.class)
 public class CompoundTagMixin {
-
     @Shadow
     @Final
     private Map<String, Tag> tags;
@@ -62,7 +61,6 @@ public class CompoundTagMixin {
 
     @Mixin(targets = "net.minecraft.nbt.CompoundTag$1")
     static class Type {
-
         @ModifyVariable(
                 method = "load(Ljava/io/DataInput;ILnet/minecraft/nbt/NbtAccounter;)Lnet/minecraft/nbt/CompoundTag;",
                 at = @At(

@@ -1,7 +1,7 @@
 package com.abdelaziz.canary.mixin.block.hopper;
 
 import com.abdelaziz.canary.common.hopper.UpdateReceiver;
-import com.abdelaziz.canary.common.util.DirectionConstants;
+import com.abdelaziz.canary.common.util.constants.DirectionConstants;
 import com.abdelaziz.canary.common.world.WorldHelper;
 import com.abdelaziz.canary.common.world.blockentity.BlockEntityGetter;
 import net.minecraft.core.BlockPos;

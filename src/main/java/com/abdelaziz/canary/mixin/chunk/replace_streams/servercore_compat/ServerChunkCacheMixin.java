@@ -1,4 +1,4 @@
-package com.abdelaziz.canary.mixin.chunk.replace_streams;
+package com.abdelaziz.canary.mixin.chunk.replace_streams.servercore_compat;
 
 import net.minecraft.server.level.ServerChunkCache;
 import org.spongepowered.asm.mixin.Mixin;

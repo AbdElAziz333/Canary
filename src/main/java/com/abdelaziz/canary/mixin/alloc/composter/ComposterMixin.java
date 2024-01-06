@@ -1,6 +1,6 @@
 package com.abdelaziz.canary.mixin.alloc.composter;
 
-import com.abdelaziz.canary.common.util.ArrayConstants;
+import com.abdelaziz.canary.common.util.constants.ArrayConstants;
 import net.minecraft.core.Direction;
 import net.minecraft.world.WorldlyContainer;
 import org.spongepowered.asm.mixin.Mixin;
