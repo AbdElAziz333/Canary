@@ -7,7 +7,7 @@
 ![Github Versions](https://img.shields.io/github/v/tag/AbdElAziz333/Canary)
 [![This is a Fork](https://img.shields.io/badge/This%20is%20port-Support%20the%20original!-darkmagenta)](https://github.com/CaffeineMC/lithium-fabric)
 
-Canary is a general-purpose optimization mod and unofficial fork of the Fabric mod [Lithium](https://github.com/CaffeineMC/lithium-fabric) for Minecraft Forge, This mod aims to optimize the general performance of Minecraft(mob ai, physics, chunk loading, etc..) without changing any behavior. It works on both the **client and server**, and **doesn't require the mod to be installed on both sides**.
+Canary is a general performance optimization mod and unofficial fork of  [Lithium](https://github.com/CaffeineMC/lithium-fabric) mod for Minecraft Forge, This mod aims to optimize the general performance of Minecraft(mob ai, physics, chunk loading, etc..) without changing any behavior. It works on both the **client and server**, and **doesn't require the mod to be installed on both sides**.
 
 # Installation
 
@@ -59,7 +59,7 @@ Canary is impossible without the high-quality contributions made by the original
 
 ### License
 
-Much like Lithium, Canary is licensed under GNU LGPLv3, a free and open-source license. For more information, please see the
+Canary is licensed under GNU LGPLv3, a free and open-source license. For more information, please see the
 [license file](LICENSE.txt).
 
 ### Issues and Feature Requests
