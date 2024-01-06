@@ -1,6 +1,6 @@
 package com.abdelaziz.canary.mixin.block.redstone_wire;
 
-import com.abdelaziz.canary.common.util.DirectionConstants;
+import com.abdelaziz.canary.common.util.constants.DirectionConstants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;

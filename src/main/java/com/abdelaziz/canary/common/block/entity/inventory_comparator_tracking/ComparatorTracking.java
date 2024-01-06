@@ -1,6 +1,6 @@
 package com.abdelaziz.canary.common.block.entity.inventory_comparator_tracking;
 
-import com.abdelaziz.canary.common.util.DirectionConstants;
+import com.abdelaziz.canary.common.util.constants.DirectionConstants;
 import com.abdelaziz.canary.common.world.blockentity.BlockEntityGetter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
