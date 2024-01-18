@@ -149,7 +149,6 @@
     "math.sine_lut.MthMixin",
     "profiler.ServerLevelMixin",
     "shapes.blockstate_cache.BlockMixin",
-    "shapes.lazy_shape_context.EntityCollisionContextMixin",
     "shapes.optimized_matching.ShapesMixin",
     "shapes.precompute_shape_arrays.CubePointRangeMixin",
     "shapes.precompute_shape_arrays.CubeVoxelShapeMixin",
