@@ -42,10 +42,6 @@ public abstract class VoxelShapeMixin {
             return maxDist;
         }
 
-        if (Math.abs(maxDist) < POSITIVE_EPSILON) {
-            return 0.0D;
-        }
-
         AxisCycle cycle = cycleDirection.inverse();
 
         Direction.Axis axisX = cycle.cycle(Direction.Axis.X);
