@@ -44,6 +44,7 @@ public abstract class LevelMixin implements LevelHeightAccessor {
         //This code path is slower than with the extra world height limit check. Tradeoff in favor of the default path.
     }
 
+    /* TODO: what is this?
     @Redirect(
             method = "getFluidState",
             at = @At(
@@ -53,5 +54,5 @@ public abstract class LevelMixin implements LevelHeightAccessor {
     )
     private boolean skipFluidHeightLimitTest(Level world, BlockPos pos) {
         return world.isOutsideBuildHeight(pos);
-    }
+    }*/
 }
