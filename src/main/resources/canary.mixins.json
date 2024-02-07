@@ -30,6 +30,8 @@
     "ai.raid.ObtainRaidLeaderBannerGoalMixin",
     "ai.raid.RaiderMixin",
     "ai.raid.RaidMixin",
+    "ai.replace_streams.storage.PersistentEntitySectionManagerMixin",
+    "ai.replace_streams.storage.TransientEntitySectionManagerMixin",
     "ai.sensor.secondary_poi.SecondaryPoiSensorMixin",
     "ai.task.launch.BrainMixin",
     "ai.task.memory_change_counting.BehaviorMixin",

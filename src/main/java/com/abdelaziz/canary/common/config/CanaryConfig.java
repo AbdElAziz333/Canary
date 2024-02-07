@@ -37,13 +37,15 @@ public class CanaryConfig {
         // You must manually add a rule for any new mixins not covered by an existing package rule.
 
         this.addMixinRule("ai", true);
-        this.addMixinRule("ai.nearby_entity_tracking", true);
+        this.addMixinRule("ai.nearby_entity_tracking", false);
         this.addMixinRule("ai.nearby_entity_tracking.goals", true);
         this.addMixinRule("ai.pathing", true);
         this.addMixinRule("ai.poi", true);
         this.addMixinRule("ai.poi.fast_portals", true);
         this.addMixinRule("ai.poi.tasks", true);
         this.addMixinRule("ai.raid", true);
+        this.addMixinRule("ai.replace_streams", true);
+        this.addMixinRule("ai.replace_streams.storage", true);
         this.addMixinRule("ai.sensor", true);
         this.addMixinRule("ai.sensor.secondary_poi", true);
         this.addMixinRule("ai.task", true);
