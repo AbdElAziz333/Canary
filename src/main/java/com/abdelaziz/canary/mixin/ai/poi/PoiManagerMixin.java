@@ -72,9 +72,7 @@ public abstract class PoiManagerMixin extends SectionStorage<PoiSection>
                                         RandomSource rand) {
         ArrayList<PoiRecord> list = this.withinSphereChunkSectionSorted(typePredicate, pos, radius, status);
 
-        int size = list.size();
-
-        for (int i = size - 1; i >= 0; i--) {
+        for (int i = list.size() - 1; i >= 0; i--) {
             //shuffle by swapping randomly
             PoiRecord currentPOI = list.set(rand.nextInt(i + 1), list.get(i));
             list.set(i, currentPOI); //Move to the end of the unconsumed part of the list
@@ -154,6 +152,7 @@ public abstract class PoiManagerMixin extends SectionStorage<PoiSection>
 
         boolean worldBorderIsFarAway = worldBorder == null || worldBorder.getDistanceToBorder(origin.getX(), origin.getZ()) > radius + 3;
         Predicate<PoiRecord> poiPredicateAfterSorting;
+
         if (worldBorderIsFarAway) {
             poiPredicateAfterSorting = afterSortPredicate;
         } else {
@@ -166,10 +165,8 @@ public abstract class PoiManagerMixin extends SectionStorage<PoiSection>
                                                                    int radius, PoiManager.Occupancy status) {
         double radiusSq = radius * radius;
 
-
         // noinspection unchecked
         RegionBasedStorageSectionExtended<PoiSection> storage = (RegionBasedStorageSectionExtended<PoiSection>) this;
-
 
         Stream<Stream<PoiSection>> stream = StreamSupport.stream(new SphereChunkOrderedPoiSetSpliterator(radius, origin, storage), false);
 
@@ -218,7 +215,6 @@ public abstract class PoiManagerMixin extends SectionStorage<PoiSection>
                                              @Nullable Predicate<PoiRecord> afterSortingPredicate) {
         // noinspection unchecked
         RegionBasedStorageSectionExtended<PoiSection> storage = (RegionBasedStorageSectionExtended<PoiSection>) this;
-
         return StreamSupport.stream(new NearbyPointOfInterestStream(typePredicate, status, useSquareDistanceLimit, preferNegativeY, afterSortingPredicate, origin, radius, storage), false);
     }
 }

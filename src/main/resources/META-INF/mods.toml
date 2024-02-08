@@ -12,6 +12,7 @@ logoFile="logo.png"
 credits="${mod_credits}"
 authors="${mod_authors}"
 displayTest="MATCH_VERSION"
+
 description='''${mod_description}'''
 
 [[dependencies.${mod_id}]]

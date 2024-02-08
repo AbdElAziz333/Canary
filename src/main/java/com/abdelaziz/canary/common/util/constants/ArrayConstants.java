@@ -1,4 +1,4 @@
-package com.abdelaziz.canary.common.util;
+package com.abdelaziz.canary.common.util.constants;
 
 /**
  * Pre-initialized constants to avoid unnecessary allocations.

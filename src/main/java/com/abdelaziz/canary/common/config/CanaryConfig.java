@@ -37,13 +37,15 @@ public class CanaryConfig {
         // You must manually add a rule for any new mixins not covered by an existing package rule.
 
         this.addMixinRule("ai", true);
-        this.addMixinRule("ai.nearby_entity_tracking", true);
+        this.addMixinRule("ai.nearby_entity_tracking", false);
         this.addMixinRule("ai.nearby_entity_tracking.goals", true);
         this.addMixinRule("ai.pathing", true);
         this.addMixinRule("ai.poi", true);
         this.addMixinRule("ai.poi.fast_portals", true);
         this.addMixinRule("ai.poi.tasks", true);
         this.addMixinRule("ai.raid", true);
+        this.addMixinRule("ai.replace_streams", true);
+        this.addMixinRule("ai.replace_streams.storage", true);
         this.addMixinRule("ai.sensor", true);
         this.addMixinRule("ai.sensor.secondary_poi", true);
         this.addMixinRule("ai.task", true);
@@ -55,7 +57,7 @@ public class CanaryConfig {
         this.addMixinRule("alloc.blockstate", true);
         this.addMixinRule("alloc.chunk_random", true);
         this.addMixinRule("alloc.chunk_ticking", true);
-        this.addMixinRule("alloc.composter", true);
+        this.addMixinRule("alloc.composter", false); //duplicated in Saturn
         this.addMixinRule("alloc.deep_passengers", true);
         this.addMixinRule("alloc.entity_tracker", true);
         this.addMixinRule("alloc.enum_values", true);
@@ -68,7 +70,7 @@ public class CanaryConfig {
 
         this.addMixinRule("block", true);
         this.addMixinRule("block.flatten_states", true);
-        this.addMixinRule("block.hopper", true);
+        this.addMixinRule("block.hopper", false);
         this.addMixinRule("block.hopper.world_edit_compat", true);
         this.addMixinRule("block.moving_block_shapes", true);
         this.addMixinRule("block.redstone_wire", true);
@@ -77,10 +79,12 @@ public class CanaryConfig {
 
         this.addMixinRule("chunk", true);
         this.addMixinRule("chunk.entity_class_groups", true);
-        this.addMixinRule("chunk.no_locking", true);
+        this.addMixinRule("chunk.no_locking", false); //duplicated in Saturn
         this.addMixinRule("chunk.no_validation", true);
         this.addMixinRule("chunk.palette", true);
         this.addMixinRule("chunk.serialization", true);
+        this.addMixinRule("chunk.replace_streams", true);
+        this.addMixinRule("chunk.replace_streams.servercore_compat", true);
 
         this.addMixinRule("collections", true);
         this.addMixinRule("collections.attributes", true);
@@ -116,8 +120,6 @@ public class CanaryConfig {
         this.addMixinRule("gen.cached_generator_settings", false);
         this.addMixinRule("gen.chunk_region", true);
 
-        this.addMixinRule("item", true);
-
         this.addMixinRule("math", true);
         this.addMixinRule("math.fast_blockpos", true);
         this.addMixinRule("math.fast_util", true);
@@ -127,7 +129,6 @@ public class CanaryConfig {
 
         this.addMixinRule("shapes", true);
         this.addMixinRule("shapes.blockstate_cache", true);
-        this.addMixinRule("shapes.lazy_shape_context", true);
         this.addMixinRule("shapes.optimized_matching", true);
         this.addMixinRule("shapes.precompute_shape_arrays", true);
         this.addMixinRule("shapes.shape_merging", true);
@@ -136,12 +137,13 @@ public class CanaryConfig {
         this.addMixinRule("util", true);
         this.addMixinRule("util.accessors", true);
         this.addMixinRule("util.block_entity_retrieval", true);
-        this.addMixinRule("util.block_tracking", true);
+        this.addMixinRule("util.block_tracking", false);
         this.addMixinRule("util.chunk_access", true);
         this.addMixinRule("util.entity_movement_tracking", true);
         this.addMixinRule("util.entity_section_position", true);
         this.addMixinRule("util.inventory_change_listening", true);
         this.addMixinRule("util.inventory_comparator_tracking", true);
+        this.addMixinRule("util.item_stack_tracking", true);
         this.addMixinRule("util.world_border_listener", true);
 
         this.addMixinRule("world", true);

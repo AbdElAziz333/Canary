@@ -1,4 +1,4 @@
-package com.abdelaziz.canary.common.util;
+package com.abdelaziz.canary.common.util.constants;
 
 import net.minecraft.core.Direction;
 

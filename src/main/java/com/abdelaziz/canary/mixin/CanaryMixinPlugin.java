@@ -48,8 +48,11 @@ public class CanaryMixinPlugin implements IMixinConfigPlugin {
             return false;
         }
 
-        //For now disable this until running some tests
-        if (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "shapes.lazy_shape_context") && (FMLLoader.getLoadingModList().getModFileById("the_bumblezone") != null)) {
+        if (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT  + "chunk.replace_streams.servercore_compat") && (FMLLoader.getLoadingModList().getModFileById("servercore")) != null) {
+            return false;
+        }
+
+        if (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT + "entity.hopper_minecart") && (FMLLoader.getLoadingModList().getModFileById("hplus")) != null) {
             return false;
         }
 

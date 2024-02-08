@@ -34,16 +34,12 @@ public abstract class VoxelShapeMixin {
 
     /**
      * @reason Use optimized implementation which delays searching for coordinates as long as possible
-     * @author JellySquid
+     * @author JellySquid, AbdElAziz
      */
     @Overwrite
     public double collideX(AxisCycle cycleDirection, AABB box, double maxDist) {
         if (this.isEmpty()) {
             return maxDist;
-        }
-
-        if (Math.abs(maxDist) < POSITIVE_EPSILON) {
-            return 0.0D;
         }
 
         AxisCycle cycle = cycleDirection.inverse();

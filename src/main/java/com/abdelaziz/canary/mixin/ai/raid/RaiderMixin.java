@@ -1,5 +1,6 @@
 package com.abdelaziz.canary.mixin.ai.raid;
 
+import com.abdelaziz.canary.common.util.constants.RaidConstants;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.raid.Raid;
 import net.minecraft.world.entity.raid.Raider;
@@ -15,23 +16,23 @@ import java.util.function.Predicate;
 
 @Mixin(Raider.class)
 public class RaiderMixin {
-    // The call to Raid#getLeaderBannerInstance() is very expensive, so cache it and re-use it during AI ticking
-    private static final ItemStack CACHED_OMINOUS_BANNER = Raid.getLeaderBannerInstance();
-
     @Mutable
     @Shadow
     @Final
     static Predicate<ItemEntity> ALLOWED_ITEMS;
-//TODO: optimizations 1- redirect in pickup method, 2- cache the value in interface
+
     static {
-        ALLOWED_ITEMS = (itemEntity) -> !itemEntity.hasPickUpDelay() && itemEntity.isAlive() && ItemStack.matches(itemEntity.getItem(), CACHED_OMINOUS_BANNER);
+        ALLOWED_ITEMS = (itemEntity) -> !itemEntity.hasPickUpDelay() && itemEntity.isAlive() && ItemStack.matches(itemEntity.getItem(), RaidConstants.CACHED_OMINOUS_BANNER);
     }
 
     @Redirect(
-            method = "die(Lnet/minecraft/world/damagesource/DamageSource;)V",
+            method = {
+                    "die(Lnet/minecraft/world/damagesource/DamageSource;)V",
+                    "pickUpItem"
+            },
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/raid/Raid;getLeaderBannerInstance()Lnet/minecraft/world/item/ItemStack;")
     )
     private ItemStack getOminousBanner() {
-        return CACHED_OMINOUS_BANNER;
+        return RaidConstants.CACHED_OMINOUS_BANNER;
     }
 }

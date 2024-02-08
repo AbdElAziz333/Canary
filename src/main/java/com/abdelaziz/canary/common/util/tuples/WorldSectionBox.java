@@ -22,22 +22,22 @@ public record WorldSectionBox(Level world, int chunkX1, int chunkY1, int chunkZ1
     //Relevant block box: Entity hitbox expanded to all blocks it touches. Then expand the resulting box by 1 block in each direction.
     //Include all chunk sections that contain blocks inside the expanded box.
     public static WorldSectionBox relevantExpandedBlocksBox(Level world, AABB box) {
-        int minX = SectionPos.posToSectionCoord(Mth.floor(box.minX) - 1);
-        int minY = SectionPos.posToSectionCoord(Mth.floor(box.minY) - 1);
-        int minZ = SectionPos.posToSectionCoord(Mth.floor(box.minZ) - 1);
-        int maxX = SectionPos.posToSectionCoord(Mth.floor(box.maxX) + 1) + 1;
-        int maxY = SectionPos.posToSectionCoord(Mth.floor(box.maxY) + 1) + 1;
-        int maxZ = SectionPos.posToSectionCoord(Mth.floor(box.maxZ) + 1) + 1;
+        int minX = SectionPos.blockToSectionCoord(Mth.floor(box.minX) - 1);
+        int minY = SectionPos.blockToSectionCoord(Mth.floor(box.minY) - 1);
+        int minZ = SectionPos.blockToSectionCoord(Mth.floor(box.minZ) - 1);
+        int maxX = SectionPos.blockToSectionCoord(Mth.floor(box.maxX) + 1) + 1;
+        int maxY = SectionPos.blockToSectionCoord(Mth.floor(box.maxY) + 1) + 1;
+        int maxZ = SectionPos.blockToSectionCoord(Mth.floor(box.maxZ) + 1) + 1;
         return new WorldSectionBox(world, minX, minY, minZ, maxX, maxY, maxZ);
     }
     //Like relevant blocks, but not expanded, because fluids never exceed the 1x1x1 volume of a block
     public static WorldSectionBox relevantFluidBox(Level world, AABB box) {
-        int minX = SectionPos.posToSectionCoord(Mth.floor(box.minX));
-        int minY = SectionPos.posToSectionCoord(Mth.floor(box.minY));
-        int minZ = SectionPos.posToSectionCoord(Mth.floor(box.minZ));
-        int maxX = SectionPos.posToSectionCoord(Mth.floor(box.maxX)) + 1;
-        int maxY = SectionPos.posToSectionCoord(Mth.floor(box.maxY)) + 1;
-        int maxZ = SectionPos.posToSectionCoord(Mth.floor(box.maxZ)) + 1;
+        int minX = SectionPos.blockToSectionCoord(Mth.floor(box.minX));
+        int minY = SectionPos.blockToSectionCoord(Mth.floor(box.minY));
+        int minZ = SectionPos.blockToSectionCoord(Mth.floor(box.minZ));
+        int maxX = SectionPos.blockToSectionCoord(Mth.floor(box.maxX)) + 1;
+        int maxY = SectionPos.blockToSectionCoord(Mth.floor(box.maxY)) + 1;
+        int maxZ = SectionPos.blockToSectionCoord(Mth.floor(box.maxZ)) + 1;
         return new WorldSectionBox(world, minX, minY, minZ, maxX, maxY, maxZ);
     }
 
@@ -46,11 +46,11 @@ public record WorldSectionBox(Level world, int chunkX1, int chunkY1, int chunkZ1
     }
 
     public boolean matchesRelevantBlocksBox(AABB box) {
-        return SectionPos.posToSectionCoord(Mth.floor(box.minX) - 1) == this.chunkX1 &&
-                SectionPos.posToSectionCoord(Mth.floor(box.minY) - 1) == this.chunkY1 &&
-                SectionPos.posToSectionCoord(Mth.floor(box.minZ) - 1) == this.chunkZ1 &&
-                SectionPos.posToSectionCoord(Mth.ceil(box.maxX) + 1) + 1 == this.chunkX2 &&
-                SectionPos.posToSectionCoord(Mth.ceil(box.maxY) + 1) + 1 == this.chunkY2 &&
-                SectionPos.posToSectionCoord(Mth.ceil(box.maxZ) + 1) + 1 == this.chunkZ2;
+        return SectionPos.blockToSectionCoord(Mth.floor(box.minX) - 1) == this.chunkX1 &&
+                SectionPos.blockToSectionCoord(Mth.floor(box.minY) - 1) == this.chunkY1 &&
+                SectionPos.blockToSectionCoord(Mth.floor(box.minZ) - 1) == this.chunkZ1 &&
+                SectionPos.blockToSectionCoord(Mth.ceil(box.maxX) + 1) + 1 == this.chunkX2 &&
+                SectionPos.blockToSectionCoord(Mth.ceil(box.maxY) + 1) + 1 == this.chunkY2 &&
+                SectionPos.blockToSectionCoord(Mth.ceil(box.maxZ) + 1) + 1 == this.chunkZ2;
     }
 }

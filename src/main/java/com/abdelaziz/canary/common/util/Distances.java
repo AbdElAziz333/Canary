@@ -4,10 +4,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 
 public class Distances {
-
     public static double getMinChunkToBlockDistanceL2Sq(BlockPos origin, int chunkX, int chunkZ) {
-        int chunkMinX = SectionPos.blockToSectionCoord(chunkX);
-        int chunkMinZ = SectionPos.blockToSectionCoord(chunkZ);
+        int chunkMinX = SectionPos.sectionToBlockCoord(chunkX);
+        int chunkMinZ = SectionPos.sectionToBlockCoord(chunkZ);
 
         int xDistance = origin.getX() - chunkMinX;
         if (xDistance > 0) {
