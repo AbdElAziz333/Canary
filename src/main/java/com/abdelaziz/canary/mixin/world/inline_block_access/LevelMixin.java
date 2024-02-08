@@ -43,15 +43,4 @@ public abstract class LevelMixin implements LevelHeightAccessor {
         return section.getBlockState(x & 15, y & 15, z & 15);
         //This code path is slower than with the extra world height limit check. Tradeoff in favor of the default path.
     }
-
-    @Redirect(
-            method = "getFluidState",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/level/Level;isOutsideBuildHeight(Lnet/minecraft/core/BlockPos;)Z"
-            )
-    )
-    private boolean skipFluidHeightLimitTest(Level world, BlockPos pos) {
-        return world.isOutsideBuildHeight(pos);
-    }
 }
